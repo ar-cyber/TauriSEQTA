@@ -19,6 +19,8 @@ pub struct HomeworkResponse {
     pub status: String,
 }
 
+// This function provides a method to make GET requests to a specified URL with optional parameters.
+// It takes a URL and a Hashmap of parameters as an input, and returns a result containing response data or an error.
 fn create_client() -> reqwest::Client {
     reqwest::Client::builder()
         .default_headers({
