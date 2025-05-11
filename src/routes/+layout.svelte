@@ -1,38 +1,68 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/core';
+	import { onMount } from 'svelte';
 	import '../app.css';
-	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2x2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
-	
-	async function getAPIData(url: string, parameters: Map<string, string>) { // Send a GET request to a url with parameters
-		// Takes a url string and a map (dictionary) of key value pairs
-		let message = await invoke('get_api_data', {url: url, parameters: Object.fromEntries(parameters)}).then((message) => {return message});
-		return await message;
+	import {
+		Icon,
+		Home,
+		Newspaper,
+		UserGroup,
+		ClipboardDocumentList,
+		BookOpen,
+		Squares2x2,
+		ChatBubbleLeftRight,
+		DocumentText,
+		AcademicCap,
+		Bell,
+		RectangleStack,
+		ChartBar,
+		Cog6Tooth,
+		CalendarDays
+	} from 'svelte-hero-icons';
+
+	let needsSetup = false;
+	let seqtaUrl = '';
+
+	onMount(async () => {
+		try {
+			needsSetup = !(await invoke<boolean>('check_session_exists'));
+		} catch (e) {
+			console.error('Unable to check session', e);
+			needsSetup = true;
+		}
+	});
+
+	async function startLogin() {
+		if (!seqtaUrl) return;
+		await invoke('create_login_window', { url: seqtaUrl });
+
+		// Poll every 1.5 s until the cookie is saved (login window closes itself)
+		const timer = setInterval(async () => {
+			needsSetup = !(await invoke<boolean>('check_session_exists'));
+			if (!needsSetup) clearInterval(timer);
+		}, 1500);
 	}
 
-	async function postAPIData(url: string, data: Map<string, string>) { // Send a POST request to a URL with data in the form of JSON
-		// Takes a url string and a map (dictionary) of key value pairs
-		let message = await invoke('post_api_data', {url: url, data: Object.fromEntries(data)}).then((message) => {return message});
-		return await message;
+	async function getAPIData(url: string, parameters: Map<string, string>) {
+		return await invoke('get_api_data', { url, parameters: Object.fromEntries(parameters) });
 	}
 
-	async function loop() { // test loop to check if Rust API is working, loops every second
+	async function postAPIData(url: string, data: Map<string, string>) {
+		return await invoke('post_api_data', { url, data: Object.fromEntries(data) });
+	}
+
+	async function loop() {
 		while (true) {
-
-			await new Promise(resolve => setTimeout(resolve, 1000));
-			let map1 = new Map<string, string>();
-			map1.set("hi", "hi");
-
-			let data = await getAPIData('https://httpbin.org/ip', map1).then((data) => {
-				return data
-			});
-
+			await new Promise((r) => setTimeout(r, 1000));
+			const map1 = new Map<string, string>();
+			map1.set('hi', 'hi');
+			const data = await getAPIData('https://httpbin.org/ip', map1);
 			console.log(data);
 		}
 	}
-
 	loop();
 
-	// Sidebar menu items
+	/* Sidebar menu items */
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
 		{ label: 'News', icon: Newspaper, path: '/news' },
@@ -52,29 +82,69 @@
 </script>
 
 <div class="h-screen" style="background: var(--background); color: var(--text);">
-
 	<!-- Top Bar -->
 	<header class="fixed top-0 left-0 right-0 h-12" style="background: var(--surface); color: var(--text);">
 		<span class="font-bold text-lg tracking-wide px-8">TauriSEQTA</span>
 	</header>
+
 	<div class="flex pt-12 h-full">
 		<!-- Sidebar -->
-		<aside class="w-64 flex flex-col py-6 overflow-y-scroll px-2 space-y-2 h-full" style="background: var(--surface); color: var(--text);">
+		<aside
+			class="w-64 flex flex-col py-6 overflow-y-scroll px-2 space-y-2 h-full"
+			style="background: var(--surface); color: var(--text);"
+		>
 			{#each menu as item}
 				<a href={item.path} class="flex items-center px-4 py-3 rounded hover:bg-[color:var(--surface-alt)] transition group">
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
 					<span class="font-bold text-base">{item.label}</span>
 					{#if item.hasSub}
-						<svg class="ml-auto w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+						<svg
+							class="ml-auto w-4 h-4"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							viewBox="0 0 24 24"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+						</svg>
 					{/if}
 				</a>
 			{/each}
 		</aside>
+
 		<!-- Main Content -->
-		<div class="flex-1 p-8 h-full overflow-y-scroll w-full" style="background: var(--background); color: var(--text);">
-			<main class="max-w-7xl mx-auto">
-				<slot />
-			</main>
+		<div
+			class="flex-1 p-8 h-full overflow-y-scroll w-full"
+			style="background: var(--background); color: var(--text);"
+		>
+			<main class="max-w-7xl mx-auto"><slot /></main>
 		</div>
 	</div>
+
+	<!-- First‑run overlay -->
+	{#if needsSetup}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-[26rem] max-w-full space-y-5">
+				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
+				<p class="text-sm" style="color: var(--text-muted);">
+					Enter the full URL to your school’s SEQTA page, then sign in in the window that opens. We’ll
+					securely save your session cookie.
+				</p>
+				<input
+					type="text"
+					bind:value={seqtaUrl}
+					placeholder="https://schoolname.seqta.com"
+					class="w-full px-3 py-2 rounded-lg border outline-none focus:ring"
+					style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
+				/>
+				<button
+					on:click={startLogin}
+					class="w-full py-2 rounded-lg font-semibold hover:scale-[1.02] transition"
+					style="background: #2563eb; color: white;"
+				>
+					Sign in
+				</button>
+			</div>
+		</div>
+	{/if}
 </div> 

@@ -1,17 +1,107 @@
 #[path = "utils/netgrab.rs"]
 mod netgrab;
+#[path = "utils/session.rs"]
+mod session;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use tauri::Manager;
+
+/// Boilerplate example command
 #[tauri::command]
-fn greet(name: &str) -> String { // Boilerplate default stuff from Tauri, unused
+fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+/// True if a saved login session exists.
+#[tauri::command]
+fn check_session_exists() -> bool {
+    session::Session::exists()
+}
+
+/// Persist the SEQTA `base_url` and `JSESSIONID`.
+#[tauri::command]
+fn save_session(base_url: String, jsessionid: String) -> Result<(), String> {
+    session::Session { base_url, jsessionid }
+        .save()
+        .map_err(|e| e.to_string())
+}
+
+/// Open a login window and harvest the cookie once the user signs in.
+#[tauri::command]
+async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), String> {
+    use tauri::{WebviewWindowBuilder, WebviewUrl};
+    use tokio::time::{sleep, Duration};
+
+    // Spawn the login window
+    WebviewWindowBuilder::new(
+        &app, 
+        "seqta_login", 
+        WebviewUrl::External(url.parse().map_err(|e| format!("Invalid URL: {}", e))?)
+    )
+        .title("SEQTA Login")
+        .inner_size(900.0, 700.0)
+        .build()
+        .map_err(|e| format!("Failed to build window: {}", e))?;
+
+    // Clone handles for async block
+    let app_handle_clone = app.clone();
+
+    // Start polling in a background task
+    tauri::async_runtime::spawn(async move {
+        for _ in 0..30 { // Poll for 30 seconds max
+            // Wait 1 second between polls
+            sleep(Duration::from_secs(1)).await;
+
+            // Try to get cookies from the login window
+            if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
+                match webview.cookies() {
+                    Ok(cookies) => {
+                        println!("Cookies: {:?}", cookies);
+                        for cookie in cookies {
+                            if cookie.name() == "JSESSIONID" {
+                                let value = cookie.value().to_string();
+                                let base_url = url.clone(); // Or extract origin from URL if needed
+
+                                // Save session
+                                let session = crate::session::Session {
+                                    base_url,
+                                    jsessionid: value,
+                                };
+
+                                if let Err(err) = session.save() {
+                                    eprintln!("Failed to save session: {}", err);
+                                }
+
+                                // Close login window
+                                let _ = webview.close();
+                                return; // Stop polling once found
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        eprintln!("Error retrieving cookies: {}", err);
+                    }
+                }
+            }
+        }
+
+        eprintln!("JSESSIONID not found within timeout");
+    });
+
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default() // Build the Tauri app and its exposed methods
+    tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, netgrab::get_api_data, netgrab::post_api_data])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            netgrab::get_api_data,
+            netgrab::post_api_data,
+            check_session_exists,
+            save_session,
+            create_login_window
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
