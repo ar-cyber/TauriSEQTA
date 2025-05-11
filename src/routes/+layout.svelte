@@ -3,17 +3,19 @@
 	import '../app.css';
 	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2x2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
 	
-	async function getAPIData(url: string, parameters: Map<string, string>) {
+	async function getAPIData(url: string, parameters: Map<string, string>) { // Send a GET request to a url with parameters
+		// Takes a url string and a map (dictionary) of key value pairs
 		let message = await invoke('get_api_data', {url: url, parameters: Object.fromEntries(parameters)}).then((message) => {return message});
 		return await message;
 	}
 
-	async function postAPIData(url: string, data: Map<string, string>) {
+	async function postAPIData(url: string, data: Map<string, string>) { // Send a POST request to a URL with data in the form of JSON
+		// Takes a url string and a map (dictionary) of key value pairs
 		let message = await invoke('post_api_data', {url: url, data: Object.fromEntries(data)}).then((message) => {return message});
 		return await message;
 	}
 
-	async function loop() {
+	async function loop() { // test loop to check if Rust API is working, loops every second
 		while (true) {
 
 			await new Promise(resolve => setTimeout(resolve, 1000));
