@@ -2,14 +2,33 @@
 	import { invoke } from '@tauri-apps/api/core';
 	import '../app.css';
 	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2x2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
-    import { get } from 'svelte/store';
 	
-	async function getAPIData() {
-		let message = await invoke('grab_api_data', {url: "https://httpbin.org/ip"}).then((message) => {return message});
+	async function getAPIData(url: string, parameters: Map<string, string>) {
+		let message = await invoke('get_api_data', {url: url, parameters: Object.fromEntries(parameters)}).then((message) => {return message});
 		return await message;
 	}
 
-	let apidata = $state(getAPIData());
+	async function postAPIData(url: string, data: Map<string, string>) {
+		let message = await invoke('post_api_data', {url: url, data: Object.fromEntries(data)}).then((message) => {return message});
+		return await message;
+	}
+
+	async function loop() {
+		while (true) {
+
+			await new Promise(resolve => setTimeout(resolve, 1000));
+			let map1 = new Map<string, string>();
+			map1.set("hi", "hi");
+
+			let data = await getAPIData('https://httpbin.org/ip', map1).then((data) => {
+				return data
+			});
+
+			console.log(data);
+		}
+	}
+
+	loop();
 
 	// Sidebar menu items
 	const menu = [
@@ -31,13 +50,6 @@
 </script>
 
 <div class="min-h-screen" style="background: var(--background); color: var(--text);">
-	{#await apidata}
-		<p>Loading...</p>
-	{:then message}
-		<p>{JSON.stringify(message)}</p>
-	{:catch error}
-		<p>Error: {error.message}</p>
-	{/await}
 
 	<!-- Top Bar -->
 	<header class="fixed top-0 left-0 right-0 h-12" style="background: var(--surface); color: var(--text);">
