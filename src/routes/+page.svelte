@@ -1,156 +1,79 @@
-<script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
+<script>
+	// Placeholder data for dashboard
+	const integrations = [
+		{ name: 'Outlook', icon: '📅' },
+		{ name: 'Office365', icon: '🏢' },
+		{ name: 'Google', icon: '🌐' }
+	];
 
-  let name = $state("");
-  let greetMsg = $state("");
+	const lessons = [];
 
-  async function greet(event: Event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
-  }
+	const assessments = [
+		{
+			date: 'Tomorrow',
+			day: 'Monday 12 May',
+			title: 'TauriSEQTA',
+			subject: 'Year 10 sss'
+		}
+	];
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
+<div class="space-y-6">
+	<!-- Integrations -->
+	<div class="flex gap-6">
+		{#each integrations as integration}
+			<div
+				class="flex-1 flex items-center justify-center py-4 shadow text-lg font-semibold"
+				style="background: var(--surface); color: var(--text); border-radius: 1rem;"
+			>
+				<span class="text-2xl mr-2">{integration.icon}</span> {integration.name}
+			</div>
+		{/each}
+	</div>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
+	<!-- Today's Lessons -->
+	<div style="background: var(--surface); border-radius: 1rem;" class="shadow p-0">
+		<div class="px-6 py-3 border-b flex items-center justify-between rounded-t-2xl" style="border-color: var(--surface-alt);">
+			<span style="color: var(--text);" class="font-semibold text-lg">Today's Lessons</span>
+			<div class="flex gap-2">
+				<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[color:var(--surface-alt)]" style="color: var(--text);">&#60;</button>
+				<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[color:var(--surface-alt)]" style="color: var(--text);">&#62;</button>
+			</div>
+		</div>
+		<div class="flex flex-col items-center justify-center py-12">
+			<div style="background: var(--background); color: var(--surface);" class="rounded-full w-24 h-24 flex items-center justify-center mb-4">
+				<span class="text-6xl">Q</span>
+			</div>
+			<p style="color: var(--text);" class="text-2xl">No lessons available.</p>
+		</div>
+	</div>
 
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
-  </form>
-  <p>{greetMsg}</p>
-</main>
-
-<style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
-
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
-
-</style>
+	<!-- Upcoming Assessments -->
+	<div style="background: var(--surface); border-radius: 1rem;" class="shadow p-0">
+		<div class="px-6 py-3 border-b flex items-center justify-between rounded-t-2xl" style="border-color: var(--surface-alt);">
+			<span style="color: var(--text);" class="font-semibold text-lg">Upcoming Assessments</span>
+			<div class="flex gap-2 flex-wrap">
+				{#each ['10COM','10EIF','10ESH1','10FOH1','10HSY'] as className}
+					<span style="background: var(--surface-alt); color: var(--text);" class="text-xs px-3 py-1 rounded-full">{className}</span>
+				{/each}
+			</div>
+		</div>
+		<div class="space-y-4 p-6">
+			{#each assessments as a}
+				<div style="background: var(--surface-alt); border: 1px solid var(--surface-alt);" class="rounded-xl p-4 flex items-center gap-4">
+					<div style="background: var(--background); color: var(--surface);" class="rounded-lg w-16 h-16 flex items-center justify-center">
+						<span class="text-3xl">📄</span>
+					</div>
+					<div class="flex-1">
+						<div style="color: var(--text);" class="font-bold text-lg">{a.date}</div>
+						<div style="color: var(--text-muted);" class="text-sm">{a.day}</div>
+						<div class="mt-2">
+							<span class="block text-xs font-semibold uppercase" style="color: var(--text-muted);">{a.subject}</span>
+							<span class="block text-base font-semibold" style="color: var(--text);">{a.title}</span>
+						</div>
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
+</div>
