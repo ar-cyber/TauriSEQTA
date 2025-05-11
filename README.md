@@ -33,10 +33,6 @@
 - Grades calculator
 - Fully customisable themes and an official theme store
 - Notification for next lesson (sent 5 minutes before end of the lesson)
-- Browser Support
-  - Chrome, Edge, Brave, Opera and other Chromium-Based browsers are supported
-  - Firefox Supported: [here](https://addons.mozilla.org/en-US/firefox/addon/betterseqta-plus/)!
-  - Safari (Experimental and not recommended - only available via compilation)
 
 ## Creating Custom Themes
 
