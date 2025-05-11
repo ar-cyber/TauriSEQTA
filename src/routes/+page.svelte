@@ -1,3 +1,4 @@
+
 <script>
 	// Placeholder data for dashboard
 	const integrations = [

@@ -1,23 +1,9 @@
 use reqwest;
 use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
 
-const JSESSIONID: &str = "token here";
-const BASE_URL: &str = "https://domain.com";
+const JSESSIONID: &str = "";
+const BASE_URL: &str = "";
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HomeworkItem {
-    pub meta: i32,
-    pub id: i32,
-    pub title: String,
-    pub items: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HomeworkResponse {
-    pub payload: Vec<HomeworkItem>,
-    pub status: String,
-}
 
 // This function provides a method to make GET requests to a specified URL with optional parameters.
 // It takes a URL and a Hashmap of parameters as an input, and returns a result containing response data or an error.
@@ -58,18 +44,18 @@ fn create_client() -> reqwest::Client {
 // This function provides a method to make GET requests to a specified URL with optional parameters.
 // It takes a URL and a Hashmap of parameters as an input, and returns a result containing response data or an error.
 #[tauri::command]
-pub async fn get_api_data(url: &str, parameters: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
-    let client = reqwest::Client::new();
-    match client.get(url)
+pub async fn get_api_data(url: &str, parameters: HashMap<String, String>) -> Result<String, String> {
+    let client = create_client(); // Create a new HTTP client with custom headers
+    let full_url = if url.starts_with("http") {
+        url.to_string()
+    } else {
+        format!("{}{}", BASE_URL, url)
+    };
+    match client.get(&full_url) // Create a GET request with the URL
     .query(&parameters) // Apply parameters
     .send() // Send
     .await {
-        Ok(response) => {
-            match response.json::<HashMap<String, String>>().await { // Check if its json
-                Ok(data) => Ok(data), // return the json data
-                Err(e) => Err(format!("Failed to parse JSON: {}", e)), // otherwise error out (might change in the future)
-            }
-        },
+        Ok(response) => Ok(format!("{}", response.text().await.unwrap_or_else(|_| "Failed to read response".to_string()))), // Return the response text
         Err(e) => Err(format!("HTTP request failed: {}", e)) // Something happened with the request, bailing out
     }
 }
@@ -78,18 +64,21 @@ pub async fn get_api_data(url: &str, parameters: HashMap<String, String>) -> Res
 // JSON Body is specified through a HashMap containing key value pairs
 // Result is the response data or an error.
 #[tauri::command]
-pub async fn post_api_data(url: &str, data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
-    let client = reqwest::Client::new();
-    match client.get(url)
+pub async fn post_api_data(url: &str, data: HashMap<String, String>, parameters: HashMap<String, String>) -> Result<String, String> {
+    let client = create_client(); // Create a new HTTP client with custom headers
+
+    let full_url = if url.starts_with("http") {
+        url.to_string()
+    } else {
+        format!("{}{}", BASE_URL, url)
+    };
+
+    match client.post(&full_url)
     .json(&data) // Add the HashMap as JSON body
+    .query(&parameters) // Apply parameters
     .send()
     .await {
-        Ok(response) => {
-            match response.json::<HashMap<String, String>>().await { // Check if it's json
-                Ok(data) => Ok(data), // return the json data
-                Err(e) => Err(format!("Failed to parse JSON: {}", e)), // otherwise error out (might change in the future)
-            }
-        },
+        Ok(response) => Ok(format!("{}", response.text().await.unwrap_or_else(|_| "Failed to read response".to_string()))), // Return the response text
         Err(e) => Err(format!("HTTP request failed: {}", e)) // Bailing out because something happened in HTTP
     }
 }
