@@ -25,6 +25,15 @@ fn save_session(base_url: String, jsessionid: String) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn logout() -> bool {
+    if let Ok(_) = crate::session::Session::clear() {
+        true
+    } else {
+        false
+    }
+}
+
 /// Open a login window and harvest the cookie once the user signs in.
 #[tauri::command]
 async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), String> {
@@ -100,7 +109,8 @@ pub fn run() {
             netgrab::post_api_data,
             check_session_exists,
             save_session,
-            create_login_window
+            create_login_window,
+            logout
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
