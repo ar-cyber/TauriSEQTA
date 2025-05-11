@@ -56,8 +56,17 @@ pub async fn get_api_data(
     url: &str,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    let client = create_client();
-    match client.get(url).query(&parameters).send().await {
+    let client = create_client(); // Create a new HTTP client with custom headers
+    
+    let session = Session::load();
+    
+    let full_url = if url.starts_with("http") {
+        url.to_string()
+    } else {
+        format!("{}{}", session.base_url.parse::<String>().unwrap(), url)
+    };
+
+    match client.get(full_url).query(&parameters).send().await {
         Ok(resp) => Ok(format!("{}", resp.text().await.unwrap())),
         Err(e) => Err(format!("HTTP request failed: {e}")),
     }
@@ -67,10 +76,24 @@ pub async fn get_api_data(
 pub async fn post_api_data(
     url: &str,
     data: HashMap<String, String>,
+    parameters: HashMap<String, String>
 ) -> Result<String, String> {
     let client = create_client();
-    match client.post(url).json(&data).send().await {
-        Ok(resp) => Ok(format!("{}", resp.text().await.unwrap())),
+
+    let session = Session::load();
+    
+    let full_url = if url.starts_with("http") {
+        url.to_string()
+    } else {
+        format!("{}{}", session.base_url.parse::<String>().unwrap(), url)
+    };
+
+    match client.post(full_url).json(&data).query(&parameters).send().await {
+        Ok(resp) => {
+            let response = resp.text().await.unwrap();
+            println!("{}", response);
+            Ok(format!("{}", response))
+        },
         Err(e) => Err(format!("HTTP request failed: {e}")),
     }
 }
