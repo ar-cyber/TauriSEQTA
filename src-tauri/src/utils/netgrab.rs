@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 #[tauri::command]
 pub async fn grab_api_data(url: &str) -> Result<HashMap<String, String>, String> {
-    match reqwest::get("https://httpbin.org/ip").await {
+    match reqwest::get(url).await {
         Ok(resp) => {
             match resp.json::<HashMap<String, String>>().await {
                 Ok(data) => Ok(data),

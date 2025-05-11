@@ -1,8 +1,16 @@
-<script>
+<script lang="ts">
 	import { invoke } from '@tauri-apps/api/core';
 	import '../app.css';
 	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2x2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
-	invoke('grab_api_data', {url: "hi"}).then((message) => console.log(message));
+    import { get } from 'svelte/store';
+	
+	async function getAPIData() {
+		let message = await invoke('grab_api_data', {url: "https://httpbin.org/ip"}).then((message) => {return message});
+		return await message;
+	}
+
+	let apidata = $state(getAPIData());
+
 	// Sidebar menu items
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -23,6 +31,14 @@
 </script>
 
 <div class="min-h-screen" style="background: var(--background); color: var(--text);">
+	{#await apidata}
+		<p>Loading...</p>
+	{:then message}
+		<p>{JSON.stringify(message)}</p>
+	{:catch error}
+		<p>Error: {error.message}</p>
+	{/await}
+
 	<!-- Top Bar -->
 	<header class="fixed top-0 left-0 right-0 h-12" style="background: var(--surface); color: var(--text);">
 		<span class="font-bold text-lg tracking-wide px-8">TauriSEQTA</span>
