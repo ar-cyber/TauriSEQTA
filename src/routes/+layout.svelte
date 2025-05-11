@@ -1,7 +1,8 @@
 <script>
+	import { invoke } from '@tauri-apps/api/core';
 	import '../app.css';
-	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2X2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
-
+	import { Icon, Home, Newspaper, UserGroup, ClipboardDocumentList, BookOpen, Squares2x2, ChatBubbleLeftRight, DocumentText, AcademicCap, Bell, RectangleStack, ChartBar, Cog6Tooth, CalendarDays } from 'svelte-hero-icons';
+	invoke('grab_api_data', {url: "hi"}).then((message) => console.log(message));
 	// Sidebar menu items
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -9,7 +10,7 @@
 		{ label: 'Welcome', icon: UserGroup, path: '/welcome' },
 		{ label: 'Assessments', icon: ClipboardDocumentList, hasSub: true, path: '/assessments' },
 		{ label: 'Courses', icon: BookOpen, hasSub: true, path: '/courses' },
-		{ label: 'Dashboard', icon: Squares2X2, path: '/dashboard' },
+		{ label: 'Dashboard', icon: Squares2x2, path: '/dashboard' },
 		{ label: 'Direqt Messages', icon: ChatBubbleLeftRight, path: '/direqt-messages' },
 		{ label: 'Documents', icon: DocumentText, path: '/documents' },
 		{ label: 'myEdOnline', icon: AcademicCap, path: '/myedonline' },
