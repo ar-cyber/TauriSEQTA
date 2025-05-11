@@ -55,13 +55,10 @@ fn create_client() -> reqwest::Client {
 pub async fn get_api_data(
     url: &str,
     parameters: HashMap<String, String>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<String, String> {
     let client = create_client();
     match client.get(url).query(&parameters).send().await {
-        Ok(resp) => resp
-            .json::<HashMap<String, String>>()
-            .await
-            .map_err(|e| format!("Failed to parse JSON: {e}")),
+        Ok(resp) => Ok(format!("{}", resp.text().await.unwrap())),
         Err(e) => Err(format!("HTTP request failed: {e}")),
     }
 }
@@ -70,13 +67,10 @@ pub async fn get_api_data(
 pub async fn post_api_data(
     url: &str,
     data: HashMap<String, String>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<String, String> {
     let client = create_client();
     match client.post(url).json(&data).send().await {
-        Ok(resp) => resp
-            .json::<HashMap<String, String>>()
-            .await
-            .map_err(|e| format!("Failed to parse JSON: {e}")),
+        Ok(resp) => Ok(format!("{}", resp.text().await.unwrap())),
         Err(e) => Err(format!("HTTP request failed: {e}")),
     }
 }
