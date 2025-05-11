@@ -140,3 +140,6 @@ src-tauri/target
 
 
 yarn.lock
+
+build/
+.svelte-kit/
