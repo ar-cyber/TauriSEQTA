@@ -62,6 +62,13 @@
 	}
 	loop();
 
+	async function handleLogout() {
+		const success = await invoke('logout');
+		if (success) {
+			needsSetup = true;
+		}
+	}
+
 	/* Sidebar menu items */
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -83,8 +90,17 @@
 
 <div class="h-screen" style="background: var(--background); color: var(--text);">
 	<!-- Top Bar -->
-	<header class="fixed top-0 left-0 right-0 h-12" style="background: var(--surface); color: var(--text);">
-		<span class="font-bold text-lg tracking-wide px-8">TauriSEQTA</span>
+	<header class="fixed top-0 left-0 right-0 h-12 flex justify-between items-center px-8" style="background: var(--surface); color: var(--text);">
+		<span class="font-bold text-lg tracking-wide">TauriSEQTA</span>
+		{#if !needsSetup}
+			<button 
+				on:click={handleLogout}
+				class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
+				style="background: var(--surface-alt); color: var(--text);"
+			>
+				Logout
+			</button>
+		{/if}
 	</header>
 
 	<div class="flex pt-12 h-full">
@@ -127,7 +143,7 @@
 			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-[26rem] max-w-full space-y-5">
 				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
 				<p class="text-sm" style="color: var(--text-muted);">
-					Enter the full URL to your school’s SEQTA page, then sign in in the window that opens. We’ll
+					Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll
 					securely save your session cookie.
 				</p>
 				<input

@@ -5,9 +5,9 @@ use std::{
     path::PathBuf,
 };
 
-/// Location: `$DATA_DIR/TauriSEQTA/session.json`
+/// Location: `$DATA_DIR/TauriSEQTA/session.json`
 fn session_file() -> PathBuf {
-    // e.g. %APPDATA%/TauriSEQTA on Windows, ~/.local/share/TauriSEQTA on Linux/macOS
+    // e.g. %APPDATA%/TauriSEQTA on Windows, ~/.local/share/TauriSEQTA on Linux/macOS
     let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
     dir.push("TauriSEQTA");
     if !dir.exists() {
@@ -17,7 +17,7 @@ fn session_file() -> PathBuf {
     dir
 }
 
-/// Saved session state.
+/// Saved session state.
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Session {
     pub base_url: String,
@@ -25,7 +25,7 @@ pub struct Session {
 }
 
 impl Session {
-    /// Load from disk; returns empty/default if none.
+    /// Load from disk; returns empty/default if none.
     pub fn load() -> Self {
         let path = session_file();
         if let Ok(mut file) = fs::File::open(path) {
@@ -45,9 +45,18 @@ impl Session {
         fs::write(path, serde_json::to_string(self).unwrap())
     }
 
-    /// True if both URL and cookie are present.
+    /// True if both URL and cookie are present.
     pub fn exists() -> bool {
         let s = Self::load();
         !(s.base_url.is_empty() || s.jsessionid.is_empty())
+    }
+
+    /// Clear the session data and remove the file
+    pub fn clear() -> io::Result<()> {
+        let path = session_file();
+        if path.exists() {
+            fs::remove_file(path)?;
+        }
+        Ok(())
     }
 }
