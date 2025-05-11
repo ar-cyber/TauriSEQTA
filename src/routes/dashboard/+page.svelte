@@ -23,12 +23,13 @@
             loading = true;
             error = null;
             console.log('Making POST request to homework endpoint...');
-            const response = await invoke<HomeworkResponse>('post_api_data', {
-                url: '/seqta/student/dashlet/summary/homework?majhvjju=',
+            const response = await invoke<string>('post_api_data', {
+                url: '/seqta/student/dashlet/summary/homework',
+                parameters: {"majhvjju": ""},
                 data: {}  // Empty object since we're just making a POST request without data
             });
             console.log('Raw response:', response);
-            homeworkData = response;
+            homeworkData = JSON.parse(response);
         } catch (e) {
             console.error('Error details:', e);
             error = e.toString();
