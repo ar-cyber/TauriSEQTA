@@ -2,8 +2,6 @@ use reqwest;
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 const JSESSIONID: &str = "token here";
 const BASE_URL: &str = "https://domain.com";
 
@@ -21,6 +19,8 @@ pub struct HomeworkResponse {
     pub status: String,
 }
 
+// This function provides a method to make GET requests to a specified URL with optional parameters.
+// It takes a URL and a Hashmap of parameters as an input, and returns a result containing response data or an error.
 fn create_client() -> reqwest::Client {
     reqwest::Client::builder()
         .default_headers({
@@ -53,34 +53,12 @@ fn create_client() -> reqwest::Client {
         })
         .build()
         .expect("Failed to create HTTP client")
-=======
-=======
->>>>>>> 1343239473333a877135872173eedaa9e3a06e49
-// This function provides a method to make GET requests to a specified URL with optional parameters.
-// It takes a URL and a Hashmap of parameters as an input, and returns a result containing response data or an error.
-#[tauri::command]
-pub async fn get_api_data(url: &str, parameters: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
-    let client = reqwest::Client::new();
-    match client.get(url)
-    .query(&parameters) // Apply parameters
-    .send() // Send
-    .await {
-        Ok(response) => {
-            match response.json::<HashMap<String, String>>().await { // Check if its json
-                Ok(data) => Ok(data), // return the json data
-                Err(e) => Err(format!("Failed to parse JSON: {}", e)), // otherwise error out (might change in the future)
-            }
-        },
-        Err(e) => Err(format!("HTTP request failed: {}", e)) // Something happened with the request, bailing out
-    }
->>>>>>> 1343239473333a877135872173eedaa9e3a06e49
 }
 
 // This function provides a method to make POST requests to a specified URL with a JSON body, specified through a Hashmap.
 // JSON Body is specified through a HashMap containing key value pairs
 // Result is the response data or an error.
 #[tauri::command]
-<<<<<<< HEAD
 pub async fn get_api_data(url: &str, parameters: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
     println!("GET request to URL: {}", url);
     println!("Parameters: {:?}", parameters);
@@ -152,20 +130,4 @@ pub async fn post_api_data(url: &str, data: HashMap<String, String>) -> Result<H
             },
             Err(e) => Err(format!("HTTP request failed: {}", e))
         }
-=======
-pub async fn post_api_data(url: &str, data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
-    let client = reqwest::Client::new();
-    match client.get(url)
-    .json(&data) // Add the HashMap as JSON body
-    .send()
-    .await {
-        Ok(response) => {
-            match response.json::<HashMap<String, String>>().await { // Check if it's json
-                Ok(data) => Ok(data), // return the json data
-                Err(e) => Err(format!("Failed to parse JSON: {}", e)), // otherwise error out (might change in the future)
-            }
-        },
-        Err(e) => Err(format!("HTTP request failed: {}", e)) // Bailing out because something happened in HTTP
-    }
->>>>>>> 1343239473333a877135872173eedaa9e3a06e49
 }
