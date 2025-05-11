@@ -81,6 +81,10 @@ pub async fn post_api_data(
     let client = create_client();
 
     let session = Session::load();
+
+    println!("{}", session.base_url.parse::<String>().unwrap());
+    println!("{}", url);
+    println!("{}{}", session.base_url.parse::<String>().unwrap(), url);
     
     let full_url = if url.starts_with("http") {
         url.to_string()

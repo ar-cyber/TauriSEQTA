@@ -25,8 +25,8 @@
             console.log('Making POST request to homework endpoint...');
             const response = await invoke<string>('post_api_data', {
                 url: '/seqta/student/dashlet/summary/homework',
-                parameters: {"majhvjju": ""},
-                data: {}  // Empty object since we're just making a POST request without data
+                data: {},  // Empty object since we're just making a POST request without data
+                parameters: {"majhvjju": ""}
             });
             console.log('Raw response:', response);
             homeworkData = JSON.parse(response);
