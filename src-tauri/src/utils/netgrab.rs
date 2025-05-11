@@ -82,9 +82,7 @@ pub async fn post_api_data(
 
     let session = Session::load();
 
-    println!("{}", session.base_url.parse::<String>().unwrap());
-    println!("{}", url);
-    println!("{}{}", session.base_url.parse::<String>().unwrap(), url);
+    // TO FIX: ensure that the account being logged in is a school/student account, not personal email
     
     let full_url = if url.starts_with("http") {
         url.to_string()
