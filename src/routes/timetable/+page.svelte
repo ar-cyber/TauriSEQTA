@@ -94,7 +94,6 @@ onMount(loadLessons);
       <span class="text-xl font-bold">{weekRangeLabel()}</span>
       <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--background)]" on:click={nextWeek}>&#62;</button>
     </div>
-    <span class="text-lg font-semibold">Cardijn College Timetable</span>
   </div>
 
   <div class="flex-1 flex items-stretch overflow-auto h-0">
