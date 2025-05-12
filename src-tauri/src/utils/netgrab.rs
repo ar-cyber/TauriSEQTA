@@ -30,10 +30,24 @@ fn create_client() -> reqwest::Client {
     let session = Session::load();
     let mut headers = reqwest::header::HeaderMap::new();
 
+    // Build the complete cookie string with JSESSIONID and additional cookies
+    let mut cookie_parts = Vec::new();
+    
+    // Add JSESSIONID first if it exists
     if !session.jsessionid.is_empty() {
+        cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
+    }
+
+    // Add all additional cookies
+    for cookie in session.additional_cookies {
+        cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
+    }
+
+    // Set the combined cookie header if we have any cookies
+    if !cookie_parts.is_empty() {
         headers.insert(
             reqwest::header::COOKIE,
-            format!("JSESSIONID={}", session.jsessionid).parse().unwrap(),
+            cookie_parts.join("; ").parse().unwrap(),
         );
     }
 

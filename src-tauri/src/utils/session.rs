@@ -22,6 +22,15 @@ fn session_file() -> PathBuf {
 pub struct Session {
     pub base_url: String,
     pub jsessionid: String,
+    pub additional_cookies: Vec<Cookie>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Cookie {
+    pub name: String,
+    pub value: String,
+    pub domain: Option<String>,
+    pub path: Option<String>,
 }
 
 impl Session {
@@ -36,7 +45,11 @@ impl Session {
                 }
             }
         }
-        Session::default()
+        Session {
+            base_url: String::new(),
+            jsessionid: String::new(),
+            additional_cookies: Vec::new(),
+        }
     }
 
     /// Persist to disk.
