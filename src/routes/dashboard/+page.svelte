@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { invoke } from '@tauri-apps/api/core';
     import { onMount } from 'svelte';
+    import { seqtaFetch } from '../../utils/seqtaFetch';
 
     interface HomeworkItem {
         meta: number;
@@ -23,14 +23,13 @@
             loading = true;
             error = null;
             console.log('Making POST request to homework endpoint...');
-            const response = await invoke<string>('post_api_data', {
-                url: '/seqta/student/dashlet/summary/homework',
-                data: {},  // Empty object since we're just making a POST request without data
-                parameters: {"majhvjju": ""}
+            const response = await seqtaFetch('/seqta/student/dashlet/summary/homework', {
+                method: 'POST',
+                body: {},
+                params: {"majhvjju": ""}
             });
-            console.log('Raw response:', response);
             homeworkData = JSON.parse(response);
-        } catch (e) {
+        } catch (e: any) {
             console.error('Error details:', e);
             error = e.toString();
         } finally {

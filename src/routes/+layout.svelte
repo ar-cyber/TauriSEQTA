@@ -88,10 +88,10 @@
 	];
 </script>
 
-<div class="h-screen" style="background: var(--background); color: var(--text);">
+<div class="h-screen bg-[var(--surface)]" style="color: var(--text);">
 	<!-- Top Bar -->
-	<header class="fixed top-0 left-0 right-0 h-12 flex justify-between items-center px-8" style="background: var(--surface); color: var(--text);">
-		<span class="font-bold text-lg tracking-wide">TauriSEQTA</span>
+	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
+		<span class="text-lg font-bold tracking-wide">TauriSEQTA</span>
 		{#if !needsSetup}
 			<button 
 				on:click={handleLogout}
@@ -106,13 +106,13 @@
 	<div class="flex pt-12 h-full">
 		<!-- Sidebar -->
 		<aside
-			class="w-64 flex flex-col py-6 overflow-y-scroll px-2 space-y-2 h-full"
+			class="flex overflow-y-scroll flex-col px-2 pb-6 space-y-2 w-64 h-full"
 			style="background: var(--surface); color: var(--text);"
 		>
 			{#each menu as item}
 				<a href={item.path} class="flex items-center px-4 py-3 rounded hover:bg-[color:var(--surface-alt)] transition group">
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
-					<span class="font-bold text-base">{item.label}</span>
+					<span class="text-base font-bold">{item.label}</span>
 					{#if item.hasSub}
 						<svg
 							class="ml-auto w-4 h-4"
@@ -130,16 +130,16 @@
 
 		<!-- Main Content -->
 		<div
-			class="flex-1 p-8 h-full overflow-y-scroll w-full"
+			class="overflow-y-scroll flex-1 p-8 w-full h-full overflow-clip rounded-tl-2xl"
 			style="background: var(--background); color: var(--text);"
 		>
-			<main class="max-w-7xl mx-auto"><slot /></main>
+			<main class="mx-auto max-w-7xl"><slot /></main>
 		</div>
 	</div>
 
 	<!-- First‑run overlay -->
 	{#if needsSetup}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
 			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-[26rem] max-w-full space-y-5">
 				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
 				<p class="text-sm" style="color: var(--text-muted);">
@@ -150,7 +150,7 @@
 					type="text"
 					bind:value={seqtaUrl}
 					placeholder="https://schoolname.seqta.com"
-					class="w-full px-3 py-2 rounded-lg border outline-none focus:ring"
+					class="px-3 py-2 w-full rounded-lg border outline-none focus:ring"
 					style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
 				/>
 				<button

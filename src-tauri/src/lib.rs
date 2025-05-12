@@ -67,8 +67,9 @@ async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), S
                         println!("Cookies: {:?}", cookies);
                         for cookie in cookies {
                             if cookie.name() == "JSESSIONID" {
+                                println!("JSESSIONID found: {}", cookie);
                                 let value = cookie.value().to_string();
-                                let base_url = url.clone(); // Or extract origin from URL if needed
+                                let base_url = url.clone();
 
                                 // Save session
                                 let session = crate::session::Session {
@@ -107,6 +108,7 @@ pub fn run() {
             greet,
             netgrab::get_api_data,
             netgrab::post_api_data,
+            netgrab::fetch_api_data,
             check_session_exists,
             save_session,
             create_login_window,
