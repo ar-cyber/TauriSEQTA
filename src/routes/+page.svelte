@@ -218,26 +218,32 @@
 		  <p class="text-2xl" style="color: var(--text);">No lessons available.</p>
 		</div>
 	  {:else}
-		<div class="md:flex md:overflow-x-scroll">
+		<div class="flex gap-4 overflow-x-auto px-4 py-6">
 		  {#each lessons as lesson, i}
-			<div class="relative p-6" style="border-top: {lesson.active ? '8px' : '6px'} solid {lesson.colour};" id={`${lesson.code}${i+1}`}>            
-			  <h2>{lesson.description}</h2>
-			  <h3>{lesson.staff}</h3>
-			  <h3>{lesson.room}</h3>
-			  <h4>{lesson.from} – {lesson.until}</h4>
-			  <h5>{lesson.attendanceTitle}</h5>
-  
+			<div class="relative flex flex-col min-w-[170px] max-w-[210px] bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8" style="border-color: {lesson.colour};">
+			  <div class="px-4 pt-4 pb-2 flex flex-col gap-1 flex-1">
+				<div class="flex items-center justify-between">
+				  <span class="font-bold text-base" style="color: var(--text);">{lesson.description}</span>
+				  {#if lesson.active}
+					<span class="ml-2 px-2 py-0.5 rounded bg-green-600 text-xs text-white">Now</span>
+				  {/if}
+				</div>
+				<div class="text-sm" style="color: var(--text-muted);">{lesson.staff}</div>
+				<div class="text-xs" style="color: var(--text-muted);">{lesson.room}</div>
+				<div class="mt-2 text-sm font-mono" style="color: var(--text);">{lesson.from} – {lesson.until}</div>
+				{#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
+				  <div class="mt-1 text-xs italic" style="color: var(--text-muted);">{lesson.attendanceTitle}</div>
+				{/if}
+			  </div>
 			  {#if lesson.programmeID !== 0}
-				<button class="absolute bottom-2 right-4" style="right:5px;" aria-label="View Assessment" onclick={() => (location.href = buildAssessmentURL(lesson.programmeID, lesson.metaID))}>
-					<svg viewBox="0 0 24 24" style="width:24px;height:24px;border-radius:0;">
-						<path d="M6 20H13V22H6C4.89 22 4 21.11 4 20V4C4 2.9 4.89 2 6 2H18C19.11 2 20 2.9 20 4V12.54L18.5 11.72L18 12V4H13V12L10.5 9.75L8 12V4H6V20M24 17L18.5 14L13 17L18.5 20L24 17M15 19.09V21.09L18.5 23L22 21.09V19.09L18.5 21L15 19.09Z" fill="currentColor"></path>
-					</svg>
-				</button>
-				<button class="absolute right-0 bottom-2" style="right:35px;" aria-label="View Course" onclick={() => (location.href = `../#?page=/courses/${lesson.programmeID}:${lesson.metaID}`)}>
-					<svg viewBox="0 0 24 24" style="width:24px;height:24px;border-radius:0;">
-						<path d="M19 1L14 6V17L19 12.5V1M21 5V18.5C19.9 18.15 18.7 18 17.5 18C15.8 18 13.35 18.65 12 19.5V6C10.55 4.9 8.45 4.5 6.5 4.5C4.55 4.5 2.45 4.9 1 6V20.65C1 20.9 1.25 21.15 1.5 21.15C1.6 21.15 1.65 21.1 1.75 21.1C3.1 20.45 5.05 20 6.5 20C8.45 20 10.55 20.4 12 21.5C13.35 20.65 15.8 20 17.5 20C19.15 20 20.85 20.3 22.25 21.05C22.35 21.1 22.4 21.1 22.5 21.1C22.75 21.1 23 20.85 23 20.6V6C22.4 5.55 21.75 5.25 21 5M10 18.41C8.75 18.09 7.5 18 6.5 18C5.44 18 4.18 18.19 3 18.5V7.13C3.91 6.73 5.14 6.5 6.5 6.5C7.86 6.5 9.09 6.73 10 7.13V18.41Z" fill="currentColor"></path>
-					</svg>
-				</button>
+				<div class="flex gap-2 px-4 pb-3 pt-1">
+				  <button class="hover:scale-110 transition-transform" aria-label="View Assessment" onclick={() => (location.href = buildAssessmentURL(lesson.programmeID, lesson.metaID))}>
+					<svg viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M6 20H13V22H6C4.89 22 4 21.11 4 20V4C4 2.9 4.89 2 6 2H18C19.11 2 20 2.9 20 4V12.54L18.5 11.72L18 12V4H13V12L10.5 9.75L8 12V4H6V20M24 17L18.5 14L13 17L18.5 20L24 17M15 19.09V21.09L18.5 23L22 21.09V19.09L18.5 21L15 19.09Z" fill="currentColor"></path></svg>
+				  </button>
+				  <button class="hover:scale-110 transition-transform" aria-label="View Course" onclick={() => (location.href = `../#?page=/courses/${lesson.programmeID}:${lesson.metaID}`)}>
+					<svg viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M19 1L14 6V17L19 12.5V1M21 5V18.5C19.9 18.15 18.7 18 17.5 18C15.8 18 13.35 18.65 12 19.5V6C10.55 4.9 8.45 4.5 6.5 4.5C4.55 4.5 2.45 4.9 1 6V20.65C1 20.9 1.25 21.15 1.5 21.15C1.6 21.15 1.65 21.1 1.75 21.1C3.1 20.45 5.05 20 6.5 20C8.45 20 10.55 20.4 12 21.5C13.35 20.65 15.8 20 17.5 20C19.15 20 20.85 20.3 22.25 21.05C22.35 21.1 22.4 21.1 22.5 21.1C22.75 21.1 23 20.85 23 20.6V6C22.4 5.55 21.75 5.25 21 5M10 18.41C8.75 18.09 7.5 18 6.5 18C5.44 18 4.18 18.19 3 18.5V7.13C3.91 6.73 5.14 6.5 6.5 6.5C7.86 6.5 9.09 6.73 10 7.13V18.41Z" fill="currentColor"></path></svg>
+				  </button>
+				</div>
 			  {/if}
 			</div>
 		  {/each}
