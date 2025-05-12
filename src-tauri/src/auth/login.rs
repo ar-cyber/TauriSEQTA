@@ -67,7 +67,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     // Clone handles for async block
     let app_handle_clone = app.clone();
 
-    let mut counter = 0;
+    let mut counter = 0; // Creates a counter so that we don't quit authentication upon the first request (which redirects)
     // Start polling in a background task
     tauri::async_runtime::spawn(async move {
         for _ in 0..1920 { // Poll for 1920 seconds max
@@ -80,9 +80,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
             if counter > 0 {
-                // Check if the auth has finished through injecting code into School SEQTA page [BROKEN CURRENTLY]
-
-                
+                // Check if the auth has finished through url
                 match webview.url() {
                     Ok(current_url) => {
                         println!("Current URL from webview: {}", current_url);
