@@ -8,7 +8,6 @@
 </p>
 
 - [Features](#features)
-- [Creating Custom Themes](#creating-custom-themes)
 - [Getting Started](#getting-started)
   - [Running Development](#running-development)
   - [Building for production](#building-for-production)
@@ -20,37 +19,28 @@
   
 ## Features
 
-- Dark mode
-  - Custom Background/Themes
-- Improved Styling/CSS
-  - Improved look for SEQTA Learn
-- Custom Home Page including:
-  - Daily Lessons
-  - Shortcuts
-  - Easier Access Notices
-  - Assessments
-- Options to remove certain items from the side menu
-- Grades calculator
-- Fully customisable themes and an official theme store
-- Notification for next lesson (sent 5 minutes before end of the lesson)
-
-## Creating Custom Themes
-
-If you are looking to create custom themes, I would recommend you start at the official documentation [here](https://betterseqta.gitbook.io/betterseqta-docs). You can see some premade examples along with a compilation script that can be used to allow for CSS frameworks and libraries such as SCSS to be used [here](https://github.com/BetterSEQTA/BetterSEQTA-Theme-Generator).
-
-Don't worry- if you get stuck feel free to ask around in the [discord](https://discord.gg/YzmbnCDkat). We're open and happy to help out! Happy creating :)
+- Custom homepage
 
 ## Getting started
 
-TODO
+Clone the repo:
+```bash
+git clone https://github.com/betterseqta/tauriseqta
+```
+Install modules
+```bash
+npm i # or your preferred like pnpm or yarn
+```
 
 ### Running Development
-
-TODO
+Run the script
+```
+npm run tauri dev
+```
 
 ### Building for production
 
-TODO
+**DO NOT BUILD FOR PRODUCTION**
 
 ## Folder Structure
 
