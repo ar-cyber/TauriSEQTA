@@ -66,10 +66,13 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                 }
             };
 
+            let full_url: String = format!("{}/#?page=/welcome", parsed_url).parse().unwrap();
+
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
                 // Get current URL to check if we're on the welcome page
-                if parsed_url.path() != "/#?page=/welcome" {
+                if full_url != format!("{}/#?page=/welcome", parsed_url) {
+                    println!("{}", full_url);
                     println!("Not on welcome page, skipping...");
                     continue;  // Skip if not on welcome page
                 }
