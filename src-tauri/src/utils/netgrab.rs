@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use serde_json::Value;
 
-use crate::session::Session;
+#[path = "../utils/session.rs"]
+mod session;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HomeworkItem {
@@ -27,7 +28,7 @@ pub enum RequestMethod {
 
 /// Build an HTTP client with headers based on the saved session.
 fn create_client() -> reqwest::Client {
-    let session = Session::load();
+    let session = session::Session::load();
     let mut headers = reqwest::header::HeaderMap::new();
 
     // Build the complete cookie string with JSESSIONID and additional cookies
@@ -81,7 +82,7 @@ pub async fn fetch_api_data(
     parameters: Option<HashMap<String, String>>,
 ) -> Result<String, String> {
     let client = create_client();
-    let session = Session::load();
+    let session = session::Session::load();
     
     let full_url = if url.starts_with("http") {
         url.to_string()
