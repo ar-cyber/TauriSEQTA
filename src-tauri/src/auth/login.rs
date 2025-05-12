@@ -65,13 +65,13 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                     continue;
                 }
             };
-            
+
             // Construct the full URL with the page parameter
             let full_url: String = format!("{}/#?page=/welcome", parsed_url).parse().unwrap();
 
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
-                // Check if the auth has finished through injecting code into School SEQTA page
+                // Check if the auth has finished through injecting code into School SEQTA page [BROKEN CURRENTLY]
                 let _ = webview.eval(format!("
                 async function loop() {{
 		            while (true) {{
