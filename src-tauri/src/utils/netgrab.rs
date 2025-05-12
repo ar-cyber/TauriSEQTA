@@ -30,11 +30,14 @@ fn create_client() -> reqwest::Client {
     let session = Session::load();
     let mut headers = reqwest::header::HeaderMap::new();
 
-    if !session.jsessionid.is_empty() {
-        headers.insert(
-            reqwest::header::COOKIE,
-            format!("JSESSIONID={}", session.jsessionid).parse().unwrap(),
-        );
+    if !session.cookies.is_empty() {
+        for (key, value) in session.cookies.into_iter() {
+            headers.insert(
+                reqwest::header::COOKIE,
+                format!("{}={}", key, value).parse().unwrap(),
+            );
+        }
+
     }
 
     headers.insert(

@@ -143,3 +143,6 @@ yarn.lock
 
 build/
 .svelte-kit/
+
+# This isn't needed
+package-lock.json

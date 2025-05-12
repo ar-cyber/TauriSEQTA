@@ -3,7 +3,9 @@ mod netgrab;
 #[path = "utils/session.rs"]
 mod session;
 
+/// Other imports
 use tauri::Manager;
+use std::collections::HashMap;
 
 /// Boilerplate example command
 #[tauri::command]
@@ -19,8 +21,8 @@ fn check_session_exists() -> bool {
 
 /// Persist the SEQTA `base_url` and `JSESSIONID`.
 #[tauri::command]
-fn save_session(base_url: String, jsessionid: String) -> Result<(), String> {
-    session::Session { base_url, jsessionid }
+fn save_session(base_url: String, cookies: HashMap<String, String>) -> Result<(), String> {
+    session::Session { base_url, cookies }
         .save()
         .map_err(|e| e.to_string())
 }
@@ -64,28 +66,25 @@ async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), S
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
                 match webview.cookies() {
                     Ok(cookies) => {
+                        let mut my_map = HashMap::new();
                         println!("Cookies: {:?}", cookies);
                         for cookie in cookies {
-                            if cookie.name() == "JSESSIONID" {
-                                println!("JSESSIONID found: {}", cookie);
-                                let value = cookie.value().to_string();
-                                let base_url = url.clone();
-
-                                // Save session
-                                let session = crate::session::Session {
-                                    base_url,
-                                    jsessionid: value,
-                                };
-
-                                if let Err(err) = session.save() {
-                                    eprintln!("Failed to save session: {}", err);
-                                }
-
-                                // Close login window
-                                let _ = webview.close();
-                                return; // Stop polling once found
-                            }
+                            my_map.insert(cookie.name().to_string(), cookie.value().to_string());
                         }
+                        println!(stringify!(my_map));
+                        let base_url = url.clone();
+                        let session = crate::session::Session {
+                            base_url,
+                            cookies: my_map,
+                        };
+
+                        if let Err(err) = session.save() {
+                            eprintln!("Failed to save session: {}", err);
+                        }
+
+                        // Close login window
+                        let _ = webview.close();
+                        return; // Stop polling once found
                     }
                     Err(err) => {
                         eprintln!("Error retrieving cookies: {}", err);

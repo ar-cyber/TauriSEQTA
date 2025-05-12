@@ -4,6 +4,7 @@ use std::{
     io::{self, Read},
     path::PathBuf,
 };
+use std::collections::HashMap;
 
 /// Location: `$DATA_DIR/TauriSEQTA/session.json`
 fn session_file() -> PathBuf {
@@ -21,7 +22,7 @@ fn session_file() -> PathBuf {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Session {
     pub base_url: String,
-    pub jsessionid: String,
+    pub cookies: HashMap<String, String>,
 }
 
 impl Session {
@@ -48,7 +49,7 @@ impl Session {
     /// True if both URL and cookie are present.
     pub fn exists() -> bool {
         let s = Self::load();
-        !(s.base_url.is_empty() || s.jsessionid.is_empty())
+        !(s.base_url.is_empty() || s.cookies.is_empty())
     }
 
     /// Clear the session data and remove the file
