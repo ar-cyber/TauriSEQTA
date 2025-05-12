@@ -23,6 +23,15 @@ pub fn save_session(base_url: String, jsessionid: String) -> Result<(), String> 
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+pub fn logout() -> bool {
+    if let Ok(_) = session::Session::clear() {
+        true
+    } else {
+        false
+    }
+}
+
 /// Open a login window and harvest the cookie once the user signs in.
 #[tauri::command]
 pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), String> {
@@ -55,10 +64,16 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                     eprintln!("Invalid URL: {}", e);
                     continue;
                 }
-            };            
+            };
 
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
+                // Get current URL to check if we're on the welcome page
+                if parsed_url.path() != "/#?page=/welcome" {
+                    println!("Not on welcome page, skipping...");
+                    continue;  // Skip if not on welcome page
+                }
+
                 match webview.cookies() {
                     Ok(cookies) => {
                         println!("Cookies: {:?}", cookies);
@@ -129,13 +144,4 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     });
 
     Ok(())
-}
-
-#[tauri::command]
-pub fn logout() -> bool {
-    if let Ok(_) = session::Session::clear() {
-        true
-    } else {
-        false
-    }
 }
