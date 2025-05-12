@@ -159,7 +159,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                 }
             }
         }
-            counter += 1;
+            counter += 1; // increment the counter at the end of the loop
         }
 
         eprintln!("JSESSIONID not found within timeout");
