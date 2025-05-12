@@ -38,11 +38,26 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     use tauri::{WebviewWindowBuilder, WebviewUrl};
     use tokio::time::{sleep, Duration};
 
+    let parsed_url = match Url::parse(&url) {
+                Ok(u) => u,
+                Err(e) => {
+                    return Err(format!("Invalid URL: {}", e));
+                }
+    };
+
+    let temp_url = format!("{}/#?page=/welcome", parsed_url);
+    let full_url: Url = match Url::parse(&temp_url) {
+        Ok(u) => u,
+        Err(e) => {
+            return Err(format!("Parsing error: {}", e));
+        }
+    };
+
     // Spawn the login window
     WebviewWindowBuilder::new(
         &app, 
         "seqta_login", 
-        WebviewUrl::External(url.parse().map_err(|e| format!("Invalid URL: {}", e))?)
+        WebviewUrl::External(full_url.clone())
     )
         .title("SEQTA Login")
         .inner_size(900.0, 700.0)
@@ -52,37 +67,34 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     // Clone handles for async block
     let app_handle_clone = app.clone();
 
+    let mut counter = 0;
     // Start polling in a background task
     tauri::async_runtime::spawn(async move {
         for _ in 0..1920 { // Poll for 1920 seconds max
             // Wait 1 second between polls
             sleep(Duration::from_secs(1)).await;
 
-            let parsed_url = match Url::parse(&url) {
-                Ok(u) => u,
-                Err(e) => {
-                    eprintln!("Invalid URL: {}", e);
-                    continue;
-                }
-            };
-
             // Construct the full URL with the page parameter
-            let full_url: String = format!("{}/#?page=/welcome", parsed_url).parse().unwrap();
+    
 
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
+            if counter > 0 {
                 // Check if the auth has finished through injecting code into School SEQTA page [BROKEN CURRENTLY]
-                let _ = webview.eval(format!("
-                async function loop() {{
-		            while (true) {{
-			            await new Promise((r) => setTimeout(r, 200));
-			            if (window.location.href == '{}') {{
-                            window.close();
-                        }}
-                }}
-            }}
-	            loop();
-                ", full_url));
+
+                
+                match webview.url() {
+                    Ok(current_url) => {
+                        println!("Current URL from webview: {}", current_url);
+                        if !(current_url.to_string().contains("#?page=/welcome")) {
+                            continue;
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error retrieving URL: {}", e);
+                    }
+                }
+                
 
 
                 match webview.cookies() {
@@ -133,8 +145,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                                         if let Err(err) = session.save() {
                                             eprintln!("Failed to save session: {}", err);
                                         }
-        
-                                        // Close login window
+
                                         let _ = webview.close();
                                         return; // Stop polling once found
                                     } else {
@@ -149,6 +160,8 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                     }
                 }
             }
+        }
+            counter += 1;
         }
 
         eprintln!("JSESSIONID not found within timeout");
