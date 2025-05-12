@@ -11,12 +11,6 @@ let loadingLessons = $state<boolean>(true);
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const timeSlots = [
-  '08:50', '09:30', '10:10',
-  '10:35', '11:15', '11:55',
-  '12:00', '12:40', '13:20',
-  '14:05', '14:45', '15:25'
-];
 
 function getMonday(d: Date) {
   d = new Date(d);
@@ -75,13 +69,49 @@ function nextWeek() {
   loadLessons();
 }
 
-function getLessonsFor(dayIdx: number, slot: string) {
-  return lessons.filter(l => l.dayIdx === dayIdx && l.from === slot);
+function getLessonsFor(dayIdx: number) {
+  return lessons.filter(l => l.dayIdx === dayIdx).sort((a, b) => a.from.localeCompare(b.from));
 }
 
 function weekRangeLabel() {
   const end = new Date(weekStart.valueOf() + 4 * 86400000);
   return `${weekStart.getDate()} ${weekStart.toLocaleString('default', { month: 'short' })} - ${end.getDate()} ${end.toLocaleString('default', { month: 'short' })} ${weekStart.getFullYear()}`;
+}
+
+function hexToRgb(hex: string) {
+  // Remove '#' if present
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(x => x + x).join('');
+  }
+  const num = parseInt(hex, 16);
+  return [
+    (num >> 16) & 255,
+    (num >> 8) & 255,
+    num & 255
+  ];
+}
+
+function isColorLight(hex: string) {
+  const [r, g, b] = hexToRgb(hex);
+  // Perceived brightness formula
+  return (r * 299 + g * 587 + b * 114) / 1000 > 150;
+}
+
+function getTextColor(bg: string) {
+  // Remove 'var(...)' and fallback to white if not a hex
+  if (!bg.startsWith('#')) return '#fff';
+  return isColorLight(bg) ? '#111' : '#fff';
+}
+
+function getUniqueTimes() {
+  // Get all unique lesson start times for the week, sorted
+  const times = Array.from(new Set(lessons.map(l => l.from)));
+  return times.sort((a, b) => a.localeCompare(b));
+}
+
+function getLessonsAt(dayIdx: number, time: string) {
+  return lessons.filter(l => l.dayIdx === dayIdx && l.from === time);
 }
 
 onMount(loadLessons);
@@ -104,23 +134,24 @@ onMount(loadLessons);
           <div class="py-2 px-4 text-center font-bold bg-[var(--surface-alt)] border-l border-[var(--surface)]">{day.toUpperCase()}</div>
         {/each}
       </div>
-      <div class="grid grid-cols-[80px_repeat(5,1fr)] w-full flex-1 h-full grid-rows-[repeat(12,minmax(0,1fr))]" style="height:100%">
-        {#each timeSlots as slot, slotIdx}
-          <div class="contents">
-            <div class="flex items-center justify-center py-4 px-2 text-center font-mono border-t border-[var(--surface-alt)] bg-[var(--surface)] h-full w-20 min-w-0">{slot}</div>
-            {#each Array(5) as _, dayIdx}
-              <div class="relative border-t border-l border-[var(--surface-alt)] bg-[var(--surface)] h-full flex items-center justify-center">
-                {#each getLessonsFor(dayIdx, slot) as lesson}
-                  <div class="rounded-lg shadow p-2 text-xs flex flex-col gap-1 w-full h-full items-center justify-center" style="background:{lesson.colour}; color:#fff;">
-                    <div class="font-bold text-sm text-center">{lesson.description}</div>
-                    <div class="text-center">{lesson.staff}</div>
-                    <div class="opacity-80 text-center">{lesson.room}</div>
-                    <div class="opacity-70 text-[10px] text-center">{lesson.from}–{lesson.until}</div>
-                  </div>
-                {/each}
-              </div>
-            {/each}
-          </div>
+      <div class="grid w-full flex-1 h-full" style="grid-template-columns: 80px repeat(5, 1fr); height:100%">
+        {#each getUniqueTimes() as time}
+          <div class="flex items-center justify-center py-4 px-2 text-center font-mono border-t border-[var(--surface-alt)] bg-[var(--surface)] h-full w-20 min-w-0">{time}</div>
+          {#each Array(5) as _, dayIdx}
+            <div class="m-2 flex flex-col gap-2 h-full">
+              {#each getLessonsAt(dayIdx, time) as lesson}
+                <div class="rounded-lg shadow p-2 text-xs flex flex-col gap-1 items-center justify-center min-w-0 h-full" style="background:{lesson.colour}; color:{getTextColor(lesson.colour)};">
+                  <div class="font-bold text-sm text-center">{lesson.description}</div>
+                  <div class="text-center">{lesson.staff}</div>
+                  <div class="opacity-80 text-center">{lesson.room}</div>
+                  <div class="opacity-70 text-[10px] text-center">{lesson.from}–{lesson.until}</div>
+                </div>
+              {/each}
+              {#if getLessonsAt(dayIdx, time).length === 0}
+                <div></div>
+              {/if}
+            </div>
+          {/each}
         {/each}
       </div>
     </div>

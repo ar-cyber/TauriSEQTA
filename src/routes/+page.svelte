@@ -110,7 +110,8 @@
   
 	  const colours = await loadLessonColours();
   
-	  const activeClass = classesRes.find((c: any) => c.active);
+	  const classesResJson = JSON.parse(classesRes);
+	  const activeClass = classesResJson.payload.find((c: any) => c.active);
 	  activeSubjects = activeClass ? activeClass.subjects : [];
   
 	  // Initialise subject filters on first run
