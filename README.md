@@ -17,7 +17,7 @@
 - [Credits](#credits)
 - [Star History](#star-history)
 
-- 
+  
 ## Features
 
 - Dark mode
