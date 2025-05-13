@@ -24,15 +24,6 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/betterseqta-dark-icon.png",
-      "icons/betterseqta-light-icon.png",
-      "icons/betterseqta-light-outline.png",
-      "icons/icon-32.png",
-      "icons/icon-48.png",
-      "icons/icon-64.png",
-      "icons/icon.ico"
-    ],
     "windows": {
       "nsis": {
         "installMode": "currentUser"
