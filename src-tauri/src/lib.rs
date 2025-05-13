@@ -24,7 +24,8 @@ pub fn run() {
             login::check_session_exists,
             login::save_session,
             login::create_login_window,
-            login::logout
+            login::logout,
+            login::force_reload
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
