@@ -43,7 +43,16 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     use tauri::{WebviewWindowBuilder, WebviewUrl};
     use tokio::time::{sleep, Duration};
 
-    let parsed_url = match Url::parse(&url) {
+    let mut http_url = String::new();
+
+    match url.starts_with("https://") {
+        true => http_url = url.clone(),
+        false => {
+            http_url = format!("https://{}", url.clone());
+        }
+    }
+
+    let parsed_url = match Url::parse(&http_url) {
                 Ok(u) => u,
                 Err(e) => {
                     return Err(format!("Invalid URL: {}", e));
@@ -114,7 +123,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                                         println!("Cookie is still valid! Expires in {}", duration); 
                                         
                                         let value = cookie.value().to_string();
-                                        let base_url = url.clone();
+                                        let base_url = http_url.clone();
         
                                         // Convert all cookies to our storage format
                                         let additional_cookies = cookies.iter()
