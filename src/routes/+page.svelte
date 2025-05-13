@@ -123,13 +123,14 @@
   
 	  upcomingAssessments = JSON.parse(assessmentsRes).payload
 		.filter((a: any) => activeCodes.includes(a.code))
+		.filter((a: any) => new Date(a.due) >= new Date())
 		.map((a: any) => {
 		  const prefName = `timetable.subject.colour.${a.code}`;
 		  const c = colours.find((p: any) => p.name === prefName);
 		  a.colour = c ? `--item-colour:${c.value};` : '--item-colour:#8e8e8e;';
 		  return a;
 		})
-		.sort((a: any, b: any) => (a.date < b.date ? -1 : 1));
+		.sort((a: any, b: any) => (a.due < b.due ? -1 : 1));
   
 	  loadingAssessments = false;
 	}
@@ -277,7 +278,7 @@
 				<span class="text-3xl">📄</span>
 			  </div>
 			  <div class="flex-1">
-				<div class="text-lg font-bold" style="color: var(--text);">{a.date}</div>
+				<div class="text-lg font-bold" style="color: var(--text);">{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
 				<div class="text-sm" style="color: var(--text-muted);">{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
 				<div class="mt-2">
 				  <span class="block text-xs font-semibold uppercase" style="color: var(--text-muted);">{a.subject}</span>
