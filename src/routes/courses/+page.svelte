@@ -27,6 +27,7 @@ let error: string | null = null;
 
 let expandedFolders: Record<string, boolean> = {};
 let selectedSubject: Subject | null = null;
+let search = '';
 
 async function loadSubjects() {
   loading = true;
@@ -57,6 +58,23 @@ function selectSubject(subject: Subject) {
   selectedSubject = subject;
 }
 
+function subjectMatches(subj: Subject) {
+  const q = search.trim().toLowerCase();
+  return (
+    subj.title.toLowerCase().includes(q) ||
+    subj.code.toLowerCase().includes(q) ||
+    subj.description.toLowerCase().includes(q)
+  );
+}
+
+function folderMatches(folder: Folder) {
+  const q = search.trim().toLowerCase();
+  return (
+    folder.code.toLowerCase().includes(q) ||
+    folder.subjects.some(subjectMatches)
+  );
+}
+
 onMount(loadSubjects);
 </script>
 
@@ -66,20 +84,28 @@ onMount(loadSubjects);
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
       Courses
     </div>
+    <div class="px-4 py-3 border-b border-[var(--surface-alt)]">
+      <input
+        type="text"
+        placeholder="Search subjects..."
+        bind:value={search}
+        class="w-full px-3 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] border border-[var(--surface-alt)] focus:outline-none focus:ring focus:ring-blue-500"
+      />
+    </div>
     <div class="flex-1 overflow-y-auto">
       {#if loading}
         <div class="px-6 py-6 text-[var(--text-muted)]">Loading…</div>
       {:else if error}
         <div class="px-6 py-6 text-red-400">{error}</div>
       {:else}
-        {#each activeSubjects as subj}
+        {#each activeSubjects.filter(subjectMatches) as subj}
           <div class="px-6 py-3 font-bold text-base hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-[var(--surface-alt)] border-blue-500' : ''}"
             on:click={() => selectSubject(subj)}>
             {subj.title}
           </div>
         {/each}
         <div class="my-2 border-t border-[var(--surface-alt)]"></div>
-        {#each otherFolders as folder}
+        {#each otherFolders.filter(folderMatches) as folder}
           <div>
             <div class="px-6 py-3 flex items-center justify-between hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all"
               on:click={() => toggleFolder(folder.code)}>
@@ -87,7 +113,7 @@ onMount(loadSubjects);
               <svg class="w-4 h-4 ml-2 text-[var(--text-muted)] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate({expandedFolders[folder.code] ? 90 : 0}deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
             </div>
             {#if expandedFolders[folder.code]}
-              {#each folder.subjects as subj}
+              {#each folder.subjects.filter(subjectMatches) as subj}
                 <div class="pl-10 pr-6 py-2 font-medium text-sm hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-[var(--surface-alt)] border-blue-500' : ''}"
                   on:click={() => selectSubject(subj)}>
                   {subj.title}
