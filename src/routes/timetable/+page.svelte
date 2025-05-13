@@ -135,8 +135,8 @@ onMount(loadLessons);
     <div class="flex-1 w-full h-full flex flex-col justify-stretch">
       <div class="grid grid-cols-[80px_repeat(5,1fr)] w-full" style="border-bottom: 2px solid var(--surface-alt);">
         <div class="bg-[var(--surface-alt)] w-20"></div>
-        {#each dayLabels as day}
-          <div class="py-2 px-4 text-center font-bold bg-[var(--surface-alt)] border-l border-[var(--surface)]">{day.toUpperCase()}</div>
+        {#each dayLabels as day, index}
+          <div class="py-2 px-4 text-center font-bold bg-[var(--surface-alt)] border-l border-[var(--surface)] {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
         {/each}
       </div>
       <div class="grid w-full flex-1 h-full" style="grid-template-columns: 80px repeat(5, 1fr); height:100%">
@@ -145,7 +145,7 @@ onMount(loadLessons);
           {#each Array(5) as _, dayIdx}
             <div class="m-2 flex flex-col gap-2 h-full">
               {#each getLessonsAt(dayIdx, time) as lesson}
-                <div class="relative flex flex-col min-w-[230px] max-w-[320px] bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8 p-0 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
+                <div class="relative flex flex-col w-full max-w-full bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8 p-0 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
                   <div class="px-6 pt-4 pb-2 flex flex-col gap-1 flex-1">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-base" style="color: var(--text);">{lesson.description}</span>
