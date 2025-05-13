@@ -43,125 +43,44 @@
     });
 </script>
 
-<div class="dashboard-container">
-    <h1>Homework Dashboard</h1>
-    
-    {#if loading}
-        <div class="loading">
-            <p>Loading homework data...</p>
-        </div>
-    {:else if error}
-        <div class="error">
-            <p>Error: {error}</p>
-        </div>
-    {:else if homeworkData}
-        <div class="homework-list">
-            {#each homeworkData.payload as homework}
-                <div class="homework-card">
-                    <h2>{homework.title}</h2>
-                    <div class="homework-items">
-                        {#each homework.items as item}
-                            <div class="homework-item">
-                                <span class="bullet">•</span>
-                                <span class="item-text">{item}</span>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-            {/each}
-        </div>
-    {:else}
-        <p>No homework data available</p>
-    {/if}
+<div class="space-y-8 max-w-3xl mx-auto py-10">
+	<div class="flex justify-between items-center mb-6">
+		<h1 class="text-2xl font-bold" style="color: var(--text);">Homework Dashboard</h1>
+	</div>
+
+	{#if loading}
+		<div class="flex justify-center items-center py-12">
+			<p style="color: var(--text-muted);">Loading homework data…</p>
+		</div>
+	{:else if error}
+		<div class="bg-red-100 text-red-700 rounded-lg px-6 py-4 mb-4 border border-red-200">
+			<p>Error: {error}</p>
+		</div>
+	{:else if homeworkData}
+		<div class="flex flex-col gap-6">
+			{#each homeworkData.payload as homework}
+				<div class="bg-[var(--surface)] rounded-xl shadow-lg border-l-8" style="border-color: #1a73e8;">
+					<div class="px-6 pt-5 pb-3">
+						<h2 class="text-lg font-bold mb-2" style="color: var(--text);">{homework.title}</h2>
+						<div class="flex flex-col gap-3">
+							{#each homework.items as item}
+								<div class="flex gap-2 items-start bg-[var(--surface-alt)] rounded-lg px-4 py-3 border border-[var(--surface-alt)]">
+									<span class="text-xl text-blue-500 mt-1">•</span>
+									<span class="text-[var(--text)]">{item}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{:else}
+		<p class="text-center" style="color: var(--text-muted);">No homework data available</p>
+	{/if}
 </div>
 
 <style>
-    .dashboard-container {
-        padding: 40px 0;
-        max-width: 1200px;
-        margin: 0 auto;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .loading {
-        text-align: center;
-        padding: 20px;
-        color: #666;
-    }
-
-    .error {
-        color: #d32f2f;
-        padding: 16px;
-        background-color: #ffebee;
-        border-radius: 8px;
-        margin: 16px 0;
-    }
-
-    .homework-list {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-        width: 100%;
-        align-items: center;
-    }
-
-    .homework-card {
-        background: #fcfcff;
-        border-radius: 14px;
-        padding: 24px 28px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
-        border: 1.5px solid #e3e8f0;
-        min-width: 340px;
-        max-width: 480px;
-        width: 100%;
-        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    }
-
-    .homework-card:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 8px 32px rgba(26, 115, 232, 0.10);
-        border-color: #b6ccf7;
-    }
-
-    .homework-card h2 {
-        margin: 0 0 16px 0;
-        color: #1a73e8;
-        font-size: 1.25rem;
-        font-weight: 600;
-        border-bottom: 2px solid #e8f0fe;
-        padding-bottom: 8px;
-        background: none;
-    }
-
-    .homework-items {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .homework-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        line-height: 1.5;
-        background-color: #f6f8fa;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #e8f0fe;
-    }
-
-    .bullet {
-        color: #1a73e8;
-        font-size: 1.2em;
-        line-height: 1;
-        margin-top: 2px;
-    }
-
-    .item-text {
-        flex: 1;
-        color: #202124;
-    }
+:global(body) {
+	background: var(--background);
+}
 </style> 
