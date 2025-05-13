@@ -114,7 +114,7 @@
 	  const activeClass = classesResJson.payload.find((c: any) => c.active);
 	  activeSubjects = activeClass ? activeClass.subjects : [];
   
-	  // Initialise subject filters on first run
+	  // Initialize subject filters on first run
 	  activeSubjects.forEach((s: any) => {
 		if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
 	  });
@@ -127,7 +127,7 @@
 		.map((a: any) => {
 		  const prefName = `timetable.subject.colour.${a.code}`;
 		  const c = colours.find((p: any) => p.name === prefName);
-		  a.colour = c ? `--item-colour:${c.value};` : '--item-colour:#8e8e8e;';
+		  a.colour = c ? c.value : '#8e8e8e';
 		  return a;
 		})
 		.sort((a: any, b: any) => (a.due < b.due ? -1 : 1));
@@ -171,6 +171,21 @@
 	function buildAssessmentURL(programmeID: number, metaID: number, itemID?: number) {
 	  const base = `../#?page=/assessments/${programmeID}:${metaID}`;
 	  return itemID ? `${base}&item=${itemID}` : base;
+	}
+
+	function getStatusBadge(status: string, due: string) {
+		const dueDate = new Date(due);
+		const now = new Date();
+		
+		if (status === 'MARKS_RELEASED') {
+			return { text: 'Marked', color: 'bg-green-500' };
+		} else if (dueDate < now) {
+			return { text: 'Overdue', color: 'bg-red-500' };
+		} else if (dueDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) { // Within 7 days
+			return { text: 'Due Soon', color: 'bg-yellow-500' };
+		} else {
+			return { text: 'Upcoming', color: 'bg-blue-500' };
+		}
 	}
 
 	onMount(async () => {
@@ -273,13 +288,19 @@
 	  {:else}
 		<div class="p-6 space-y-4" id="upcoming-items">
 		  {#each filteredAssessments as a}
-			<div class="flex gap-4 items-center p-4 rounded-xl upcoming-assessment transition-transform duration-300 hover:scale-105" style="background: var(--surface-alt); border: 1px solid var(--surface-alt); {a.colour}">
+			<div class="flex gap-4 items-center p-4 rounded-xl upcoming-assessment transition-transform duration-300 hover:scale-105" style="background: var(--surface-alt); border: 1px solid var(--surface-alt); border-left: 8px solid {a.colour};">
 			  <div class="flex justify-center items-center w-16 h-16 rounded-lg" style="background: var(--background); color: var(--surface);">
 				<span class="text-3xl">📄</span>
 			  </div>
 			  <div class="flex-1">
-				<div class="text-lg font-bold" style="color: var(--text);">{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-				<div class="text-sm" style="color: var(--text-muted);">{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+				<div class="flex items-center gap-2">
+				  <div class="text-lg font-bold" style="color: var(--text);">
+					{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' })}
+				  </div>
+				  <span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(a.status, a.due).color}">
+					{getStatusBadge(a.status, a.due).text}
+				  </span>
+				</div>
 				<div class="mt-2">
 				  <span class="block text-xs font-semibold uppercase" style="color: var(--text-muted);">{a.subject}</span>
 				  <span class="block text-base font-semibold" style="color: var(--text);">{a.title}</span>
