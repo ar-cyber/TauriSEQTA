@@ -45,8 +45,6 @@ TODO
   <img src="https://contrib.rocks/image?repo=betterseqta/tauriseqta" />
 </a>
 
-TODO
-
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=BetterSEQTA/tauriseqta&type=Date)](https://star-history.com/#BetterSEQTA/tauriseqta&Date)
