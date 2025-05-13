@@ -17,7 +17,9 @@
 		RectangleStack,
 		ChartBar,
 		Cog6Tooth,
-		CalendarDays
+		CalendarDays,
+		GlobeAlt,
+		ArrowRightOnRectangle
 	} from 'svelte-hero-icons';
 
 	let needsSetup = false;
@@ -140,25 +142,29 @@
 	<!-- First‑run overlay -->
 	{#if needsSetup}
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
-			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-[26rem] max-w-full space-y-5">
+			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-full h-full flex flex-col justify-center items-center space-y-5">
 				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
 				<p class="text-sm" style="color: var(--text-muted);">
 					Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll
 					securely save your session cookie.
 				</p>
-				<input
-					type="text"
-					bind:value={seqtaUrl}
-					placeholder="https://schoolname.seqta.com"
-					class="px-3 py-2 w-full rounded-lg border outline-none focus:ring"
-					style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
-				/>
+				<div class="flex items-center">
+					<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
+					<input
+						type="text"
+						bind:value={seqtaUrl}
+						placeholder="https://schoolname.seqta.com"
+						class="px-3 py-2 w-full max-w-xl rounded-lg border outline-none focus:ring"
+						style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
+					/>
+				</div>
 				<button
 					on:click={startLogin}
-					class="w-full py-2 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-300 hover:scale-105"
+					class="w-full max-w-md py-2 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-300 hover:scale-105 flex items-center justify-center"
 					style="background: #2563eb; color: white;"
 				>
-					Sign in
+					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
+					Sign in
 				</button>
 			</div>
 		</div>
