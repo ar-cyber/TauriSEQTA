@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/core';
+	import { emit, listen } from '@tauri-apps/api/event'
+
 	import { onMount } from 'svelte';
 	import '../app.css';
 	import {
@@ -33,6 +35,10 @@
 			needsSetup = true;
 		}
 	});
+
+	listen<string>('reload', (event) => {
+		location.reload();
+	})
 
 	async function startLogin() {
 		if (!seqtaUrl) return;

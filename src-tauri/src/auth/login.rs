@@ -1,9 +1,14 @@
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use time::OffsetDateTime;
 use url::Url;
 
 #[path = "../utils/session.rs"]
 mod session;
+
+#[tauri::command]
+pub fn force_reload(app: tauri::AppHandle) {
+  app.emit("reload", "hi".to_string() ).unwrap();
+}
 
 /// True if a saved login session exists.
 #[tauri::command]
@@ -145,6 +150,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                                         }
 
                                         let _ = webview.close();
+                                        force_reload(app);
                                         return; // Stop polling once found
                                     } else {
                                         println!("Cookie has expired!");
