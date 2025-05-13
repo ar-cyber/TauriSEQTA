@@ -114,15 +114,20 @@ function getLessonsAt(dayIdx: number, time: string) {
   return lessons.filter(l => l.dayIdx === dayIdx && l.from === time);
 }
 
+function buildAssessmentURL(programmeID: number, metaID: number, itemID?: number) {
+  const base = `../#?page=/assessments/${programmeID}:${metaID}`;
+  return itemID ? `${base}&item=${itemID}` : base;
+}
+
 onMount(loadLessons);
 </script>
 
 <div class="flex flex-col h-screen w-full bg-[var(--surface)] text-[var(--text)]">
   <div class="flex items-center justify-between px-8 py-4 bg-[var(--surface-alt)] shadow sticky top-0 z-10">
     <div class="flex items-center gap-2">
-      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--background)]" onclick={prevWeek}>&#60;</button>
+      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={prevWeek}>&#60;</button>
       <span class="text-xl font-bold">{weekRangeLabel()}</span>
-      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--background)]" onclick={nextWeek}>&#62;</button>
+      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={nextWeek}>&#62;</button>
     </div>
   </div>
 
@@ -140,7 +145,7 @@ onMount(loadLessons);
           {#each Array(5) as _, dayIdx}
             <div class="m-2 flex flex-col gap-2 h-full">
               {#each getLessonsAt(dayIdx, time) as lesson}
-                <div class="relative flex flex-col min-w-[230px] max-w-[320px] bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8 p-0" style="border-color: {lesson.colour};">
+                <div class="relative flex flex-col min-w-[230px] max-w-[320px] bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8 p-0 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
                   <div class="px-6 pt-4 pb-2 flex flex-col gap-1 flex-1">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-base" style="color: var(--text);">{lesson.description}</span>
