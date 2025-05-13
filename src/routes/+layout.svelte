@@ -150,13 +150,13 @@
 				</p>
 				<div class="flex items-center">
 					<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
-					<input
-						type="text"
-						bind:value={seqtaUrl}
-						placeholder="https://schoolname.seqta.com"
+				<input
+					type="text"
+					bind:value={seqtaUrl}
+					placeholder="https://schoolname.seqta.com"
 						class="px-3 py-2 w-full max-w-xl rounded-lg border outline-none focus:ring"
-						style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
-					/>
+					style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
+				/>
 				</div>
 				<button
 					on:click={startLogin}
