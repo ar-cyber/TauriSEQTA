@@ -110,7 +110,7 @@
 			style="background: var(--surface); color: var(--text);"
 		>
 			{#each menu as item}
-				<a href={item.path} class="flex items-center px-4 py-3 rounded hover:bg-[color:var(--surface-alt)] transition group">
+				<a href={item.path} class="flex items-center px-4 py-3 rounded hover:bg-[color:var(--surface-alt)] transition-transform duration-300 hover:scale-105 group">
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
 					<span class="text-base font-bold">{item.label}</span>
 					{#if item.hasSub}
@@ -155,7 +155,7 @@
 				/>
 				<button
 					on:click={startLogin}
-					class="w-full py-2 rounded-lg font-semibold hover:scale-[1.02] transition"
+					class="w-full py-2 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-300 hover:scale-105"
 					style="background: #2563eb; color: white;"
 				>
 					Sign in
