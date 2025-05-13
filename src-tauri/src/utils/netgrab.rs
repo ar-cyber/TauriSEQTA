@@ -83,7 +83,6 @@ pub async fn fetch_api_data(
 ) -> Result<String, String> {
     let client = create_client();
     let session = session::Session::load();
-    println!("{}", url);
     let full_url = if url.starts_with("http") {
         url.to_string()
     } else {
