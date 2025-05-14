@@ -28,6 +28,9 @@
       "nsis": {
         "installMode": "currentUser"
       }
-    }
+    },
+    "icon": [
+      "icons/icon.ico"
+    ]
   }
 }
