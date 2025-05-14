@@ -16,6 +16,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Arch Linux container (Linux only)
+        if: matrix.os == 'ubuntu-22.04'
+        uses: addnab/docker-run-action@v3
+        with:
+          image: archlinux:latest
+          options: -v ${{ github.workspace }}:/workspace -w /workspace
+          run: |
+            pacman -Syu --noconfirm
+            pacman -S --noconfirm base-devel webkit2gtk gtk3 libsoup libappindicator-gtk3
+            # Install Node.js, Rust, and build as normal
+            curl -fsSL https://fnm.vercel.app/install | bash
+            export PATH=$HOME/.fnm:$PATH
+            eval "$(fnm env)"
+            fnm install 20
+            fnm use 20
+            npm install -g @tauri-apps/cli
+            npm install
+            npm run tauri build
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
