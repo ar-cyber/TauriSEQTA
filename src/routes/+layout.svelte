@@ -105,9 +105,7 @@
 		{ label: 'Dashboard', icon: Squares2x2, path: '/dashboard' },
 		{ label: 'Direqt Messages', icon: ChatBubbleLeftRight, path: '/direqt-messages' },
 		{ label: 'Documents', icon: DocumentText, path: '/documents' },
-		{ label: 'myEdOnline', icon: AcademicCap, path: '/myedonline' },
 		{ label: 'Notices', icon: Bell, path: '/notices' },
-		{ label: 'Portals', icon: RectangleStack, hasSub: true, path: '/portals' },
 		{ label: 'Reports', icon: ChartBar, path: '/reports' },
 		{ label: 'Settings', icon: Cog6Tooth, path: '/settings' },
 		{ label: 'Timetable', icon: CalendarDays, path: '/timetable' }

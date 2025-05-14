@@ -1,1 +1,0 @@
-<h1>Portals Page</h1><p>This is the Portals page.</p> 
