@@ -43,7 +43,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
     use tauri::{WebviewWindowBuilder, WebviewUrl};
     use tokio::time::{sleep, Duration};
 
-    let mut http_url = String::new();
+    let http_url;
 
     match url.starts_with("https://") {
         true => http_url = url.clone(),
@@ -59,8 +59,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                 }
     };
 
-    let temp_url = format!("{}/#?page=/welcome", parsed_url);
-    let full_url: Url = match Url::parse(&temp_url) {
+    let full_url: Url = match Url::parse(&format!("{}/#?page=/welcome", parsed_url)) {
         Ok(u) => u,
         Err(e) => {
             return Err(format!("Parsing error: {}", e));
