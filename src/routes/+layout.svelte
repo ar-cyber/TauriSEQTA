@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/core';
 	import { emit, listen } from '@tauri-apps/api/event'
+	import { seqtaFetch } from '../utils/seqtaFetch';
 
 	import { onMount } from 'svelte';
 	import '../app.css';
@@ -26,10 +27,14 @@
 
 	let needsSetup = false;
 	let seqtaUrl = '';
+	let userInfo = $state<any>(null);
 
 	onMount(async () => {
 		try {
 			needsSetup = !(await invoke<boolean>('check_session_exists'));
+			if (!needsSetup) {
+				loadUserInfo();
+			}
 		} catch (e) {
 			console.error('Unable to check session', e);
 			needsSetup = true;
@@ -77,6 +82,19 @@
 		}
 	}
 
+	async function loadUserInfo() {
+		try {
+			const res = await seqtaFetch('/seqta/student/login?', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json; charset=utf-8' },
+				body: {}
+			});
+			userInfo = JSON.parse(res).payload;
+		} catch (e) {
+			console.error('Failed to load user info:', e);
+		}
+	}
+
 	/* Sidebar menu items */
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -100,15 +118,36 @@
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
 		<span class="text-lg font-bold tracking-wide">DeskQTA</span>
-		{#if !needsSetup}
-			<button 
-				on:click={handleLogout}
-				class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
-				style="background: var(--surface-alt); color: var(--text);"
-			>
-				Logout
-			</button>
-		{/if}
+		<div class="flex items-center gap-4">
+			{#if userInfo}
+				<div class="flex items-center gap-3 px-3 py-1 rounded-lg border border-[var(--surface-alt)] min-w-[320px]" style="background: transparent;">
+					<!-- Avatar with initials -->
+					<div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-base select-none">
+						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
+					</div>
+					<div class="flex flex-col min-w-0 flex-1">
+						<div class="flex items-center gap-2">
+							<span class="font-semibold text-base truncate">{userInfo.userDesc}</span>
+							<span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-400/20 uppercase tracking-wide">{userInfo.type}</span>
+						</div>
+						<div class="flex items-center gap-2 text-xs text-[var(--text-muted)] min-w-0">
+							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
+							<span>•</span>
+							<span class="font-mono">{userInfo.userCode}</span>
+						</div>
+					</div>
+				</div>
+			{/if}
+			{#if !needsSetup}
+				<button 
+					on:click={handleLogout}
+					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
+					style="background: var(--surface-alt); color: var(--text);"
+				>
+					Logout
+				</button>
+			{/if}
+		</div>
 	</header>
 
 	<div class="flex pt-12 h-full">
