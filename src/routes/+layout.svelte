@@ -81,6 +81,7 @@
 				body: {}
 			});
 			userInfo = JSON.parse(res).payload;
+			console.log(userInfo);
 		} catch (e) {
 			console.error('Failed to load user info:', e);
 		}
@@ -112,7 +113,7 @@
 		</div>
 		<div class="flex items-center gap-4">
 			{#if userInfo}
-				<div class="flex items-center gap-3 px-3 py-1 rounded-lg border border-[var(--surface-alt)] min-w-[320px]" style="background: transparent;">
+				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px]" style="background: transparent;">
 					<!-- Avatar with initials -->
 					<div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-base select-none">
 						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
@@ -126,6 +127,9 @@
 							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
 							<span>•</span>
 							<span class="font-mono">{userInfo.userCode}</span>
+							<span>•</span>
+							<span class="font-mono">{userInfo.meta.governmentID}</span>
+
 						</div>
 					</div>
 				</div>
