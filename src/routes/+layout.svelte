@@ -64,16 +64,6 @@
 		return await invoke('post_api_data', { url, data: Object.fromEntries(data) });
 	}
 
-	async function loop() {
-		while (true) {
-			await new Promise((r) => setTimeout(r, 1000));
-			const map1 = new Map<string, string>();
-			map1.set('hi', 'hi');
-			const data = await getAPIData('https://httpbin.org/ip', map1);
-			console.log(data);
-		}
-	}
-	loop();
 
 	async function handleLogout() {
 		const success = await invoke('logout');
