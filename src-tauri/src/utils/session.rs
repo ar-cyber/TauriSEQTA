@@ -5,11 +5,11 @@ use std::{
     path::PathBuf,
 };
 
-/// Location: `$DATA_DIR/TauriSEQTA/session.json`
+/// Location: `$DATA_DIR/DeskQTA/session.json`
 fn session_file() -> PathBuf {
-    // e.g. %APPDATA%/TauriSEQTA on Windows, ~/.local/share/TauriSEQTA on Linux/macOS
+    // e.g. %APPDATA%/DeskQTA on Windows, ~/.local/share/DeskQTA on Linux/macOS
     let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
-    dir.push("TauriSEQTA");
+    dir.push("DeskQTA");
     if !dir.exists() {
         fs::create_dir_all(&dir).expect("Unable to create data dir");
     }

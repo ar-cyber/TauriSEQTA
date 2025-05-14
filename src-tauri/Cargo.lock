@@ -712,6 +712,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "deskqta"
+version = "0.1.0"
+dependencies = [
+ "dirs-next",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+ "time",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4033,22 +4049,6 @@ dependencies = [
  "embed-resource",
  "indexmap 2.9.0",
  "toml",
-]
-
-[[package]]
-name = "tauriseqta"
-version = "0.1.0"
-dependencies = [
- "dirs-next",
- "reqwest",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-opener",
- "time",
- "tokio",
- "url",
 ]
 
 [[package]]

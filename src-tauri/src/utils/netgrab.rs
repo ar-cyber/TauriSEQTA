@@ -54,7 +54,7 @@ fn create_client() -> reqwest::Client {
 
     headers.insert(
         reqwest::header::USER_AGENT,
-        "Mozilla/5.0 (TauriSEQTA)".parse().unwrap(),
+        "Mozilla/5.0 (DeskQTA)".parse().unwrap(),
     );
     headers.insert(
         reqwest::header::ACCEPT,

@@ -99,7 +99,7 @@
 <div class="h-screen bg-[var(--surface)]" style="color: var(--text);">
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
-		<span class="text-lg font-bold tracking-wide">TauriSEQTA</span>
+		<span class="text-lg font-bold tracking-wide">DeskQTA</span>
 		{#if !needsSetup}
 			<button 
 				on:click={handleLogout}

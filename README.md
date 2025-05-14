@@ -16,7 +16,29 @@
   
 ## Features
 
-- Custom homepage
+- **Custom Homepage**: A personalized homepage that displays upcoming assessments, lessons, and notices with subject-specific colors.
+
+- **Assessments Page**: 
+  - Displays all assessments, including past ones, sorted by the newest first.
+  - Features a Kanban-style board view where each subject has its own column.
+  - Status badges for assessments indicating "Marked," "Overdue," "Due Soon," and "Upcoming."
+
+
+- **Timetable Colors**: Integration of timetable colors for subjects to enhance visual identification throuhout the entire app.
+
+- **Sidebar Navigation**: A sidebar with quick navigation links to various sections like Home, News, Assessments, Courses, Dashboard, etc.
+
+- **Session Management**: 
+  - Handles user sessions with login and logout functionality.
+  - Stores session data securely.
+
+- **API Integration**: 
+  - Fetches data from SEQTA APIs for assessments, subjects, and user preferences.
+  - Utilizes Rust for backend operations with Tauri.
+
+- **Responsive Design**: 
+  - Utilizes Tailwind CSS for styling.
+  - Ensures a responsive and modern UI across different devices.
 
 ## Getting started
 
