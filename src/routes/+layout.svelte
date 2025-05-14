@@ -42,6 +42,7 @@
 	onMount(checkSession);
 
 	listen<string>('reload', (event) => {
+		location.reload();
 		checkSession();
 	})
 
