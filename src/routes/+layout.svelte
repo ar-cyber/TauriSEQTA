@@ -106,8 +106,8 @@
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
 		<div class="flex items-center">
-			<img src="/32x32.png" alt="DeskQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
-			<span class="text-lg font-bold tracking-wide">DeskQTA</span>
+			<img src="/32x32.png" alt="DesQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
+			<span class="text-lg font-bold tracking-wide">DesQTA</span>
 		</div>
 		<div class="flex items-center gap-4">
 			{#if userInfo}

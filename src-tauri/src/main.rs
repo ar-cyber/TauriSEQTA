@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    deskqta_lib::run() // Entrypoint for Rust code in Tauri
+    desqta_lib::run() // Entrypoint for Rust code in Tauri
 }

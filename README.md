@@ -66,10 +66,10 @@ TODO
 
 ## Contributors
 
-<a href="https://github.com/betterseqta/tauriseqta/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=betterseqta/tauriseqta" />
+<a href="https://github.com/betterseqta/desqta/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=betterseqta/desqta" />
 </a>
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=BetterSEQTA/tauriseqta&type=Date)](https://star-history.com/#BetterSEQTA/tauriseqta&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=BetterSEQTA/desqta&type=Date)](https://star-history.com/#BetterSEQTA/desqta&Date)
