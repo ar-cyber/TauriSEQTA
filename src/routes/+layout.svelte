@@ -108,7 +108,6 @@
 				body: {}
 			});
 			userInfo = JSON.parse(res).payload;
-			console.log(userInfo);
 		} catch (e) {
 			console.error('Failed to load user info:', e);
 		}

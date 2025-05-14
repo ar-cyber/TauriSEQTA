@@ -154,7 +154,7 @@
 		body: { date: dateStr }
 	  });
   
-	  notices = res.payload.filter((n: any) => labelArray.includes(JSON.stringify(n.label)));
+	  notices = res.payload?.filter((n: any) => labelArray.includes(JSON.stringify(n.label)));
 	  loadingNotices = false;
 	}
     
