@@ -29,7 +29,7 @@
 	export const needsSetup = writable(false);
 
 	let seqtaUrl = '';
-	let userInfo = $state<any>(null);
+	let userInfo = $state<UserInfo>();
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -71,6 +71,33 @@
 		if (success) {
 			await checkSession();
 		}
+	}
+
+	interface UserInfo {
+		clientIP: string;
+		email: string;
+		id: number;
+		lastAccessedTime: number;
+		meta: {
+			code: string;
+			governmentID: string;
+		};
+		personUUID: string;
+		saml: [{
+			autologin: boolean;
+			label: string;
+			method: string;
+			request: string;
+			sigalg: URL;
+			signature: string;
+			slo: boolean;
+			url: URL
+		}];
+		status: string;
+		type: string;
+		userCode: string;
+		userDesc: string;
+		userName: string;
 	}
 
 	async function loadUserInfo() {
