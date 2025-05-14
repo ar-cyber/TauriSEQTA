@@ -28,7 +28,7 @@
 	import { writable } from 'svelte/store';
 	export const needsSetup = writable(false);
 
-	let seqtaUrl = '';
+	let seqtaUrl = $state<string>('');
 	let userInfo = $state<UserInfo>();
 
 	async function checkSession() {
@@ -162,7 +162,7 @@
 			{/if}
 			{#if !$needsSetup}
 				<button 
-					on:click={handleLogout}
+					onclick={handleLogout}
 					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
 					style="background: var(--surface-alt); color: var(--text);"
 				>
@@ -226,8 +226,8 @@
 				/>
 				</div>
 				<button
-					on:click={startLogin}
-					class="w-full max-w-md py-2 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-300 hover:scale-105 flex items-center justify-center"
+					onclick={startLogin}
+					class="w-full max-w-md py-2 rounded-lg font-semibold transition-transform duration-300 hover:scale-105 flex items-center justify-center"
 					style="background: #2563eb; color: white;"
 				>
 					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
