@@ -105,7 +105,10 @@
 <div class="h-screen bg-[var(--surface)]" style="color: var(--text);">
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
-		<span class="text-lg font-bold tracking-wide">DeskQTA</span>
+		<div class="flex items-center">
+			<img src="/32x32.png" alt="DeskQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
+			<span class="text-lg font-bold tracking-wide">DeskQTA</span>
+		</div>
 		<div class="flex items-center gap-4">
 			{#if userInfo}
 				<div class="flex items-center gap-3 px-3 py-1 rounded-lg border border-[var(--surface-alt)] min-w-[320px]" style="background: transparent;">
