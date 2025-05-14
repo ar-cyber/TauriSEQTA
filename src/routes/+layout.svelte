@@ -25,24 +25,24 @@
 		ArrowRightOnRectangle
 	} from 'svelte-hero-icons';
 
-	let needsSetup = false;
+	import { writable } from 'svelte/store';
+	export const needsSetup = writable(false);
+
 	let seqtaUrl = '';
 	let userInfo = $state<any>(null);
 
-	onMount(async () => {
-		try {
-			needsSetup = !(await invoke<boolean>('check_session_exists'));
-			if (!needsSetup) {
-				loadUserInfo();
-			}
-		} catch (e) {
-			console.error('Unable to check session', e);
-			needsSetup = true;
+	async function checkSession() {
+		const sessionExists = await invoke<boolean>('check_session_exists');
+		needsSetup.set(!sessionExists);
+		if (sessionExists) {
+			loadUserInfo();
 		}
-	});
+	}
+
+	onMount(checkSession);
 
 	listen<string>('reload', (event) => {
-		location.reload();
+		checkSession();
 	})
 
 	async function startLogin() {
@@ -51,8 +51,9 @@
 
 		// Poll every 1.5 s until the cookie is saved (login window closes itself)
 		const timer = setInterval(async () => {
-			needsSetup = !(await invoke<boolean>('check_session_exists'));
-			if (!needsSetup) clearInterval(timer);
+			const sessionExists = await invoke<boolean>('check_session_exists');
+			needsSetup.set(!sessionExists);
+			if (sessionExists) clearInterval(timer);
 		}, 1500);
 	}
 
@@ -64,11 +65,10 @@
 		return await invoke('post_api_data', { url, data: Object.fromEntries(data) });
 	}
 
-
 	async function handleLogout() {
 		const success = await invoke('logout');
 		if (success) {
-			needsSetup = true;
+			await checkSession();
 		}
 	}
 
@@ -129,7 +129,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if !needsSetup}
+			{#if !$needsSetup}
 				<button 
 					on:click={handleLogout}
 					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
@@ -176,7 +176,7 @@
 	</div>
 
 	<!-- First‑run overlay -->
-	{#if needsSetup}
+	{#if $needsSetup}
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
 			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-full h-full flex flex-col justify-center items-center space-y-5">
 				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
