@@ -109,13 +109,13 @@
 		<div class="flex gap-2">
 			<button 
 				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'list' ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)] text-[var(--text)]'}"
-				on:click={() => selectedTab = 'list'}
+				onclick={() => selectedTab = 'list'}
 			>
 				List View
 			</button>
 			<button 
 				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'board' ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)] text-[var(--text)]'}"
-				on:click={() => selectedTab = 'board'}
+				onclick={() => selectedTab = 'board'}
 			>
 				Board View
 			</button>
@@ -142,7 +142,7 @@
 								href="#subject-{subject.code}"
 								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] transition-colors cursor-pointer"
 								style="color: var(--text);"
-								on:click={(e) => scrollToSubject(e, subject.code)}
+								onclick={(e) => scrollToSubject(e, subject.code)}
 							>
 								<div class="w-2 h-2 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
 								<span class="text-sm truncate">{subject.code}</span>

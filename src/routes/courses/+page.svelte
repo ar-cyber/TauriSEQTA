@@ -100,7 +100,7 @@ onMount(loadSubjects);
       {:else}
         {#each activeSubjects.filter(subjectMatches) as subj}
           <div class="px-6 py-3 font-bold text-base hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-[var(--surface-alt)] border-blue-500' : ''}"
-            on:click={() => selectSubject(subj)}>
+            onclick={() => selectSubject(subj)}>
             {subj.title}
           </div>
         {/each}
@@ -108,14 +108,14 @@ onMount(loadSubjects);
         {#each otherFolders.filter(folderMatches) as folder}
           <div>
             <div class="px-6 py-3 flex items-center justify-between hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all"
-              on:click={() => toggleFolder(folder.code)}>
+              onclick={() => toggleFolder(folder.code)}>
               <span class="font-bold text-base">{folder.code}</span>
               <svg class="w-4 h-4 ml-2 text-[var(--text-muted)] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate({expandedFolders[folder.code] ? 90 : 0}deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
             </div>
             {#if expandedFolders[folder.code]}
               {#each folder.subjects.filter(subjectMatches) as subj}
                 <div class="pl-10 pr-6 py-2 font-medium text-sm hover:bg-[var(--surface-alt)] cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-[var(--surface-alt)] border-blue-500' : ''}"
-                  on:click={() => selectSubject(subj)}>
+                  onclick={() => selectSubject(subj)}>
                   {subj.title}
                 </div>
               {/each}
