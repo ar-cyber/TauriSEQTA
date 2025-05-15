@@ -2,15 +2,39 @@
 import { onMount } from 'svelte';
 import { seqtaFetch } from '../../utils/seqtaFetch';
 
-const studentId = 69;
+interface Lesson {
+  code: string;
+  description: string;
+  staff: string;
+  room: string;
+  from: string;
+  until: string;
+  date: string;
+  dayIdx: number;
+  colour: string;
+  programmeID: number;
+  metaID: number;
+  attendanceTitle?: string;
+}
+
+interface LessonColour {
+  name: string;
+  value: string;
+}
+
+const studentId = import.meta.env.VITE_STUDENT_ID || 69;
 
 let weekStart: Date = getMonday(new Date());
-let lessons = $state<any[]>([]);
-let lessonColours = $state<any[]>([]);
+let lessons = $state<Lesson[]>([]);
+let lessonColours = $state<LessonColour[]>([]);
 let loadingLessons = $state<boolean>(true);
+let isNavigating = $state<boolean>(false);
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+// Memoize unique times
+const uniqueTimes = $derived(getUniqueTimes());
 
 function getMonday(d: Date) {
   d = new Date(d);
@@ -29,44 +53,64 @@ function formatDate(date: Date): string {
 
 async function loadLessonColours() {
   if (lessonColours.length) return lessonColours;
-  const res = await seqtaFetch('/seqta/student/load/prefs?', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: { request: 'userPrefs', asArray: true, user: studentId }
-  });
-  lessonColours = JSON.parse(res).payload;
-  return lessonColours;
+  try {
+    const res = await seqtaFetch('/seqta/student/load/prefs?', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: { request: 'userPrefs', asArray: true, user: studentId }
+    });
+    lessonColours = JSON.parse(res).payload;
+    return lessonColours;
+  } catch (error) {
+    console.error('Failed to load lesson colours:', error);
+    return [];
+  }
 }
 
 async function loadLessons() {
   loadingLessons = true;
-  const from = formatDate(weekStart);
-  const until = formatDate(new Date(weekStart.getTime() + 4 * 86400000));
-  const res = await seqtaFetch('/seqta/student/load/timetable?', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: { from, until, student: studentId }
-  });
-  const colours = await loadLessonColours();
-  lessons = JSON.parse(res).payload.items.map((lesson: any) => {
-    const colourPrefName = `timetable.subject.colour.${lesson.code}`;
-    const subjectColour = colours.find((c: any) => c.name === colourPrefName);
-    lesson.colour = subjectColour ? `${subjectColour.value}` : `#232428`;
-    lesson.from = lesson.from.substring(0, 5);
-    lesson.until = lesson.until.substring(0, 5);
-    lesson.dayIdx = (new Date(lesson.date).getDay() + 6) % 7; // 0=Mon, 4=Fri
-    return lesson;
-  });
-  loadingLessons = false;
+  try {
+    const from = formatDate(weekStart);
+    const until = formatDate(new Date(weekStart.getTime() + 4 * 86400000));
+    const res = await seqtaFetch('/seqta/student/load/timetable?', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: { from, until, student: studentId }
+    });
+    const colours = await loadLessonColours();
+    lessons = JSON.parse(res).payload.items.map((lesson: any) => {
+      const colourPrefName = `timetable.subject.colour.${lesson.code}`;
+      const subjectColour = colours.find((c) => c.name === colourPrefName);
+      return {
+        ...lesson,
+        colour: subjectColour ? subjectColour.value : '#232428',
+        from: lesson.from.substring(0, 5),
+        until: lesson.until.substring(0, 5),
+        dayIdx: (new Date(lesson.date).getDay() + 6) % 7
+      };
+    });
+  } catch (error) {
+    console.error('Failed to load lessons:', error);
+    lessons = [];
+  } finally {
+    loadingLessons = false;
+  }
 }
 
-function prevWeek() {
-  weekStart = new Date(weekStart.valueOf() - 7 * 86400000);
-  loadLessons();
-}
-function nextWeek() {
-  weekStart = new Date(weekStart.valueOf() + 7 * 86400000);
-  loadLessons();
+async function navigateWeek(direction: 'prev' | 'next' | 'today') {
+  if (isNavigating) return;
+  isNavigating = true;
+  try {
+    if (direction === 'today') {
+      weekStart = getMonday(new Date());
+    } else {
+      const days = direction === 'prev' ? -7 : 7;
+      weekStart = new Date(weekStart.valueOf() + days * 86400000);
+    }
+    await loadLessons();
+  } finally {
+    isNavigating = false;
+  }
 }
 
 function getLessonsFor(dayIdx: number) {
@@ -125,9 +169,24 @@ onMount(loadLessons);
 <div class="flex flex-col h-screen w-full bg-[var(--surface)] text-[var(--text)]">
   <div class="flex items-center justify-between px-4 py-2 bg-[var(--surface-alt)] shadow">
     <div class="flex items-center gap-2">
-      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={prevWeek}>&#60;</button>
+      <button 
+        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        onclick={() => navigateWeek('prev')}
+        disabled={isNavigating}
+      >&#60;</button>
+      <button
+        class="px-3 py-1 text-sm rounded-lg hover:bg-[var(--background)] transition-colors"
+        onclick={() => navigateWeek('today')}
+        disabled={isNavigating}
+      >
+        Today
+      </button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
-      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={nextWeek}>&#62;</button>
+      <button 
+        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        onclick={() => navigateWeek('next')}
+        disabled={isNavigating}
+      >&#62;</button>
     </div>
   </div>
 
@@ -140,12 +199,16 @@ onMount(loadLessons);
         {/each}
       </div>
       <div class="grid w-full flex-1 h-full" style="grid-template-columns: 60px repeat(5, 1fr); height:100%">
-        {#each getUniqueTimes() as time}
+        {#each uniqueTimes as time}
           <div class="flex items-center justify-center py-2 px-1 text-center font-mono border-t border-[var(--surface-alt)] bg-[var(--surface)] h-full w-14 min-w-0 text-sm">{time}</div>
           {#each Array(5) as _, dayIdx}
             <div class="m-1 flex flex-col gap-1 h-full">
               {#each getLessonsAt(dayIdx, time) as lesson}
-                <div class="relative flex flex-col w-full max-w-full bg-[var(--surface-alt)] rounded-lg shadow-sm border-l-4 p-0 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
+                <div 
+                  class="relative flex flex-col w-full max-w-full bg-[var(--surface-alt)] rounded-lg shadow-sm border-l-4 p-0 transition-transform duration-300 hover:scale-105" 
+                  style="border-color: {lesson.colour};"
+                  title={`${lesson.description}\n${lesson.staff}\n${lesson.room}\n${lesson.from} - ${lesson.until}`}
+                >
                   <div class="px-2 pt-2 pb-1 flex flex-col gap-0.5 flex-1">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-sm truncate" style="color: var(--text);">{lesson.description}</span>
@@ -158,10 +221,18 @@ onMount(loadLessons);
                   </div>
                   {#if lesson.programmeID !== 0}
                     <div class="flex gap-1 px-2 pb-1 pt-0.5">
-                      <button class="hover:scale-110 transition-transform" aria-label="View Assessment" onclick={() => (location.href = buildAssessmentURL(lesson.programmeID, lesson.metaID))}>
+                      <button 
+                        class="hover:scale-110 transition-transform" 
+                        aria-label="View Assessment" 
+                        onclick={() => (location.href = buildAssessmentURL(lesson.programmeID, lesson.metaID))}
+                      >
                         <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M6 20H13V22H6C4.89 22 4 21.11 4 20V4C4 2.9 4.89 2 6 2H18C19.11 2 20 2.9 20 4V12.54L18.5 11.72L18 12V4H13V12L10.5 9.75L8 12V4H6V20M24 17L18.5 14L13 17L18.5 20L24 17M15 19.09V21.09L18.5 23L22 21.09V19.09L18.5 21L15 19.09Z" fill="currentColor"></path></svg>
                       </button>
-                      <button class="hover:scale-110 transition-transform" aria-label="View Course" onclick={() => (location.href = `../#?page=/courses/${lesson.programmeID}:${lesson.metaID}`)}>
+                      <button 
+                        class="hover:scale-110 transition-transform" 
+                        aria-label="View Course" 
+                        onclick={() => (location.href = `../#?page=/courses/${lesson.programmeID}:${lesson.metaID}`)}
+                      >
                         <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M19 1L14 6V17L19 12.5V1M21 5V18.5C19.9 18.15 18.7 18 17.5 18C15.8 18 13.35 18.65 12 19.5V6C10.55 4.9 8.45 4.5 6.5 4.5C4.55 4.5 2.45 4.9 1 6V20.65C1 20.9 1.25 21.15 1.5 21.15C1.6 21.15 1.65 21.1 1.75 21.1C3.1 20.45 5.05 20 6.5 20C8.45 20 10.55 20.4 12 21.5C13.35 20.65 15.8 20 17.5 20C19.15 20 20.85 20.3 22.25 21.05C22.35 21.1 22.4 21.1 22.5 21.1C22.75 21.1 23 20.85 23 20.6V6C22.4 5.55 21.75 5.25 21 5M10 18.41C8.75 18.09 7.5 18 6.5 18C5.44 18 4.18 18.19 3 18.5V7.13C3.91 6.73 5.14 6.5 6.5 6.5C7.86 6.5 9.09 6.73 10 7.13V18.41Z" fill="currentColor"></path></svg>
                       </button>
                     </div>
@@ -177,7 +248,12 @@ onMount(loadLessons);
       </div>
     </div>
     {#if loadingLessons}
-      <div class="absolute inset-0 flex items-center justify-center"><span class="text-lg text-[var(--text-muted)]">Loading…</span></div>
+      <div class="absolute inset-0 flex items-center justify-center bg-[var(--surface)] bg-opacity-80">
+        <div class="flex flex-col items-center gap-2">
+          <div class="w-8 h-8 border-4 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-lg text-[var(--text-muted)]">Loading timetable…</span>
+        </div>
+      </div>
     {/if}
   </div>
 </div> 
