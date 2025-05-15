@@ -180,14 +180,14 @@
   }
 </script>
 
-<div class="flex h-screen bg-[var(--surface)] text-[var(--text)]">
-  <!-- Sidebar -->
+<div class="flex h-full text-[var(--text)]">
+<!-- Sidebar -->
   <div class="w-80 border-r border-[var(--surface-alt)] flex flex-col">
     <!-- New Message Button -->
     <div class="p-4 border-b border-[var(--surface-alt)]">
       <button
         class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-        on:click={() => showComposeModal = true}
+        onclick={() => showComposeModal = true}
       >
         <Icon src={Plus} class="w-5 h-5" />
         <span>New Message</span>
@@ -207,14 +207,14 @@
     </div>
 
     <!-- Conversations -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="overflow-y-auto flex-1">
       {#each conversations as conversation}
         <button
           class="w-full p-4 flex items-center gap-3 hover:bg-[var(--surface-alt)] transition-all duration-200 {selectedConversation.id === conversation.id ? 'bg-[var(--surface-alt)]' : ''} group"
-          on:click={() => selectedConversation = conversation}
+          onclick={() => selectedConversation = conversation}
         >
           <div class="relative">
-            <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg transition-transform duration-200 group-hover:scale-110">
+            <div class="flex justify-center items-center w-12 h-12 text-lg font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
               {conversation.avatar}
             </div>
             {#if conversation.online}
@@ -222,14 +222,14 @@
             {/if}
           </div>
           <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="font-semibold truncate group-hover:text-blue-500 transition-colors duration-200">{conversation.name}</span>
+            <div class="flex justify-between items-center">
+              <span class="font-semibold truncate transition-colors duration-200 group-hover:text-blue-500">{conversation.name}</span>
               <span class="text-xs text-[var(--text-muted)]">{conversation.time}</span>
             </div>
-            <div class="flex items-center justify-between">
+            <div class="flex justify-between items-center">
               <span class="text-sm text-[var(--text-muted)] truncate group-hover:text-[var(--text)] transition-colors duration-200">{conversation.lastMessage}</span>
               {#if conversation.unread}
-                <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-500 text-white text-xs animate-bounce">{conversation.unread}</span>
+                <span class="px-2 py-0.5 ml-2 text-xs text-white bg-blue-500 rounded-full animate-bounce">{conversation.unread}</span>
               {/if}
             </div>
           </div>
@@ -239,12 +239,12 @@
   </div>
 
   <!-- Chat Area -->
-  <div class="flex-1 flex flex-col">
+  <div class="flex flex-col flex-1">
     <!-- Chat Header -->
     <div class="h-16 border-b border-[var(--surface-alt)] flex items-center justify-between px-6">
-      <div class="flex items-center gap-3">
+      <div class="flex gap-3 items-center">
         <div class="relative group">
-          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+          <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
             {selectedConversation.avatar}
           </div>
           {#if selectedConversation.online}
@@ -252,25 +252,25 @@
           {/if}
         </div>
         <div>
-          <h2 class="font-semibold group-hover:text-blue-500 transition-colors duration-200">{selectedConversation.name}</h2>
+          <h2 class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{selectedConversation.name}</h2>
           <p class="text-sm text-[var(--text-muted)]">{selectedConversation.role}</p>
         </div>
       </div>
-      <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-90" on:click={() => {}}>
+      <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-90" onclick={() => {}}>
         <Icon src={EllipsisHorizontal} class="w-6 h-6" />
       </button>
     </div>
 
     <!-- Messages -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+    <div class="overflow-y-auto flex-1 p-6 space-y-4">
       {#each messages as message}
         <div class="flex {message.isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
           <div class="max-w-[70%] {message.isMe ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)]'} rounded-2xl px-4 py-2 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-[1.02]">
             {#if !message.isMe}
-              <div class="text-xs font-semibold mb-1">{message.sender}</div>
+              <div class="mb-1 text-xs font-semibold">{message.sender}</div>
             {/if}
             <div class="text-sm">{message.content}</div>
-            <div class="text-xs mt-1 opacity-70 text-right">{message.time}</div>
+            <div class="mt-1 text-xs text-right opacity-70">{message.time}</div>
           </div>
         </div>
       {/each}
@@ -278,22 +278,22 @@
 
     <!-- Message Input -->
     <div class="p-4 border-t border-[var(--surface-alt)]">
-      <div class="flex items-center gap-2">
+      <div class="flex gap-2 items-center">
         <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-12">
           <Icon src={PaperClip} class="w-6 h-6" />
         </button>
-        <div class="flex-1 relative">
+        <div class="relative flex-1">
           <textarea
             bind:value={newMessage}
-            on:keypress={handleKeyPress}
+            onkeypress={handleKeyPress}
             placeholder="Type a message..."
             class="w-full px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
             rows="1"
           ></textarea>
         </div>
         <button
-          on:click={() => sendMessage()}
-          class="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95 disabled:transform-none"
+          onclick={() => sendMessage()}
+          class="p-2 text-white bg-blue-500 rounded-lg transition-all duration-200 transform hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 disabled:transform-none"
           disabled={!newMessage.trim()}
         >
           <Icon src={PaperAirplane} class="w-6 h-6" />
@@ -305,14 +305,14 @@
 
 <!-- Compose Message Modal -->
 {#if showComposeModal}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+  <div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50 animate-fade-in">
     <div class="bg-[var(--surface)] rounded-lg w-[500px] max-h-[80vh] flex flex-col shadow-2xl transform transition-all duration-300 scale-100">
       <!-- Modal Header -->
       <div class="p-4 border-b border-[var(--surface-alt)] flex items-center justify-between">
         <h2 class="text-lg font-semibold">New Message</h2>
         <button
           class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-90"
-          on:click={() => showComposeModal = false}
+          onclick={() => showComposeModal = false}
         >
           <Icon src={XMark} class="w-6 h-6" />
         </button>
@@ -329,17 +329,17 @@
       </div>
 
       <!-- Recipient List -->
-      <div class="flex-1 overflow-y-auto p-4">
+      <div class="overflow-y-auto flex-1 p-4">
         {#each filteredRecipients as recipient}
           <button
             class="w-full p-3 flex items-center gap-3 hover:bg-[var(--surface-alt)] transition-all duration-200 rounded-lg {selectedRecipient?.id === recipient.id ? 'bg-[var(--surface-alt)]' : ''} group"
-            on:click={() => selectedRecipient = recipient}
+            onclick={() => selectedRecipient = recipient}
           >
-            <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
               {recipient.avatar}
             </div>
             <div class="text-left">
-              <div class="font-semibold group-hover:text-blue-500 transition-colors duration-200">{recipient.name}</div>
+              <div class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{recipient.name}</div>
               <div class="text-sm text-[var(--text-muted)] group-hover:text-[var(--text)] transition-colors duration-200">{recipient.role}</div>
             </div>
           </button>
@@ -357,7 +357,7 @@
         <button
           class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none shadow-md hover:shadow-lg"
           disabled={!selectedRecipient || !composeMessage.trim()}
-          on:click={startNewConversation}
+          onclick={startNewConversation}
         >
           Send Message
         </button>

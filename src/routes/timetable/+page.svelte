@@ -146,9 +146,9 @@ const timeBounds = $derived(getTimeBounds);
 onMount(loadLessons);
 </script>
 
-<div class="flex flex-col h-screen w-full bg-[var(--surface)] text-[var(--text)]">
+<div class="flex flex-col h-screen w-full text-[var(--text)]">
   <div class="flex items-center justify-between px-4 py-2 bg-[var(--surface-alt)] shadow">
-    <div class="flex items-center gap-2">
+    <div class="flex gap-2 items-center">
       <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={prevWeek}>&#60;</button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
       <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={nextWeek}>&#62;</button>
@@ -156,8 +156,8 @@ onMount(loadLessons);
   </div>
 
   {#key lessons}
-  <div class="flex-1 flex items-stretch overflow-hidden">
-    <div class="flex-1 w-full h-full flex flex-col justify-stretch">
+  <div class="flex overflow-hidden flex-1 items-stretch">
+    <div class="flex flex-col flex-1 w-full h-full justify-stretch">
       <!-- Header Row -->
       <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full" style="border-bottom: 2px solid var(--surface-alt);">
         <div class="bg-[var(--surface-alt)] w-14"></div>
@@ -167,9 +167,9 @@ onMount(loadLessons);
       </div>
       <!-- Time grid and lessons -->
       {#if lessons.length}
-        <div class="relative w-full flex-1 h-full" style="height: {GRID_HEIGHT}px;">
+        <div class="relative flex-1 w-full h-full" style="height: {GRID_HEIGHT}px;">
           <!-- Time labels -->
-          <div class="absolute left-0 top-0 h-full w-14 z-10 pointer-events-none">
+          <div class="absolute top-0 left-0 z-10 w-14 h-full pointer-events-none">
             {#each getUniqueTimes() as time}
               <div class="absolute left-0 w-full border-t border-[var(--surface-alt)]" style="top: {timeToY(timeToMinutes(time), timeBounds().min, timeBounds().max)}px;">
                 <span class="text-xs text-[var(--text-muted)]">{time}</span>
@@ -177,7 +177,7 @@ onMount(loadLessons);
             {/each}
           </div>
           <!-- Day columns -->
-          <div class="grid grid-cols-5 absolute left-14 right-0 top-0 h-full">
+          <div class="grid absolute top-0 right-0 left-14 grid-cols-5 h-full">
             {#each Array(5) as _, dayIdx}
               <div class="relative h-full border-l border-[var(--surface-alt)]">
                 {#each getLessonsFor(dayIdx) as lesson}
@@ -189,13 +189,13 @@ onMount(loadLessons);
                       border-color: {lesson.colour};
                     "
                   >
-                    <span class="font-bold text-sm truncate" style="color: var(--text);">{lesson.description}</span>
+                    <span class="text-sm font-bold truncate" style="color: var(--text);">{lesson.description}</span>
                     <span class="text-xs truncate" style="color: var(--text-muted);">{lesson.staff}</span>
                     <span class="text-xs truncate" style="color: var(--text-muted);">{lesson.room}</span>
                     {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
                       <span class="text-xs italic truncate" style="color: var(--text-muted);">{lesson.attendanceTitle}</span>
                     {/if}
-                    <span class="text-xs font-mono mt-1" style="color: var(--text);">{lesson.from} – {lesson.until}</span>
+                    <span class="mt-1 font-mono text-xs" style="color: var(--text);">{lesson.from} – {lesson.until}</span>
                   </div>
                 {/each}
               </div>
@@ -204,7 +204,7 @@ onMount(loadLessons);
         </div>
       {/if}
       {#if loadingLessons}
-        <div class="absolute inset-0 flex items-center justify-center"><span class="text-lg text-[var(--text-muted)]">Loading…</span></div>
+        <div class="flex absolute inset-0 justify-center items-center"><span class="text-lg text-[var(--text-muted)]">Loading…</span></div>
       {/if}
     </div>
   </div>

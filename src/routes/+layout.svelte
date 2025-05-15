@@ -30,6 +30,7 @@
 
 	let seqtaUrl = $state<string>('');
 	let userInfo = $state<UserInfo>();
+	let { children } = $props();
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -134,20 +135,20 @@
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
 		<div class="flex items-center">
-			<img src="/32x32.png" alt="DesQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
+			<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
 			<span class="text-lg font-bold tracking-wide">DesQTA</span>
 		</div>
-		<div class="flex items-center gap-4">
+		<div class="flex gap-4 items-center">
 			{#if userInfo}
 				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px]" style="background: transparent;">
 					<!-- Avatar with initials -->
-					<div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-base select-none">
+					<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white bg-blue-600 rounded-full select-none">
 						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
 					</div>
-					<div class="flex flex-col min-w-0 flex-1">
-						<div class="flex items-center gap-2">
-							<span class="font-semibold text-base truncate">{userInfo.userDesc}</span>
-							<span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-400/20 uppercase tracking-wide">{userInfo.type}</span>
+					<div class="flex flex-col flex-1 min-w-0">
+						<div class="flex gap-2 items-center">
+							<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
+							<span class="px-2 py-0.5 text-xs tracking-wide text-blue-400 uppercase rounded border bg-blue-500/10 border-blue-400/20">{userInfo.type}</span>
 						</div>
 						<div class="flex items-center gap-2 text-xs text-[var(--text-muted)] min-w-0">
 							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
@@ -198,12 +199,12 @@
 		</aside>
 
 		<!-- Main Content -->
-		<div
-			class="overflow-y-scroll flex-1 p-8 w-full h-full overflow-clip rounded-tl-2xl"
+		<main
+			class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl"
 			style="background: var(--background); color: var(--text);"
 		>
-			<main class="mx-auto max-w-7xl"><slot /></main>
-		</div>
+			{@render children()}
+		</main>
 	</div>
 
 	<!-- First‑run overlay -->
@@ -227,7 +228,7 @@
 				</div>
 				<button
 					onclick={startLogin}
-					class="w-full max-w-md py-2 rounded-lg font-semibold transition-transform duration-300 hover:scale-105 flex items-center justify-center"
+					class="flex justify-center items-center py-2 w-full max-w-md font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
 					style="background: #2563eb; color: white;"
 				>
 					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
