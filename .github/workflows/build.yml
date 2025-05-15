@@ -1,4 +1,4 @@
-name: Build DeskQTA
+name: Build DesQTA
 
 on:
   push:

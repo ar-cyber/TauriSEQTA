@@ -28,8 +28,8 @@
 	import { writable } from 'svelte/store';
 	export const needsSetup = writable(false);
 
-	let seqtaUrl = '';
-	let userInfo = $state<any>(null);
+	let seqtaUrl = $state<string>('');
+	let userInfo = $state<UserInfo>();
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -42,6 +42,7 @@
 	onMount(checkSession);
 
 	listen<string>('reload', (event) => {
+		location.reload();
 		checkSession();
 	})
 
@@ -70,6 +71,33 @@
 		if (success) {
 			await checkSession();
 		}
+	}
+
+	interface UserInfo {
+		clientIP: string;
+		email: string;
+		id: number;
+		lastAccessedTime: number;
+		meta: {
+			code: string;
+			governmentID: string;
+		};
+		personUUID: string;
+		saml: [{
+			autologin: boolean;
+			label: string;
+			method: string;
+			request: string;
+			sigalg: URL;
+			signature: string;
+			slo: boolean;
+			url: URL
+		}];
+		status: string;
+		type: string;
+		userCode: string;
+		userDesc: string;
+		userName: string;
 	}
 
 	async function loadUserInfo() {
@@ -106,12 +134,12 @@
 	<!-- Top Bar -->
 	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
 		<div class="flex items-center">
-			<img src="/32x32.png" alt="DeskQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
-			<span class="text-lg font-bold tracking-wide">DeskQTA</span>
+			<img src="/32x32.png" alt="DesQTA Logo" class="w-8 h-8 mr-3 select-none" draggable="false" />
+			<span class="text-lg font-bold tracking-wide">DesQTA</span>
 		</div>
 		<div class="flex items-center gap-4">
 			{#if userInfo}
-				<div class="flex items-center gap-3 px-3 py-1 rounded-lg border border-[var(--surface-alt)] min-w-[320px]" style="background: transparent;">
+				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px]" style="background: transparent;">
 					<!-- Avatar with initials -->
 					<div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-base select-none">
 						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
@@ -125,13 +153,16 @@
 							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
 							<span>•</span>
 							<span class="font-mono">{userInfo.userCode}</span>
+							<span>•</span>
+							<span class="font-mono">{userInfo.meta.governmentID}</span>
+
 						</div>
 					</div>
 				</div>
 			{/if}
 			{#if !$needsSetup}
 				<button 
-					on:click={handleLogout}
+					onclick={handleLogout}
 					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
 					style="background: var(--surface-alt); color: var(--text);"
 				>
@@ -195,8 +226,8 @@
 				/>
 				</div>
 				<button
-					on:click={startLogin}
-					class="w-full max-w-md py-2 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-300 hover:scale-105 flex items-center justify-center"
+					onclick={startLogin}
+					class="w-full max-w-md py-2 rounded-lg font-semibold transition-transform duration-300 hover:scale-105 flex items-center justify-center"
 					style="background: #2563eb; color: white;"
 				>
 					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
