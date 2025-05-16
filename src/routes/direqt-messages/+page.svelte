@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { seqtaFetch } from '../../utils/seqtaFetch';
   import { Icon } from 'svelte-hero-icons';
-  import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark, Star } from 'svelte-hero-icons';
+  import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark, Star, ArrowUturnLeft } from 'svelte-hero-icons';
 
   // Example folders
   const folders = [
@@ -42,6 +42,7 @@
 
   let starring = $state(false);
   let deleting = $state(false);
+  let restoring = $state(false);
 
   async function fetchMessages(folderLabel: string = 'inbox') {
     loading = true;
@@ -219,20 +220,32 @@
     if (starring) return;
     starring = true;
     try {
+      let newStarred = true;
+      // If in Starred folder and already starred, unstar
+      if (selectedFolder === 'Starred' && msg.starred) {
+        newStarred = false;
+      }
       const response = await seqtaFetch(
         '/seqta/student/save/message?',
         {
           method: 'POST',
           body: {
             mode: 'x-star',
-            starred: true,
+            starred: newStarred,
             items: [msg.id]
           }
         }
       );
       const data = typeof response === 'string' ? JSON.parse(response) : response;
-      if (data?.payload?.starred) {
-        msg.starred = true;
+      if (typeof data?.payload?.starred !== 'undefined') {
+        msg.starred = !!data.payload.starred;
+        // If unstarred in Starred folder, remove from list
+        if (!msg.starred && selectedFolder === 'Starred') {
+          messages = messages.filter(m => m.id !== msg.id);
+          if (selectedMessage && selectedMessage.id === msg.id) {
+            selectedMessage = null;
+          }
+        }
       }
     } catch (e) {
       // Optionally show error
@@ -269,6 +282,37 @@
       // Optionally show error
     } finally {
       deleting = false;
+    }
+  }
+
+  async function restoreMessage(msg: Message) {
+    if (restoring) return;
+    restoring = true;
+    try {
+      const response = await seqtaFetch(
+        '/seqta/student/save/message?',
+        {
+          method: 'POST',
+          body: {
+            mode: 'x-label',
+            label: 'inbox',
+            items: [msg.id]
+          }
+        }
+      );
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+      if (data?.payload?.label === 'inbox') {
+        // Remove from messages list
+        messages = messages.filter(m => m.id !== msg.id);
+        // If this was the open message, clear detail
+        if (selectedMessage && selectedMessage.id === msg.id) {
+          selectedMessage = null;
+        }
+      }
+    } catch (e) {
+      // Optionally show error
+    } finally {
+      restoring = false;
     }
   }
 </script>
@@ -345,7 +389,25 @@
             <div class="text-sm text-[var(--text-muted)]">To: <span class="font-semibold text-[var(--text)]">{selectedMessage.to}</span></div>
           </div>
           <div class="flex gap-2 bg-[var(--surface)] rounded-lg p-2 shadow-sm items-center">
-            {#if selectedMessage}
+            {#if selectedFolder === 'Trash'}
+              <button class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-green-400/20 focus:bg-green-400/30 transition-all duration-200" title="Restore" on:click={() => selectedMessage && restoreMessage(selectedMessage)} disabled={restoring}>
+                {#if restoring}
+                  <svg class="w-4 h-4 animate-spin text-green-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                {:else}
+                  <Icon src={ArrowUturnLeft} class="w-4 h-4 text-green-400 mb-0.5" />
+                {/if}
+                <span class="text-green-400 font-medium text-sm">Restore</span>
+              </button>
+            {:else if selectedFolder === 'Starred'}
+              <button class="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-yellow-400/20 focus:bg-yellow-400/30 transition-all duration-200" title="Unstar" on:click={() => selectedMessage && starMessage(selectedMessage)} disabled={starring || !selectedMessage.starred}>
+                {#if starring}
+                  <svg class="w-5 h-5 animate-spin text-yellow-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                {:else}
+                  <Icon src={Star} class="w-5 h-5 text-yellow-400 mb-1" solid={true} />
+                {/if}
+                <span class="text-yellow-400 font-semibold">Unstar</span>
+              </button>
+            {:else}
               <button class="p-2 rounded-lg hover:bg-yellow-400/20 focus:bg-yellow-400/30 transition-all duration-200" title="Star" on:click={() => selectedMessage && starMessage(selectedMessage)} disabled={starring || selectedMessage.starred}>
                 {#if starring}
                   <svg class="w-5 h-5 animate-spin text-yellow-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
