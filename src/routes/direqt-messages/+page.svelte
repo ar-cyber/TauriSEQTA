@@ -23,6 +23,7 @@
     body: string;
     date: string;
     unread: boolean;
+    starred?: boolean;
   }
 
   let messages: Message[] = $state([]);
@@ -38,6 +39,8 @@
 
   let detailLoading = $state(false);
   let detailError = $state<string | null>(null);
+
+  let starring = $state(false);
 
   async function fetchMessages(folderLabel: string = 'inbox') {
     loading = true;
@@ -126,7 +129,8 @@
             preview: msg.subject + (msg.attachments ? ' (Attachment)' : ''),
             body: '',
             date: msg.date?.replace('T', ' ').slice(0, 16) || '',
-            unread: !msg.read
+            unread: !msg.read,
+            starred: !!msg.starred
           }));
         } else {
           messages = [];
@@ -166,6 +170,10 @@
       } else {
         msg.body = '<em>No content.</em>';
       }
+      // If the API returns starred in the detail, update it
+      if (typeof data?.payload?.starred !== 'undefined') {
+        msg.starred = !!data.payload.starred;
+      }
     } catch (e) {
       detailError = 'Failed to load message.';
       msg.body = '';
@@ -204,6 +212,32 @@
       unread: false
     });
     showComposeModal = false;
+  }
+
+  async function starMessage(msg: Message) {
+    if (starring) return;
+    starring = true;
+    try {
+      const response = await seqtaFetch(
+        '/seqta/student/save/message?',
+        {
+          method: 'POST',
+          body: {
+            mode: 'x-star',
+            starred: true,
+            items: [msg.id]
+          }
+        }
+      );
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+      if (data?.payload?.starred) {
+        msg.starred = true;
+      }
+    } catch (e) {
+      // Optionally show error
+    } finally {
+      starring = false;
+    }
   }
 </script>
 
@@ -275,10 +309,19 @@
         <div class="p-6 border-b border-[var(--surface)] flex items-center justify-between rounded-t-xl bg-[var(--surface-alt)]">
           <div>
             <div class="font-bold text-2xl mb-1 text-blue-400">{selectedMessage.subject}</div>
-            <div class="text-sm text-[var(--text-muted)] mt-1">From: <span class="font-semibold text-[var(--text)]">{selectedMessage.sender}</span> &lt;{selectedMessage.sender.toLowerCase().replace(' ', '.')}@school.edu&gt;</div>
+            <div class="text-sm text-[var(--text-muted)] mt-1"><span class="font-semibold text-[var(--text)]">{selectedMessage.sender}</span></div>
             <div class="text-sm text-[var(--text-muted)]">To: <span class="font-semibold text-[var(--text)]">{selectedMessage.to}</span></div>
           </div>
-          <div class="flex gap-2 bg-[var(--surface)] rounded-lg p-2 shadow-sm">
+          <div class="flex gap-2 bg-[var(--surface)] rounded-lg p-2 shadow-sm items-center">
+            {#if selectedMessage}
+              <button class="p-2 rounded-lg hover:bg-yellow-400/20 focus:bg-yellow-400/30 transition-all duration-200" title="Star" on:click={() => selectedMessage && starMessage(selectedMessage)} disabled={starring || selectedMessage.starred}>
+                {#if starring}
+                  <svg class="w-5 h-5 animate-spin text-yellow-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                {:else}
+                  <Icon src={Star} class="w-5 h-5 text-yellow-400" solid={selectedMessage.starred} />
+                {/if}
+              </button>
+            {/if}
             <button class="p-2 rounded-lg hover:bg-blue-500/20 focus:bg-blue-500/30 transition-all duration-200" on:click={openCompose} title="Reply">
               <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
             </button>
