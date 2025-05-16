@@ -41,6 +41,7 @@
   let detailError = $state<string | null>(null);
 
   let starring = $state(false);
+  let deleting = $state(false);
 
   async function fetchMessages(folderLabel: string = 'inbox') {
     loading = true;
@@ -239,6 +240,37 @@
       starring = false;
     }
   }
+
+  async function deleteMessage(msg: Message) {
+    if (deleting) return;
+    deleting = true;
+    try {
+      const response = await seqtaFetch(
+        '/seqta/student/save/message?',
+        {
+          method: 'POST',
+          body: {
+            mode: 'x-label',
+            label: 'trash',
+            items: [msg.id]
+          }
+        }
+      );
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+      if (data?.payload?.label === 'trash') {
+        // Remove from messages list
+        messages = messages.filter(m => m.id !== msg.id);
+        // If this was the open message, clear detail
+        if (selectedMessage && selectedMessage.id === msg.id) {
+          selectedMessage = null;
+        }
+      }
+    } catch (e) {
+      // Optionally show error
+    } finally {
+      deleting = false;
+    }
+  }
 </script>
 
 <div class="flex h-screen bg-[var(--surface)] text-[var(--text)]">
@@ -325,8 +357,12 @@
             <button class="p-2 rounded-lg hover:bg-blue-500/20 focus:bg-blue-500/30 transition-all duration-200" on:click={openCompose} title="Reply">
               <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
             </button>
-            <button class="p-2 rounded-lg hover:bg-red-500/20 focus:bg-red-500/30 transition-all duration-200" title="Delete">
-              <Icon src={Trash} class="w-5 h-5 text-red-400" />
+            <button class="p-2 rounded-lg hover:bg-red-500/20 focus:bg-red-500/30 transition-all duration-200" title="Delete" on:click={() => selectedMessage && deleteMessage(selectedMessage)} disabled={deleting}>
+              {#if deleting}
+                <svg class="w-5 h-5 animate-spin text-red-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+              {:else}
+                <Icon src={Trash} class="w-5 h-5 text-red-400" />
+              {/if}
             </button>
           </div>
         </div>
