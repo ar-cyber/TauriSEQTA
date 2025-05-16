@@ -2,13 +2,13 @@
   import { onMount } from 'svelte';
   import { seqtaFetch } from '../../utils/seqtaFetch';
   import { Icon } from 'svelte-hero-icons';
-  import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark } from 'svelte-hero-icons';
+  import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark, Star } from 'svelte-hero-icons';
 
   // Example folders
   const folders = [
     { name: 'Inbox', icon: Inbox },
     { name: 'Sent', icon: PaperAirplane },
-    { name: 'Drafts', icon: DocumentDuplicate },
+    { name: 'Starred', icon: Star },
     { name: 'Trash', icon: Trash }
   ];
 
@@ -179,7 +179,8 @@
     selectedMessage = null;
     if (folder === 'Inbox') fetchMessages('inbox');
     else if (folder === 'Sent') fetchMessages('sent');
-    // You can add more folder logic here for Drafts, Trash, etc.
+    else if (folder === 'Starred') fetchMessages('starred');
+    else if (folder === 'Trash') fetchMessages('trash');
   }
 
   function openCompose() {
