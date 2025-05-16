@@ -98,25 +98,10 @@ function isColorLight(hex: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 150;
 }
 
-function getTextColor(bg: string) {
-  // Remove 'var(...)' and fallback to white if not a hex
-  if (!bg.startsWith('#')) return '#fff';
-  return isColorLight(bg) ? '#111' : '#fff';
-}
-
 function getUniqueTimes() {
   // Get all unique lesson start times for the week, sorted
   const times = Array.from(new Set(lessons.map(l => l.from)));
   return times.sort((a, b) => a.localeCompare(b));
-}
-
-function getLessonsAt(dayIdx: number, time: string) {
-  return lessons.filter(l => l.dayIdx === dayIdx && l.from === time);
-}
-
-function buildAssessmentURL(programmeID: number, metaID: number, itemID?: number) {
-  const base = `../#?page=/assessments/${programmeID}:${metaID}`;
-  return itemID ? `${base}&item=${itemID}` : base;
 }
 
 // Utility: Convert "HH:MM" to minutes since midnight
@@ -146,12 +131,12 @@ const timeBounds = $derived(getTimeBounds);
 onMount(loadLessons);
 </script>
 
-<div class="flex flex-col h-full w-full text-slate-50">
-  <div class="flex items-center justify-between px-4 py-2 bg-slate-800 shadow">
+<div class="flex flex-col w-full h-full text-slate-50">
+  <div class="flex justify-between items-center px-4 py-2 shadow bg-slate-800">
     <div class="flex gap-2 items-center">
-      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={prevWeek}>&#60;</button>
+      <button class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110" onclick={prevWeek}>&#60;</button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
-      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={nextWeek}>&#62;</button>
+      <button class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110" onclick={nextWeek}>&#62;</button>
     </div>
   </div>
 
@@ -159,10 +144,10 @@ onMount(loadLessons);
   <div class="flex overflow-hidden flex-1 items-stretch">
     <div class="flex flex-col flex-1 w-full h-full justify-stretch">
       <!-- Header Row -->
-      <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full" style="border-bottom: 2px solid var(--surface-alt);">
-        <div class="bg-slate-800 w-14"></div>
+      <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full border-b-2 border-slate-800">
+        <div class="w-14 bg-slate-800"></div>
         {#each dayLabels as day, index}
-          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-[var(--surface)] text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
+          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-slate-900 text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
         {/each}
       </div>
       <!-- Time grid and lessons -->
@@ -182,20 +167,20 @@ onMount(loadLessons);
               <div class="relative h-full border-l border-slate-800">
                 {#each getLessonsFor(dayIdx) as lesson}
                   <div
-                    class="absolute left-1 right-1 rounded-lg shadow-sm border-l-4 bg-slate-800 p-2 flex flex-col justify-center"
+                    class="flex absolute right-1 left-1 flex-col justify-center p-2 rounded-lg border-l-4 shadow-sm bg-slate-800"
                     style="
                       top: {timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
                       height: {timeToY(timeToMinutes(lesson.until), timeBounds().min, timeBounds().max) - timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
                       border-color: {lesson.colour};
                     "
                   >
-                    <span class="text-sm font-bold truncate" style="color: var(--text);">{lesson.description}</span>
-                    <span class="text-xs truncate" style="color: var(--text-muted);">{lesson.staff}</span>
-                    <span class="text-xs truncate" style="color: var(--text-muted);">{lesson.room}</span>
+                    <span class="text-sm font-bold truncate">{lesson.description}</span>
+                    <span class="text-xs truncate text-slate-400">{lesson.staff}</span>
+                    <span class="text-xs truncate text-slate-400">{lesson.room}</span>
                     {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                      <span class="text-xs italic truncate" style="color: var(--text-muted);">{lesson.attendanceTitle}</span>
+                      <span class="text-xs italic truncate text-slate-400">{lesson.attendanceTitle}</span>
                     {/if}
-                    <span class="mt-1 font-mono text-xs" style="color: var(--text);">{lesson.from} – {lesson.until}</span>
+                    <span class="mt-1 font-mono text-xs">{lesson.from} – {lesson.until}</span>
                   </div>
                 {/each}
               </div>
