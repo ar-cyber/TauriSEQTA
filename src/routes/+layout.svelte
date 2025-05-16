@@ -131,16 +131,16 @@
 	];
 </script>
 
-<div class="h-screen bg-[var(--surface)]" style="color: var(--text);">
+<div class="h-screen bg-slate-900">
 	<!-- Top Bar -->
-	<header class="flex fixed top-0 right-0 left-0 justify-between items-center place-items-center px-8 h-12" style="background: var(--surface); color: var(--text);">
+	<header class="flex top-0 right-0 left-0 justify-between items-center place-items-center py-2 pr-8 pl-4">
 		<div class="flex items-center">
 			<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
 			<span class="text-lg font-bold tracking-wide">DesQTA</span>
 		</div>
 		<div class="flex gap-4 items-center">
 			{#if userInfo}
-				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px]" style="background: transparent;">
+				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px] bg-transparent">
 					<!-- Avatar with initials -->
 					<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white bg-blue-600 rounded-full select-none">
 						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
@@ -150,13 +150,12 @@
 							<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
 							<span class="px-2 py-0.5 text-xs tracking-wide text-blue-400 uppercase rounded border bg-blue-500/10 border-blue-400/20">{userInfo.type}</span>
 						</div>
-						<div class="flex items-center gap-2 text-xs text-[var(--text-muted)] min-w-0">
+						<div class="flex gap-2 items-center min-w-0 text-xs text-slate-400">
 							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
 							<span>•</span>
 							<span class="font-mono">{userInfo.userCode}</span>
 							<span>•</span>
 							<span class="font-mono">{userInfo.meta.governmentID}</span>
-
 						</div>
 					</div>
 				</div>
@@ -164,8 +163,7 @@
 			{#if !$needsSetup}
 				<button 
 					onclick={handleLogout}
-					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition"
-					style="background: var(--surface-alt); color: var(--text);"
+					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition bg-zinc-800"
 				>
 					Logout
 				</button>
@@ -173,14 +171,13 @@
 		</div>
 	</header>
 
-	<div class="flex pt-12 h-full">
+	<div class="flex h-full">
 		<!-- Sidebar -->
 		<aside
 			class="flex overflow-y-scroll flex-col px-2 pb-6 space-y-2 w-64 h-full"
-			style="background: var(--surface); color: var(--text);"
 		>
 			{#each menu as item}
-				<a href={item.path} class="flex items-center px-4 py-3 rounded hover:bg-[color:var(--surface-alt)] transition-transform duration-300 hover:scale-105 group">
+				<a href={item.path} class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-slate-800 hover:scale-[1.03] group">
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
 					<span class="text-base font-bold">{item.label}</span>
 					{#if item.hasSub}
@@ -199,10 +196,8 @@
 		</aside>
 
 		<!-- Main Content -->
-		<main
-			class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl"
-			style="background: var(--background); color: var(--text);"
-		>
+		<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
+		<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
 			{@render children()}
 		</main>
 	</div>
@@ -210,25 +205,24 @@
 	<!-- First‑run overlay -->
 	{#if $needsSetup}
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
-			<div class="bg-[color:var(--surface)] rounded-2xl shadow-xl p-8 w-full h-full flex flex-col justify-center items-center space-y-5">
-				<h2 class="text-xl font-bold" style="color: var(--text);">Connect to your SEQTA instance</h2>
-				<p class="text-sm" style="color: var(--text-muted);">
+			<div class="flex flex-col justify-center items-center p-8 space-y-5 max-w-xl rounded-2xl shadow-xl bg-slate-900">
+				<h2 class="text-xl font-bold">Connect to your SEQTA instance</h2>
+				<p class="text-sm">
 					Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll
 					securely save your session cookie.
 				</p>
-				<div class="flex items-center">
+				<div class="flex items-center w-full">
 					<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
-				<input
-					type="text"
-					bind:value={seqtaUrl}
-					placeholder="https://schoolname.seqta.com"
-						class="px-3 py-2 w-full max-w-xl rounded-lg border outline-none focus:ring"
-					style="background: var(--surface-alt); color: var(--text); border-color: var(--surface-alt);"
-				/>
+					<input
+						type="text"
+						bind:value={seqtaUrl}
+						placeholder="https://schoolname.seqta.com"
+						class="px-3 py-2 w-full rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
+					/>
 				</div>
 				<button
 					onclick={startLogin}
-					class="flex justify-center items-center py-2 w-full max-w-md font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
+					class="flex justify-center items-center py-2 w-full font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
 					style="background: #2563eb; color: white;"
 				>
 					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />

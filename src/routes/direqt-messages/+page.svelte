@@ -180,11 +180,11 @@
   }
 </script>
 
-<div class="flex h-full text-[var(--text)]">
+<div class="flex h-full text-slate-50">
 <!-- Sidebar -->
-  <div class="w-80 border-r border-[var(--surface-alt)] flex flex-col">
+  <div class="w-80 border-r border-slate-800 flex flex-col">
     <!-- New Message Button -->
-    <div class="p-4 border-b border-[var(--surface-alt)]">
+    <div class="p-4 border-b border-slate-800">
       <button
         class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
         onclick={() => showComposeModal = true}
@@ -195,13 +195,13 @@
     </div>
 
     <!-- Search -->
-    <div class="p-4 border-b border-[var(--surface-alt)]">
+    <div class="p-4 border-b border-slate-800">
       <div class="relative group">
         <input
           type="text"
           bind:value={searchQuery}
           placeholder="Search messages..."
-          class="w-full px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 group-hover:bg-[var(--surface-hover)]"
+          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 group-hover:bg-[var(--surface-hover)]"
         />
       </div>
     </div>
@@ -210,7 +210,7 @@
     <div class="overflow-y-auto flex-1">
       {#each conversations as conversation}
         <button
-          class="w-full p-4 flex items-center gap-3 hover:bg-[var(--surface-alt)] transition-all duration-200 {selectedConversation.id === conversation.id ? 'bg-[var(--surface-alt)]' : ''} group"
+          class="w-full p-4 flex items-center gap-3 hover:bg-slate-800 transition-all duration-200 {selectedConversation.id === conversation.id ? 'bg-slate-800' : ''} group"
           onclick={() => selectedConversation = conversation}
         >
           <div class="relative">
@@ -224,10 +224,10 @@
           <div class="flex-1 min-w-0">
             <div class="flex justify-between items-center">
               <span class="font-semibold truncate transition-colors duration-200 group-hover:text-blue-500">{conversation.name}</span>
-              <span class="text-xs text-[var(--text-muted)]">{conversation.time}</span>
+              <span class="text-xs text-slate-400">{conversation.time}</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-[var(--text-muted)] truncate group-hover:text-[var(--text)] transition-colors duration-200">{conversation.lastMessage}</span>
+              <span class="text-sm text-slate-400 truncate group-hover:text-slate-50 transition-colors duration-200">{conversation.lastMessage}</span>
               {#if conversation.unread}
                 <span class="px-2 py-0.5 ml-2 text-xs text-white bg-blue-500 rounded-full animate-bounce">{conversation.unread}</span>
               {/if}
@@ -241,7 +241,7 @@
   <!-- Chat Area -->
   <div class="flex flex-col flex-1">
     <!-- Chat Header -->
-    <div class="h-16 border-b border-[var(--surface-alt)] flex items-center justify-between px-6">
+    <div class="h-16 border-b border-slate-800 flex items-center justify-between px-6">
       <div class="flex gap-3 items-center">
         <div class="relative group">
           <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
@@ -253,10 +253,10 @@
         </div>
         <div>
           <h2 class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{selectedConversation.name}</h2>
-          <p class="text-sm text-[var(--text-muted)]">{selectedConversation.role}</p>
+          <p class="text-sm text-slate-400">{selectedConversation.role}</p>
         </div>
       </div>
-      <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-90" onclick={() => {}}>
+      <button class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-90" onclick={() => {}}>
         <Icon src={EllipsisHorizontal} class="w-6 h-6" />
       </button>
     </div>
@@ -265,7 +265,7 @@
     <div class="overflow-y-auto flex-1 p-6 space-y-4">
       {#each messages as message}
         <div class="flex {message.isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
-          <div class="max-w-[70%] {message.isMe ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)]'} rounded-2xl px-4 py-2 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-[1.02]">
+          <div class="max-w-[70%] {message.isMe ? 'bg-blue-500 text-white' : 'bg-slate-800'} rounded-2xl px-4 py-2 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-[1.02]">
             {#if !message.isMe}
               <div class="mb-1 text-xs font-semibold">{message.sender}</div>
             {/if}
@@ -277,9 +277,9 @@
     </div>
 
     <!-- Message Input -->
-    <div class="p-4 border-t border-[var(--surface-alt)]">
+    <div class="p-4 border-t border-slate-800">
       <div class="flex gap-2 items-center">
-        <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-12">
+        <button class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-12">
           <Icon src={PaperClip} class="w-6 h-6" />
         </button>
         <div class="relative flex-1">
@@ -287,7 +287,7 @@
             bind:value={newMessage}
             onkeypress={handleKeyPress}
             placeholder="Type a message..."
-            class="w-full px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
+            class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
             rows="1"
           ></textarea>
         </div>
@@ -306,12 +306,12 @@
 <!-- Compose Message Modal -->
 {#if showComposeModal}
   <div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50 animate-fade-in">
-    <div class="bg-[var(--surface)] rounded-lg w-[500px] max-h-[80vh] flex flex-col shadow-2xl transform transition-all duration-300 scale-100">
+    <div class="bg-slate-900 rounded-lg w-[500px] max-h-[80vh] flex flex-col shadow-2xl transform transition-all duration-300 scale-100">
       <!-- Modal Header -->
-      <div class="p-4 border-b border-[var(--surface-alt)] flex items-center justify-between">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
         <h2 class="text-lg font-semibold">New Message</h2>
         <button
-          class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200 hover:rotate-90"
+          class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-90"
           onclick={() => showComposeModal = false}
         >
           <Icon src={XMark} class="w-6 h-6" />
@@ -319,12 +319,12 @@
       </div>
 
       <!-- Recipient Search -->
-      <div class="p-4 border-b border-[var(--surface-alt)]">
+      <div class="p-4 border-b border-slate-800">
         <input
           type="text"
           bind:value={recipientSearch}
           placeholder="Search for a recipient..."
-          class="w-full px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
+          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
         />
       </div>
 
@@ -332,7 +332,7 @@
       <div class="overflow-y-auto flex-1 p-4">
         {#each filteredRecipients as recipient}
           <button
-            class="w-full p-3 flex items-center gap-3 hover:bg-[var(--surface-alt)] transition-all duration-200 rounded-lg {selectedRecipient?.id === recipient.id ? 'bg-[var(--surface-alt)]' : ''} group"
+            class="w-full p-3 flex items-center gap-3 hover:bg-slate-800 transition-all duration-200 rounded-lg {selectedRecipient?.id === recipient.id ? 'bg-slate-800' : ''} group"
             onclick={() => selectedRecipient = recipient}
           >
             <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
@@ -340,18 +340,18 @@
             </div>
             <div class="text-left">
               <div class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{recipient.name}</div>
-              <div class="text-sm text-[var(--text-muted)] group-hover:text-[var(--text)] transition-colors duration-200">{recipient.role}</div>
+              <div class="text-sm text-slate-400 group-hover:text-slate-50 transition-colors duration-200">{recipient.role}</div>
             </div>
           </button>
         {/each}
       </div>
 
       <!-- Message Input -->
-      <div class="p-4 border-t border-[var(--surface-alt)]">
+      <div class="p-4 border-t border-slate-800">
         <textarea
           bind:value={composeMessage}
           placeholder="Type your message..."
-          class="w-full px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 transition-all duration-200 hover:bg-[var(--surface-hover)]"
+          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 transition-all duration-200 hover:bg-[var(--surface-hover)]"
           rows="3"
         ></textarea>
         <button

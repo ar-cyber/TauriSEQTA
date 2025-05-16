@@ -108,13 +108,13 @@
 		<h1 class="text-2xl font-bold" style="color: var(--text);">Assessments</h1>
 		<div class="flex gap-2">
 			<button 
-				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'list' ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)] text-[var(--text)]'}"
+				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'list' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
 				onclick={() => selectedTab = 'list'}
 			>
 				List View
 			</button>
 			<button 
-				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'board' ? 'bg-blue-500 text-white' : 'bg-[var(--surface-alt)] text-[var(--text)]'}"
+				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'board' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
 				onclick={() => selectedTab = 'board'}
 			>
 				Board View
@@ -134,13 +134,13 @@
 		<div class="flex gap-6">
 			<!-- Quick Navigation Sidebar -->
 			<div class="w-48 flex-shrink-0">
-				<div class="sticky top-6 bg-[var(--surface-alt)] rounded-xl p-4">
+				<div class="sticky top-6 bg-slate-800 rounded-xl p-4">
 					<h3 class="text-sm font-semibold mb-3" style="color: var(--text-muted);">Quick Jump</h3>
 					<div class="space-y-2">
 						{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
 							<a 
 								href="#subject-{subject.code}"
-								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] transition-colors cursor-pointer"
+								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-900 transition-colors cursor-pointer"
 								style="color: var(--text);"
 								onclick={(e) => scrollToSubject(e, subject.code)}
 							>
@@ -155,7 +155,7 @@
 			<!-- Main Content -->
 			<div class="flex-1 space-y-6">
 				{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
-					<div id="subject-{subject.code}" class="bg-[var(--surface-alt)] rounded-xl overflow-hidden">
+					<div id="subject-{subject.code}" class="bg-slate-800 rounded-xl overflow-hidden">
 						<div class="px-6 py-4 border-b" style="border-color: var(--surface);">
 							<div class="flex items-center gap-3">
 								<div class="w-3 h-3 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
@@ -165,7 +165,7 @@
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-								<div class="flex gap-4 items-center p-4 rounded-xl bg-[var(--surface)] transition-transform duration-300 hover:scale-105 border-l-8" style="border-color: {assessment.colour};">
+								<div class="flex gap-4 items-center p-4 rounded-xl bg-slate-900 transition-transform duration-300 hover:scale-105 border-l-8" style="border-color: {assessment.colour};">
 									<div class="flex justify-center items-center w-16 h-16 rounded-lg" style="background: var(--background); color: var(--surface);">
 										<span class="text-3xl">📄</span>
 									</div>
@@ -199,13 +199,13 @@
 		<div class="flex gap-4 overflow-x-auto pb-4">
 			{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
 				<div class="flex-shrink-0 w-80">
-					<div class="bg-[var(--surface-alt)] rounded-xl p-4 mb-4 border-l-8" style="border-color: {subject.colour || '#8e8e8e'};">
+					<div class="bg-slate-800 rounded-xl p-4 mb-4 border-l-8" style="border-color: {subject.colour || '#8e8e8e'};">
 						<h3 class="font-bold text-lg" style="color: var(--text);">{subject.title}</h3>
 						<p class="text-sm" style="color: var(--text-muted);">{subject.code}</p>
 					</div>
 					<div class="space-y-4">
 						{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-							<div class="bg-[var(--surface)] rounded-xl p-4 shadow-lg border-l-8" style="border-color: {assessment.colour};">
+							<div class="bg-slate-900 rounded-xl p-4 shadow-lg border-l-8" style="border-color: {assessment.colour};">
 								<div class="flex items-center gap-2">
 									<div class="text-sm font-semibold" style="color: var(--text-muted);">
 										{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}

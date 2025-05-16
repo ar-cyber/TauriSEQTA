@@ -146,8 +146,8 @@ const timeBounds = $derived(getTimeBounds);
 onMount(loadLessons);
 </script>
 
-<div class="flex flex-col h-screen w-full text-[var(--text)]">
-  <div class="flex items-center justify-between px-4 py-2 bg-[var(--surface-alt)] shadow">
+<div class="flex flex-col h-full w-full text-slate-50">
+  <div class="flex items-center justify-between px-4 py-2 bg-slate-800 shadow">
     <div class="flex gap-2 items-center">
       <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--background)] transition-transform duration-300 hover:scale-110" onclick={prevWeek}>&#60;</button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
@@ -160,9 +160,9 @@ onMount(loadLessons);
     <div class="flex flex-col flex-1 w-full h-full justify-stretch">
       <!-- Header Row -->
       <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full" style="border-bottom: 2px solid var(--surface-alt);">
-        <div class="bg-[var(--surface-alt)] w-14"></div>
+        <div class="bg-slate-800 w-14"></div>
         {#each dayLabels as day, index}
-          <div class="py-1 px-2 text-center font-bold bg-[var(--surface-alt)] border-l border-[var(--surface)] text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
+          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-[var(--surface)] text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
         {/each}
       </div>
       <!-- Time grid and lessons -->
@@ -171,18 +171,18 @@ onMount(loadLessons);
           <!-- Time labels -->
           <div class="absolute top-0 left-0 z-10 w-14 h-full pointer-events-none">
             {#each getUniqueTimes() as time}
-              <div class="absolute left-0 w-full border-t border-[var(--surface-alt)]" style="top: {timeToY(timeToMinutes(time), timeBounds().min, timeBounds().max)}px;">
-                <span class="text-xs text-[var(--text-muted)]">{time}</span>
+              <div class="absolute left-0 w-full border-t border-slate-800" style="top: {timeToY(timeToMinutes(time), timeBounds().min, timeBounds().max)}px;">
+                <span class="text-xs text-slate-400">{time}</span>
               </div>
             {/each}
           </div>
           <!-- Day columns -->
           <div class="grid absolute top-0 right-0 left-14 grid-cols-5 h-full">
             {#each Array(5) as _, dayIdx}
-              <div class="relative h-full border-l border-[var(--surface-alt)]">
+              <div class="relative h-full border-l border-slate-800">
                 {#each getLessonsFor(dayIdx) as lesson}
                   <div
-                    class="absolute left-1 right-1 rounded-lg shadow-sm border-l-4 bg-[var(--surface-alt)] p-2 flex flex-col justify-center"
+                    class="absolute left-1 right-1 rounded-lg shadow-sm border-l-4 bg-slate-800 p-2 flex flex-col justify-center"
                     style="
                       top: {timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
                       height: {timeToY(timeToMinutes(lesson.until), timeBounds().min, timeBounds().max) - timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
@@ -204,7 +204,7 @@ onMount(loadLessons);
         </div>
       {/if}
       {#if loadingLessons}
-        <div class="flex absolute inset-0 justify-center items-center"><span class="text-lg text-[var(--text-muted)]">Loading…</span></div>
+        <div class="flex absolute inset-0 justify-center items-center"><span class="text-lg text-slate-400">Loading…</span></div>
       {/if}
     </div>
   </div>

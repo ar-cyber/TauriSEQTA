@@ -209,46 +209,46 @@
 	<div class="space-y-6">
 		<div class="flex gap-6">
 			{#each [{ name: 'Outlook', icon: '📅', url: 'https://outlook.office.com' }, { name: 'Office365', icon: '🏢', url: 'https://office365.com' }, { name: 'Google', icon: '🌐', url: 'https://google.com' }] as integration}
-			<a href={integration.url} target="_blank" class="flex flex-1 justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105" style="background: var(--surface); color: var(--text);">
+			<a href={integration.url} target="_blank" class="flex flex-1 justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105 bg-slate-900">
 				<span class="mr-2 text-2xl">{integration.icon}</span> {integration.name}
 			</a>
 			{/each}
 		</div>
 		
-		<div class="rounded-2xl shadow bg-[var(--surface)]">
-			<div class="flex justify-between items-center px-6 py-3 rounded-t-2xl border-b" style="border-color: var(--surface-alt);">
-			<span class="text-lg font-semibold" style="color: var(--text);">{lessonsSubtitle()}</span>
+		<div class="rounded-2xl shadow bg-slate-900">
+			<div class="flex justify-between items-center px-6 py-3 rounded-t-2xl border-b border-slate-800">
+			<span class="text-lg font-semibold">{lessonsSubtitle()}</span>
 			<div class="flex gap-2">
-				<button onclick={prevDay} class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[color:var(--surface-alt)] transition-transform duration-300 hover:scale-110" style="color: var(--text);">&#60;</button>
-				<button onclick={nextDay} class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[color:var(--surface-alt)] transition-transform duration-300 hover:scale-110" style="color: var(--text);">&#62;</button>
+				<button onclick={prevDay} class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-800 hover:scale-110">&#60;</button>
+				<button onclick={nextDay} class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-800 hover:scale-110">&#62;</button>
 			</div>
 			</div>
 		
 			{#if loadingLessons}
-			<div class="flex flex-col justify-center items-center py-12"><p style="color:var(--text-muted);">Loading lessons…</p></div>
+			<div class="flex flex-col justify-center items-center py-12"><p class="text-slate-400">Loading lessons…</p></div>
 			{:else if lessons.length === 0}
 			<div class="flex flex-col justify-center items-center py-12">
-				<div class="flex justify-center items-center mb-4 w-24 h-24 rounded-full" style="background: var(--background); color: var(--surface);">
+				<div class="flex justify-center items-center mb-4 w-24 h-24 rounded-full bg-slate-950 text-slate-900">
 				<span class="text-6xl">Q</span>
 				</div>
-				<p class="text-2xl" style="color: var(--text);">No lessons available.</p>
+				<p class="text-2xl">No lessons available.</p>
 			</div>
 			{:else}
 			<div class="flex overflow-x-auto gap-4 px-4 py-6">
 				{#each lessons as lesson, i}
-				<div class="relative flex flex-col min-w-[170px] max-w-[210px] bg-[var(--surface-alt)] rounded-xl shadow-lg border-l-8 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
+				<div class="relative flex flex-col min-w-[170px] max-w-[210px] bg-slate-800 rounded-xl shadow-lg border-l-8 transition-transform duration-300 hover:scale-105" style="border-color: {lesson.colour};">
 					<div class="flex flex-col flex-1 gap-1 px-4 pt-4 pb-2">
 					<div class="flex justify-between items-center">
-						<span class="text-base font-bold" style="color: var(--text);">{lesson.description}</span>
+						<span class="text-base font-bold">{lesson.description}</span>
 						{#if lesson.active}
 						<span class="px-2 py-0.5 ml-2 text-xs text-white bg-green-600 rounded">Now</span>
 						{/if}
 					</div>
-					<div class="text-sm" style="color: var(--text-muted);">{lesson.staff}</div>
-					<div class="text-xs" style="color: var(--text-muted);">{lesson.room}</div>
-					<div class="mt-2 font-mono text-sm" style="color: var(--text);">{lesson.from} – {lesson.until}</div>
+					<div class="text-sm text-slate-400">{lesson.staff}</div>
+					<div class="text-xs text-slate-400">{lesson.room}</div>
+					<div class="mt-2 font-mono text-sm">{lesson.from} – {lesson.until}</div>
 					{#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-						<div class="mt-1 text-xs italic" style="color: var(--text-muted);">{lesson.attendanceTitle}</div>
+						<div class="mt-1 text-xs italic text-slate-400">{lesson.attendanceTitle}</div>
 					{/if}
 					</div>
 					{#if lesson.programmeID !== 0}
@@ -267,18 +267,18 @@
 			{/if}
 		</div>
 		
-		<div class="rounded-2xl shadow bg-[var(--surface)]">
-				<div class="flex justify-between items-center px-6 py-3 rounded-t-2xl border-b" style="border-color: var(--surface-alt);">
-			<span class="text-lg font-semibold" style="color: var(--text);">Upcoming Assessments</span>
-			<div class="flex flex-wrap gap-2" id="upcoming-filters">
-				{#each activeSubjects as subj}
-				<label class="upcoming-checkbox-container" style={subj.colour}>
-					<input type="checkbox" bind:checked={subjectFilters[subj.code]} />
-					<span class="upcoming-checkmark"></span>
-					{subj.code}
-				</label>
-				{/each}
-			</div>
+		<div class="rounded-2xl shadow bg-slate-900">
+			<div class="flex justify-between items-center px-6 py-3 rounded-t-2xl border-b border-slate-800">
+				<span class="text-lg font-semibold">Upcoming Assessments</span>
+				<div class="flex flex-wrap gap-2" id="upcoming-filters">
+					{#each activeSubjects as subj}
+					<label class="upcoming-checkbox-container" style={subj.colour}>
+						<input type="checkbox" bind:checked={subjectFilters[subj.code]} />
+						<span class="upcoming-checkmark"></span>
+						{subj.code}
+					</label>
+					{/each}
+				</div>
 			</div>
 		
 			{#if loadingAssessments}
@@ -288,13 +288,13 @@
 			{:else}
 			<div class="p-6 space-y-4" id="upcoming-items">
 				{#each filteredAssessments as a}
-				<div class="flex gap-4 items-center p-4 rounded-xl transition-transform duration-300 upcoming-assessment hover:scale-105" style="background: var(--surface-alt); border: 1px solid var(--surface-alt); border-left: 8px solid {a.colour};">
-					<div class="flex justify-center items-center w-16 h-16 rounded-lg" style="background: var(--background); color: var(--surface);">
+				<div class="flex gap-4 items-center p-4 rounded-xl transition-transform duration-300 upcoming-assessment hover:scale-105 bg-slate-800" style="border: 1px solid var(--surface-alt); border-left: 8px solid {a.colour};">
+					<div class="flex justify-center items-center w-16 h-16 rounded-lg bg-slate-900">
 					<span class="text-3xl">📄</span>
 					</div>
 					<div class="flex-1">
 					<div class="flex gap-2 items-center">
-						<div class="text-lg font-bold" style="color: var(--text);">
+						<div class="text-lg font-bold">
 						{new Date(a.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' })}
 						</div>
 						<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(a.status, a.due).color}">
@@ -303,7 +303,7 @@
 					</div>
 					<div class="mt-2">
 						<span class="block text-xs font-semibold uppercase" style="color: var(--text-muted);">{a.subject}</span>
-						<span class="block text-base font-semibold" style="color: var(--text);">{a.title}</span>
+						<span class="block text-base font-semibold">{a.title}</span>
 					</div>
 					</div>
 				</div>

@@ -59,14 +59,14 @@
 	{:else if homeworkData}
 		<div class="flex flex-col gap-6">
 			{#each homeworkData.payload as homework}
-				<div class="bg-[var(--surface)] rounded-xl shadow-lg border-l-8" style="border-color: #1a73e8;">
+				<div class="bg-slate-900 rounded-xl shadow-lg border-l-8" style="border-color: #1a73e8;">
 					<div class="px-6 pt-5 pb-3">
 						<h2 class="text-lg font-bold mb-2" style="color: var(--text);">{homework.title}</h2>
 						<div class="flex flex-col gap-3">
 							{#each homework.items as item}
-								<div class="flex gap-2 items-start bg-[var(--surface-alt)] rounded-lg px-4 py-3 border border-[var(--surface-alt)]">
+								<div class="flex gap-2 items-start bg-slate-800 rounded-lg px-4 py-3 border border-slate-800">
 									<span class="text-xl text-blue-500 mt-1">•</span>
-									<span class="text-[var(--text)]">{item}</span>
+									<span class="text-slate-50">{item}</span>
 								</div>
 							{/each}
 						</div>
