@@ -17,25 +17,23 @@ body {
 
 /* Custom Scrollbar Styles */
 ::-webkit-scrollbar {
-	@apply bg-slate-800;
-	width: 10px;
-	height: 8px;
+	background: #111827; /* slate-900 */
+	width: 8px;
 	border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb {
-	@apply border-slate-800 border-2;
-	background: var(--primary-color);
+	background: #3b82f6; /* blue-500 */
 	border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: #2563eb;
+	background: #2563eb; /* blue-600 */
 }
 ::-webkit-scrollbar-corner {
-	@apply bg-slate-800;
+	background: #111827; /* slate-900 */
 }
 
 /* Firefox */
 * {
 	scrollbar-width: thin;
-	scrollbar-color: var(--primary-color) var(--slate-800);
+	scrollbar-color: #3b82f6 #111827;
 } 
