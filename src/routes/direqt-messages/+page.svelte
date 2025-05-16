@@ -1,365 +1,344 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { seqtaFetch } from '../../utils/seqtaFetch';
   import { Icon } from 'svelte-hero-icons';
-  import { PaperAirplane, PaperClip, EllipsisHorizontal, UserCircle, Plus, XMark } from 'svelte-hero-icons';
+  import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark } from 'svelte-hero-icons';
 
-  interface Recipient {
-    id: number;
-    name: string;
-    role: string;
-    avatar: string;
-  }
+  // Example folders
+  const folders = [
+    { name: 'Inbox', icon: Inbox },
+    { name: 'Sent', icon: PaperAirplane },
+    { name: 'Drafts', icon: DocumentDuplicate },
+    { name: 'Trash', icon: Trash }
+  ];
 
-  interface Conversation {
-    id: number;
-    name: string;
-    role: string;
-    avatar: string;
-    lastMessage: string;
-    time: string;
-    unread: number;
-    online: boolean;
-  }
-
+  // Example messages
   interface Message {
     id: number;
+    folder: string;
     sender: string;
-    content: string;
-    time: string;
-    isMe: boolean;
+    to: string;
+    subject: string;
+    preview: string;
+    body: string;
+    date: string;
+    unread: boolean;
   }
 
-  // Example data
-  const conversations: Conversation[] = [
-    {
-      id: 1,
-      name: "Mr. Smith",
-      role: "Mathematics Teacher",
-      avatar: "MS",
-      lastMessage: "Don't forget to submit your assignment by Friday",
-      time: "10:30 AM",
-      unread: 2,
-      online: true
-    },
-    {
-      id: 2,
-      name: "Mrs. Johnson",
-      role: "Science Department",
-      avatar: "SJ",
-      lastMessage: "Great work on the lab report!",
-      time: "Yesterday",
-      unread: 0,
-      online: false
-    },
-    {
-      id: 3,
-      name: "Student Support",
-      role: "Administration",
-      avatar: "SS",
-      lastMessage: "Your request has been approved",
-      time: "2 days ago",
-      unread: 0,
-      online: true
-    }
-  ];
+  let messages: Message[] = $state([]);
+  let loading = $state(true);
+  let error = $state<string | null>(null);
 
-  const messages: Message[] = [
-    {
-      id: 1,
-      sender: "Mr. Smith",
-      content: "Hi there! How's the assignment coming along?",
-      time: "10:15 AM",
-      isMe: false
-    },
-    {
-      id: 2,
-      sender: "You",
-      content: "I'm working on it now. I have a question about question 3.",
-      time: "10:20 AM",
-      isMe: true
-    },
-    {
-      id: 3,
-      sender: "Mr. Smith",
-      content: "Sure, what's your question?",
-      time: "10:25 AM",
-      isMe: false
-    },
-    {
-      id: 4,
-      sender: "You",
-      content: "I'm not sure how to approach the quadratic equation part. Could you explain it?",
-      time: "10:28 AM",
-      isMe: true
-    },
-    {
-      id: 5,
-      sender: "Mr. Smith",
-      content: "Don't forget to submit your assignment by Friday",
-      time: "10:30 AM",
-      isMe: false
-    }
-  ];
-
-  // Example recipients data
-  const allRecipients: Recipient[] = [
-    { id: 1, name: "Mr. Smith", role: "Mathematics Teacher", avatar: "MS" },
-    { id: 2, name: "Mrs. Johnson", role: "Science Department", avatar: "SJ" },
-    { id: 3, name: "Student Support", role: "Administration", avatar: "SS" },
-    { id: 4, name: "Mr. Brown", role: "English Teacher", avatar: "MB" },
-    { id: 5, name: "Ms. Davis", role: "History Department", avatar: "MD" }
-  ];
-
-  let selectedConversation = $state<Conversation>(conversations[0]);
-  let newMessage = $state('');
-  let searchQuery = $state('');
+  let selectedFolder = $state('Inbox');
+  let selectedMessage: Message | null = $state(null);
   let showComposeModal = $state(false);
-  let recipientSearch = $state('');
-  let selectedRecipient = $state<Recipient | null>(null);
-  let composeMessage = $state('');
+  let composeTo = $state('');
+  let composeSubject = $state('');
+  let composeBody = $state('');
 
-  // Filter recipients based on search
-  let filteredRecipients = $derived(
-    allRecipients.filter(recipient => 
-      recipient.name.toLowerCase().includes(recipientSearch.toLowerCase()) ||
-      recipient.role.toLowerCase().includes(recipientSearch.toLowerCase())
-    )
-  );
+  let detailLoading = $state(false);
+  let detailError = $state<string | null>(null);
+
+  async function fetchMessages(folderLabel: string = 'inbox') {
+    loading = true;
+    error = null;
+    try {
+      if (folderLabel === 'sent') {
+        // Fetch both sent and outbox, then combine
+        const [sentRes, outboxRes] = await Promise.all([
+          seqtaFetch('https://learn.cardijn.catholic.edu.au/seqta/student/load/message?', {
+            method: 'POST',
+            body: {
+              searchValue: "",
+              sortBy: "date",
+              sortOrder: "desc",
+              action: "list",
+              label: 'sent',
+              offset: 0,
+              limit: 100,
+              datetimeUntil: null
+            }
+          }),
+          seqtaFetch('https://learn.cardijn.catholic.edu.au/seqta/student/load/message?', {
+            method: 'POST',
+            body: {
+              searchValue: "",
+              sortBy: "date",
+              sortOrder: "desc",
+              action: "list",
+              label: 'outbox',
+              offset: 0,
+              limit: 100,
+              datetimeUntil: null
+            }
+          })
+        ]);
+        const sentData = typeof sentRes === 'string' ? JSON.parse(sentRes) : sentRes;
+        const outboxData = typeof outboxRes === 'string' ? JSON.parse(outboxRes) : outboxRes;
+        const sentMsgs = (sentData?.payload?.messages || []).map((msg: any) => ({
+          id: msg.id,
+          folder: 'Sent',
+          sender: msg.sender,
+          to: msg.participants?.[0]?.name || '',
+          subject: msg.subject,
+          preview: msg.subject + (msg.attachments ? ' (Attachment)' : ''),
+          body: '',
+          date: msg.date?.replace('T', ' ').slice(0, 16) || '',
+          unread: !msg.read
+        }));
+        const outboxMsgs = (outboxData?.payload?.messages || []).map((msg: any) => ({
+          id: msg.id,
+          folder: 'Sent',
+          sender: msg.sender,
+          to: msg.participants?.[0]?.name || '',
+          subject: msg.subject,
+          preview: msg.subject + (msg.attachments ? ' (Attachment)' : ''),
+          body: '',
+          date: msg.date?.replace('T', ' ').slice(0, 16) || '',
+          unread: !msg.read
+        }));
+        messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
+      } else {
+        const response = await seqtaFetch(
+          'https://learn.cardijn.catholic.edu.au/seqta/student/load/message?',
+          {
+            method: 'POST',
+            body: {
+              searchValue: "",
+              sortBy: "date",
+              sortOrder: "desc",
+              action: "list",
+              label: folderLabel,
+              offset: 0,
+              limit: 100,
+              datetimeUntil: null
+            }
+          }
+        );
+        const data = typeof response === 'string' ? JSON.parse(response) : response;
+        if (data?.payload?.messages) {
+          messages = data.payload.messages.map((msg: any) => ({
+            id: msg.id,
+            folder: folderLabel.charAt(0).toUpperCase() + folderLabel.slice(1),
+            sender: msg.sender,
+            to: msg.participants?.[0]?.name || '',
+            subject: msg.subject,
+            preview: msg.subject + (msg.attachments ? ' (Attachment)' : ''),
+            body: '',
+            date: msg.date?.replace('T', ' ').slice(0, 16) || '',
+            unread: !msg.read
+          }));
+        } else {
+          messages = [];
+        }
+      }
+    } catch (e) {
+      error = 'Failed to load messages.';
+      messages = [];
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(() => fetchMessages('inbox'));
+
+  async function openMessage(msg: Message) {
+    selectedMessage = msg;
+    msg.unread = false;
+    // If already loaded, don't fetch again
+    if (msg.body) return;
+    detailLoading = true;
+    detailError = null;
+    try {
+      const response = await seqtaFetch(
+        'https://learn.cardijn.catholic.edu.au/seqta/student/load/message?',
+        {
+          method: 'POST',
+          body: {
+            action: 'message',
+            id: msg.id
+          }
+        }
+      );
+      const data = typeof response === 'string' ? JSON.parse(response) : response;
+      if (data?.payload?.contents) {
+        msg.body = data.payload.contents;
+      } else {
+        msg.body = '<em>No content.</em>';
+      }
+    } catch (e) {
+      detailError = 'Failed to load message.';
+      msg.body = '';
+    } finally {
+      detailLoading = false;
+    }
+  }
+
+  function openFolder(folder: string) {
+    selectedFolder = folder;
+    selectedMessage = null;
+    if (folder === 'Inbox') fetchMessages('inbox');
+    else if (folder === 'Sent') fetchMessages('sent');
+    // You can add more folder logic here for Drafts, Trash, etc.
+  }
+
+  function openCompose() {
+    showComposeModal = true;
+    composeTo = '';
+    composeSubject = '';
+    composeBody = '';
+  }
 
   function sendMessage() {
-    if (!newMessage.trim()) return;
+    if (!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()) return;
     messages.push({
       id: messages.length + 1,
-      sender: "You",
-      content: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
+      folder: 'Sent',
+      sender: 'You',
+      to: composeTo,
+      subject: composeSubject,
+      preview: composeBody.slice(0, 60),
+      body: composeBody,
+      date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      unread: false
     });
-    newMessage = '';
-  }
-
-  function handleKeyPress(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  }
-
-  function startNewConversation() {
-    if (!selectedRecipient || !composeMessage.trim()) return;
-    
-    // Add new conversation
-    const newConversation = {
-      id: conversations.length + 1,
-      name: selectedRecipient.name,
-      role: selectedRecipient.role,
-      avatar: selectedRecipient.avatar,
-      lastMessage: composeMessage,
-      time: "Just now",
-      unread: 0,
-      online: true
-    };
-    
-    conversations.push(newConversation);
-    selectedConversation = newConversation;
-    
-    // Add initial message
-    messages.push({
-      id: messages.length + 1,
-      sender: "You",
-      content: composeMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
-    });
-    
-    // Reset and close modal
-    composeMessage = '';
-    selectedRecipient = null;
-    recipientSearch = '';
     showComposeModal = false;
   }
 </script>
 
-<div class="flex h-full text-slate-50">
-<!-- Sidebar -->
-  <div class="w-80 border-r border-slate-800 flex flex-col">
-    <!-- New Message Button -->
-    <div class="p-4 border-b border-slate-800">
-      <button
-        class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-        onclick={() => showComposeModal = true}
-      >
+<div class="flex h-screen bg-[var(--surface)] text-[var(--text)]">
+  <!-- Sidebar -->
+  <aside class="w-64 border-r border-[var(--surface-alt)] flex flex-col bg-[var(--surface)]">
+    <div class="p-4 border-b border-[var(--surface-alt)]">
+      <button class="w-full px-4 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg font-semibold text-base" on:click={openCompose}>
         <Icon src={Plus} class="w-5 h-5" />
-        <span>New Message</span>
+        <span>Compose</span>
       </button>
     </div>
-
-    <!-- Search -->
-    <div class="p-4 border-b border-slate-800">
-      <div class="relative group">
-        <input
-          type="text"
-          bind:value={searchQuery}
-          placeholder="Search messages..."
-          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 group-hover:bg-[var(--surface-hover)]"
-        />
-      </div>
-    </div>
-
-    <!-- Conversations -->
-    <div class="overflow-y-auto flex-1">
-      {#each conversations as conversation}
+    <nav class="flex-1 py-4">
+      {#each folders as folder}
         <button
-          class="w-full p-4 flex items-center gap-3 hover:bg-slate-800 transition-all duration-200 {selectedConversation.id === conversation.id ? 'bg-slate-800' : ''} group"
-          onclick={() => selectedConversation = conversation}
+          class="w-full flex items-center gap-3 px-6 py-2 text-left font-medium rounded-lg transition-all duration-200 relative group
+            {selectedFolder === folder.name ? 'bg-[var(--surface-alt)] text-blue-500 border-l-4 border-blue-500 pl-[1.25rem]' : 'border-l-4 border-transparent'}
+            hover:bg-[var(--surface-alt)] focus:outline-none focus:ring-2 focus:ring-blue-400"
+          on:click={() => openFolder(folder.name)}
         >
-          <div class="relative">
-            <div class="flex justify-center items-center w-12 h-12 text-lg font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
-              {conversation.avatar}
-            </div>
-            {#if conversation.online}
-              <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-[var(--surface)] animate-pulse"></div>
-            {/if}
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold truncate transition-colors duration-200 group-hover:text-blue-500">{conversation.name}</span>
-              <span class="text-xs text-slate-400">{conversation.time}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-slate-400 truncate group-hover:text-slate-50 transition-colors duration-200">{conversation.lastMessage}</span>
-              {#if conversation.unread}
-                <span class="px-2 py-0.5 ml-2 text-xs text-white bg-blue-500 rounded-full animate-bounce">{conversation.unread}</span>
-              {/if}
-            </div>
-          </div>
+          <Icon src={folder.icon} class="w-5 h-5" />
+          <span>{folder.name}</span>
         </button>
       {/each}
-    </div>
-  </div>
+    </nav>
+  </aside>
 
-  <!-- Chat Area -->
-  <div class="flex flex-col flex-1">
-    <!-- Chat Header -->
-    <div class="h-16 border-b border-slate-800 flex items-center justify-between px-6">
-      <div class="flex gap-3 items-center">
-        <div class="relative group">
-          <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
-            {selectedConversation.avatar}
+  <!-- Message List -->
+  <section class="w-[28rem] border-r border-[var(--surface-alt)] flex flex-col bg-[var(--surface)]">
+    <div class="p-4 border-b border-[var(--surface-alt)] font-semibold text-lg">{selectedFolder}</div>
+    <div class="flex-1 overflow-y-auto bg-[var(--surface)]">
+      {#if loading}
+        <div class="p-8 text-center text-[var(--text-muted)]">Loading messages...</div>
+      {:else if error}
+        <div class="p-8 text-center text-red-500">{error}</div>
+      {:else}
+        {#each messages.filter(m => m.folder === selectedFolder) as msg (msg.id)}
+          <button
+            class="w-full text-left px-6 py-4 border-b border-[var(--surface-alt)] transition-all duration-200 flex flex-col gap-1
+              rounded-lg group relative
+              {selectedMessage?.id === msg.id ? 'bg-blue-950/60 shadow-lg border-blue-500 border-l-4' : ''}
+              {msg.unread ? 'border-l-4 border-blue-500' : 'border-l-4 border-transparent'}
+              hover:bg-[var(--surface-alt)] focus:outline-none focus:ring-2 focus:ring-blue-400"
+            on:click={() => openMessage(msg)}
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-bold {msg.unread ? 'text-blue-400' : ''}">{msg.sender}</span>
+                <span class="text-xs text-[var(--text-muted)]">to {msg.to}</span>
+              </div>
+              <span class="text-xs text-[var(--text-muted)]">{msg.date}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold {msg.unread ? 'text-blue-400' : ''}">{msg.subject}</span>
+              <span class="text-xs text-[var(--text-muted)] truncate">{msg.preview}</span>
+            </div>
+          </button>
+        {:else}
+          <div class="p-8 text-center text-[var(--text-muted)]">No messages in this folder.</div>
+        {/each}
+      {/if}
+    </div>
+  </section>
+
+  <!-- Message Detail -->
+  <main class="flex-1 flex flex-col bg-[var(--surface)] p-6">
+    {#if selectedMessage}
+      <div class="rounded-xl shadow-lg bg-[var(--surface-alt)] border border-[var(--surface-alt)] flex flex-col h-full">
+        <div class="p-6 border-b border-[var(--surface)] flex items-center justify-between rounded-t-xl bg-[var(--surface-alt)]">
+          <div>
+            <div class="font-bold text-2xl mb-1 text-blue-400">{selectedMessage.subject}</div>
+            <div class="text-sm text-[var(--text-muted)] mt-1">From: <span class="font-semibold text-[var(--text)]">{selectedMessage.sender}</span> &lt;{selectedMessage.sender.toLowerCase().replace(' ', '.')}@school.edu&gt;</div>
+            <div class="text-sm text-[var(--text-muted)]">To: <span class="font-semibold text-[var(--text)]">{selectedMessage.to}</span></div>
           </div>
-          {#if selectedConversation.online}
-            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[var(--surface)] animate-pulse"></div>
+          <div class="flex gap-2 bg-[var(--surface)] rounded-lg p-2 shadow-sm">
+            <button class="p-2 rounded-lg hover:bg-blue-500/20 focus:bg-blue-500/30 transition-all duration-200" on:click={openCompose} title="Reply">
+              <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
+            </button>
+            <button class="p-2 rounded-lg hover:bg-red-500/20 focus:bg-red-500/30 transition-all duration-200" title="Delete">
+              <Icon src={Trash} class="w-5 h-5 text-red-400" />
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-8 text-base bg-[var(--surface-alt)] rounded-b-xl">
+          {#if detailLoading}
+            <div class="text-center text-[var(--text-muted)]">Loading message...</div>
+          {:else if detailError}
+            <div class="text-center text-red-500">{detailError}</div>
+          {:else}
+            <div>{@html selectedMessage.body}</div>
           {/if}
         </div>
-        <div>
-          <h2 class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{selectedConversation.name}</h2>
-          <p class="text-sm text-slate-400">{selectedConversation.role}</p>
-        </div>
       </div>
-      <button class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-90" onclick={() => {}}>
-        <Icon src={EllipsisHorizontal} class="w-6 h-6" />
-      </button>
-    </div>
-
-    <!-- Messages -->
-    <div class="overflow-y-auto flex-1 p-6 space-y-4">
-      {#each messages as message}
-        <div class="flex {message.isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
-          <div class="max-w-[70%] {message.isMe ? 'bg-blue-500 text-white' : 'bg-slate-800'} rounded-2xl px-4 py-2 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-[1.02]">
-            {#if !message.isMe}
-              <div class="mb-1 text-xs font-semibold">{message.sender}</div>
-            {/if}
-            <div class="text-sm">{message.content}</div>
-            <div class="mt-1 text-xs text-right opacity-70">{message.time}</div>
-          </div>
-        </div>
-      {/each}
-    </div>
-
-    <!-- Message Input -->
-    <div class="p-4 border-t border-slate-800">
-      <div class="flex gap-2 items-center">
-        <button class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-12">
-          <Icon src={PaperClip} class="w-6 h-6" />
-        </button>
-        <div class="relative flex-1">
-          <textarea
-            bind:value={newMessage}
-            onkeypress={handleKeyPress}
-            placeholder="Type a message..."
-            class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
-            rows="1"
-          ></textarea>
-        </div>
-        <button
-          onclick={() => sendMessage()}
-          class="p-2 text-white bg-blue-500 rounded-lg transition-all duration-200 transform hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 disabled:transform-none"
-          disabled={!newMessage.trim()}
-        >
-          <Icon src={PaperAirplane} class="w-6 h-6" />
-        </button>
+    {:else}
+      <div class="flex-1 flex items-center justify-center text-[var(--text-muted)] text-lg">
+        Select a message to view its details.
       </div>
-    </div>
-  </div>
+    {/if}
+  </main>
 </div>
 
-<!-- Compose Message Modal -->
+<!-- Compose Modal -->
 {#if showComposeModal}
-  <div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50 animate-fade-in">
-    <div class="bg-slate-900 rounded-lg w-[500px] max-h-[80vh] flex flex-col shadow-2xl transform transition-all duration-300 scale-100">
-      <!-- Modal Header -->
-      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-        <h2 class="text-lg font-semibold">New Message</h2>
-        <button
-          class="p-2 rounded-lg hover:bg-slate-800 transition-all duration-200 hover:rotate-90"
-          onclick={() => showComposeModal = false}
-        >
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+    <div class="bg-[var(--surface)] rounded-xl w-[32rem] max-w-full shadow-2xl flex flex-col border border-[var(--surface-alt)]">
+      <div class="p-4 border-b border-[var(--surface-alt)] flex items-center justify-between rounded-t-xl">
+        <h2 class="text-lg font-semibold">Compose Message</h2>
+        <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200" on:click={() => showComposeModal = false}>
           <Icon src={XMark} class="w-6 h-6" />
         </button>
       </div>
-
-      <!-- Recipient Search -->
-      <div class="p-4 border-b border-slate-800">
+      <div class="p-4 flex flex-col gap-4">
         <input
           type="text"
-          bind:value={recipientSearch}
-          placeholder="Search for a recipient..."
-          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-[var(--surface-hover)]"
+          placeholder="To"
+          bind:value={composeTo}
+          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-      </div>
-
-      <!-- Recipient List -->
-      <div class="overflow-y-auto flex-1 p-4">
-        {#each filteredRecipients as recipient}
-          <button
-            class="w-full p-3 flex items-center gap-3 hover:bg-slate-800 transition-all duration-200 rounded-lg {selectedRecipient?.id === recipient.id ? 'bg-slate-800' : ''} group"
-            onclick={() => selectedRecipient = recipient}
-          >
-            <div class="flex justify-center items-center w-10 h-10 font-bold text-white bg-blue-600 rounded-full transition-transform duration-200 group-hover:scale-110">
-              {recipient.avatar}
-            </div>
-            <div class="text-left">
-              <div class="font-semibold transition-colors duration-200 group-hover:text-blue-500">{recipient.name}</div>
-              <div class="text-sm text-slate-400 group-hover:text-slate-50 transition-colors duration-200">{recipient.role}</div>
-            </div>
-          </button>
-        {/each}
-      </div>
-
-      <!-- Message Input -->
-      <div class="p-4 border-t border-slate-800">
+        <input
+          type="text"
+          placeholder="Subject"
+          bind:value={composeSubject}
+          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         <textarea
-          bind:value={composeMessage}
-          placeholder="Type your message..."
-          class="w-full px-4 py-2 rounded-lg bg-slate-800 text-slate-50 placeholder-[var(--text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 transition-all duration-200 hover:bg-[var(--surface-hover)]"
-          rows="3"
+          placeholder="Message..."
+          bind:value={composeBody}
+          rows="8"
+          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         ></textarea>
         <button
-          class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none shadow-md hover:shadow-lg"
-          disabled={!selectedRecipient || !composeMessage.trim()}
-          onclick={startNewConversation}
+          class="self-end px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
+          on:click={sendMessage}
         >
-          Send Message
+          Send
         </button>
       </div>
     </div>
@@ -367,11 +346,6 @@
 {/if}
 
 <style>
-  textarea {
-    min-height: 40px;
-    max-height: 120px;
-  }
-
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -382,7 +356,6 @@
       transform: translateY(0);
     }
   }
-
   .animate-fade-in {
     animation: fade-in 0.3s ease-out;
   }
