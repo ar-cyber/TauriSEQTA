@@ -47,7 +47,7 @@
 
 Clone the repo:
 ```bash
-git clone https://github.com/betterseqta/desqta
+git clone --branch develop https://github.com/betterseqta/desqta 
 ```
 Install modules
 ```bash
