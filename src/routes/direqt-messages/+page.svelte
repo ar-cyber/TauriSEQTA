@@ -46,7 +46,7 @@
       if (folderLabel === 'sent') {
         // Fetch both sent and outbox, then combine
         const [sentRes, outboxRes] = await Promise.all([
-          seqtaFetch('https://learn.cardijn.catholic.edu.au/seqta/student/load/message?', {
+          seqtaFetch('/seqta/student/load/message?', {
             method: 'POST',
             body: {
               searchValue: "",
@@ -59,7 +59,7 @@
               datetimeUntil: null
             }
           }),
-          seqtaFetch('https://learn.cardijn.catholic.edu.au/seqta/student/load/message?', {
+          seqtaFetch('/seqta/student/load/message?', {
             method: 'POST',
             body: {
               searchValue: "",
@@ -100,7 +100,7 @@
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
       } else {
         const response = await seqtaFetch(
-          'https://learn.cardijn.catholic.edu.au/seqta/student/load/message?',
+          '/seqta/student/load/message?',
           {
             method: 'POST',
             body: {
@@ -151,7 +151,7 @@
     detailError = null;
     try {
       const response = await seqtaFetch(
-        'https://learn.cardijn.catholic.edu.au/seqta/student/load/message?',
+        '/seqta/student/load/message?',
         {
           method: 'POST',
           body: {
