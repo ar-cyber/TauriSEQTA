@@ -282,13 +282,13 @@
 			</div>
 		
 			{#if loadingAssessments}
-			<div class="flex flex-col justify-center items-center py-12"><p style="color:var(--text-muted);">Loading assessments…</p></div>
+			<div class="flex flex-col justify-center items-center py-12"><p class="text-slate-400">Loading assessments…</p></div>
 			{:else if filteredAssessments.length === 0}
-			<div class="flex flex-col justify-center items-center py-12"><p style="color:var(--text);">Nothing coming up 🎉</p></div>
+			<div class="flex flex-col justify-center items-center py-12"><p>Nothing coming up 🎉</p></div>
 			{:else}
 			<div class="p-6 space-y-4" id="upcoming-items">
 				{#each filteredAssessments as a}
-				<div class="flex gap-4 items-center p-4 rounded-xl transition-transform duration-300 upcoming-assessment hover:scale-105 bg-slate-800" style="border: 1px solid var(--surface-alt); border-left: 8px solid {a.colour};">
+				<div class="flex gap-4 items-center p-4 rounded-xl border border-l-8 transition-transform duration-300 upcoming-assessment hover:scale-105 bg-slate-800 border-slate-800" style="border-left: 8px solid {a.colour};">
 					<div class="flex justify-center items-center w-16 h-16 rounded-lg bg-slate-900">
 					<span class="text-3xl">📄</span>
 					</div>

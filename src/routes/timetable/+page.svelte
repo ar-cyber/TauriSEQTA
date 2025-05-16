@@ -9,7 +9,6 @@ let lessons = $state<any[]>([]);
 let lessonColours = $state<any[]>([]);
 let loadingLessons = $state<boolean>(true);
 
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 function getMonday(d: Date) {
