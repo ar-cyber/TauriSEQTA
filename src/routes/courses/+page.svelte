@@ -85,7 +85,7 @@ onMount(loadSubjects);
         type="text"
         placeholder="Search subjects..."
         bind:value={search}
-        class="w-full px-3 py-2 rounded-lg bg-slate-800 text-slate-50 border border-slate-800 focus:outline-none focus:ring focus:ring-blue-500"
+        class="px-3 py-2 w-full rounded-lg border bg-slate-800 text-slate-50 border-slate-800 focus:outline-none focus:ring focus:ring-blue-500"
       />
     </div>
     <div class="overflow-y-auto flex-1">
@@ -95,7 +95,7 @@ onMount(loadSubjects);
         <div class="px-6 py-6 text-red-400">{error}</div>
       {:else}
         {#each activeSubjects.filter(subjectMatches) as subj}
-          <button class="px-6 py-3 font-bold text-base hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-blue-500' : ''}"
+          <button class="px-6 py-3 w-full text-left font-bold text-base hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-blue-500' : ''}"
             onclick={() => selectSubject(subj)}>
             {subj.title}
           </button>
@@ -103,10 +103,12 @@ onMount(loadSubjects);
         <div class="my-2 border-t border-slate-800"></div>
         {#each otherFolders.filter(folderMatches) as folder}
           <div>
-            <button class="flex justify-between items-center px-6 py-3 border-l-2 border-transparent transition-all cursor-pointer hover:bg-slate-800 hover:border-blue-500"
+            <button class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all cursor-pointer hover:bg-slate-800 hover:border-blue-500"
               onclick={() => toggleFolder(folder.code)}>
               <span class="text-base font-bold">{folder.code}</span>
-              <svg class="w-4 h-4 ml-2 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate({expandedFolders[folder.code] ? 90 : 0}deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+              <svg class="ml-2 w-4 h-4 transition-transform duration-200 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate({expandedFolders[folder.code] ? 90 : 0}deg)">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
           </button>
           {#if expandedFolders[folder.code]}
             {#each folder.subjects.filter(subjectMatches) as subj}
@@ -125,7 +127,7 @@ onMount(loadSubjects);
     {#if selectedSubject}
       <div class="p-8 mx-auto max-w-xl rounded-xl shadow-lg bg-slate-900">
         <h2 class="mb-2 text-2xl font-bold">{selectedSubject.title}</h2>
-        <div class="text-slate-400 mb-4">{selectedSubject.description}</div>
+        <div class="mb-4 text-slate-400">{selectedSubject.description}</div>
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div><span class="font-semibold">Code:</span> {selectedSubject.code}</div>
           <div><span class="font-semibold">Class Unit:</span> {selectedSubject.classunit}</div>

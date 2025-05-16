@@ -18,6 +18,7 @@
 		AcademicCap,
 		Bell,
 		RectangleStack,
+		ArrowLeftStartOnRectangle,
 		ChartBar,
 		Cog6Tooth,
 		CalendarDays,
@@ -131,51 +132,15 @@
 	];
 </script>
 
-<div class="h-screen bg-slate-900">
-	<!-- Top Bar -->
-	<header class="flex top-0 right-0 left-0 justify-between items-center place-items-center py-2 pr-8 pl-4">
-		<div class="flex items-center">
-			<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
-			<span class="text-lg font-bold tracking-wide">DesQTA</span>
-		</div>
-		<div class="flex gap-4 items-center">
-			{#if userInfo}
-				<div class="flex items-center gap-3 px-3 py-1 rounded-lg min-w-[320px] bg-transparent">
-					<!-- Avatar with initials -->
-					<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white bg-blue-600 rounded-full select-none">
-						{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
-					</div>
-					<div class="flex flex-col flex-1 min-w-0">
-						<div class="flex gap-2 items-center">
-							<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
-							<span class="px-2 py-0.5 text-xs tracking-wide text-blue-400 uppercase rounded border bg-blue-500/10 border-blue-400/20">{userInfo.type}</span>
-						</div>
-						<div class="flex gap-2 items-center min-w-0 text-xs text-slate-400">
-							<span class="truncate" title={userInfo.email}>{userInfo.email}</span>
-							<span>•</span>
-							<span class="font-mono">{userInfo.userCode}</span>
-							<span>•</span>
-							<span class="font-mono">{userInfo.meta.governmentID}</span>
-						</div>
-					</div>
-				</div>
-			{/if}
-			{#if !$needsSetup}
-				<button 
-					onclick={handleLogout}
-					class="px-4 py-1 rounded-lg font-semibold hover:scale-[1.02] transition bg-zinc-800"
-				>
-					Logout
-				</button>
-			{/if}
-		</div>
-	</header>
-
-	<div class="flex h-full">
-		<!-- Sidebar -->
-		<aside
-			class="flex overflow-y-scroll flex-col px-2 pb-6 space-y-2 w-64 h-full"
-		>
+<div class="flex pt-2 h-screen bg-slate-900">
+	<aside
+		class="flex flex-col justify-between px-2 pb-2 space-y-2 w-64 h-full"
+	>
+		<div class="flex overflow-y-scroll flex-col gap-2 h-full">
+			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-slate-900">
+				<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
+				<span class="text-lg font-bold tracking-wide">DesQTA</span>
+			</div>
 			{#each menu as item}
 				<a href={item.path} class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-slate-800 hover:scale-[1.03] group">
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
@@ -193,14 +158,43 @@
 					{/if}
 				</a>
 			{/each}
-		</aside>
+		</div>
+		<div>
+			<div class="flex justify-between">
+				{#if userInfo}
+					<div class="flex gap-3 items-center px-2 py-1 bg-transparent rounded-lg">
+						<!-- Avatar with initials -->
+						<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white bg-blue-600 rounded-full select-none">
+							{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
+						</div>
+						<div class="flex flex-col flex-1 min-w-0">
+							<div class="flex gap-2 items-center">
+								<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
+							</div>
+							<div class="flex gap-2 items-center min-w-0 text-xs text-slate-400">
+								<span class="font-mono">{userInfo.userCode}</span>
+								<span>•</span>
+								<span class="font-mono">{userInfo.meta.governmentID}</span>
+							</div>
+						</div>
+					</div>
+				{/if}
+				{#if !$needsSetup}
+					<button 
+						onclick={handleLogout}
+						class="px-2 py-1 font-semibold rounded-lg transition text-zinc-400 hover:text-zinc-50"
+					>
+						<Icon src={ArrowLeftStartOnRectangle} class="size-4" />
+					</button>
+				{/if}
+			</div>
+		</div>
+	</aside>
 
-		<!-- Main Content -->
-		<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
-		<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
-			{@render children()}
-		</main>
-	</div>
+	<!-- Main Content -->
+	<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
+		{@render children()}
+	</main>
 
 	<!-- First‑run overlay -->
 	{#if $needsSetup}
