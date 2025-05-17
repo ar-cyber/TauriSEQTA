@@ -3,7 +3,7 @@
   import { seqtaFetch } from '../../utils/seqtaFetch';
   import { Icon } from 'svelte-hero-icons';
   import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark, Star, ArrowUturnLeft } from 'svelte-hero-icons';
-
+  import Editor from './ckeditor.svelte'
   // Example folders
   const folders = [
     { name: 'Inbox', icon: Inbox },
@@ -25,7 +25,8 @@
     unread: boolean;
     starred?: boolean;
   }
-
+  
+  
   let messages: Message[] = $state([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
@@ -215,7 +216,19 @@
     });
     showComposeModal = false;
   }
-
+  async function getPeople(mode: String) {
+    if (mode != "student" || mode != "staff" || mode != "tutor") return
+    const response = await seqtaFetch(
+      '/seqta/student/message/people?',
+      {
+        method: 'POST',
+        body: {
+          mode: mode
+        }
+      }
+    )
+    return JSON.parse(response).payload
+  }
   async function starMessage(msg: Message) {
     if (starring) return;
     starring = true;
@@ -315,6 +328,9 @@
       restoring = false;
     }
   }
+
+
+
 </script>
 
 <div class="flex h-screen bg-[var(--surface)] text-[var(--text)]">
@@ -457,24 +473,9 @@
         </button>
       </div>
       <div class="p-4 flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="To"
-          bind:value={composeTo}
-          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="text"
-          placeholder="Subject"
-          bind:value={composeSubject}
-          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <textarea
-          placeholder="Message..."
-          bind:value={composeBody}
-          rows="8"
-          class="px-4 py-2 rounded-lg bg-[var(--surface-alt)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-        ></textarea>
+        <!-- Add some dropdowns here for querying; may require us to get the user's settings-->
+        <!-- To be replaced with CKEditor-->
+        <Editor />
         <button
           class="self-end px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
