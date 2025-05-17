@@ -16,7 +16,9 @@
 body {
 	@apply antialiased;
 }
-
+select {
+	color: black
+}
 /* Custom Scrollbar Styles */
 ::-webkit-scrollbar {
 	background: #111827; /* slate-900 */

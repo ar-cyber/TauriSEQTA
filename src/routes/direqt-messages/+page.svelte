@@ -217,10 +217,9 @@
     });
     showComposeModal = false;
   }
-  async function getPeople(mode: String) {
-    if (mode != "student" || mode != "staff" || mode != "tutor") return
+  async function getPeople(mode: String): Promise<any> {
     const response = await seqtaFetch(
-      '/seqta/student/message/people?',
+      '/seqta/student/load/message/people?',
       {
         method: 'POST',
         body: {
@@ -228,8 +227,15 @@
         }
       }
     )
-    return JSON.parse(response).payload
+    // console.log(response)
+    const data = JSON.parse(response).payload
+    return data
   }
+
+  const students = getPeople("student");
+  const staff = getPeople("staff");
+  const tutors = getPeople("tutor");
+
   async function starMessage(msg: Message) {
     if (starring) return;
     starring = true;
@@ -474,6 +480,39 @@
         </button>
       </div>
       <div class="p-4 flex flex-col gap-4" style="min-height: 75%;">
+        <select>
+          <option>Select a student</option>
+          {#await students}
+            <option>Loading data</option>
+          {:then data}
+            {#each data as s}
+              <!-- {console.log(s)} -->
+              <option id="{s.id}">{s.xx_display} | {s.rollgroup	}</option>
+            {/each}
+          {/await}
+        </select>
+        <select>
+          <option>Select a staff member</option>
+          {#await staff}
+            <option>Loading data</option>
+          {:then data}
+            {#each data as s}
+              <!-- {console.log(s)} -->
+              <option id="{s.id}">{s.xx_display}</option>
+            {/each}
+          {/await}
+        </select>
+        <select>
+          <option>Select a tutor</option>
+          {#await tutors}
+            <option>Loading data</option>
+          {:then data}
+            {#each data as s}
+              <!-- {console.log(s)} -->
+              <option id="{s.id}">{s.xx_display}</option>
+            {/each}
+          {/await}
+        </select>
         <!-- Add some dropdowns here for querying; may require us to get the user's settings-->
         <!-- To be replaced with CKEditor-->
         <Editor />
