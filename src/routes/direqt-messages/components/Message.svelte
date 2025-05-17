@@ -55,8 +55,23 @@
         font-family: system-ui, -apple-system, sans-serif;
         color: #f1f5f9;
         margin: 0;
-        padding: 0;
+        padding: 0 1px;
         background-color: transparent;
+        line-height: 1.8;
+        font-size: 15px;
+      }
+
+      a {
+        color: #60a5fa;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+      
+      p {
+        margin: 0 0 1.2em;
       }
 
       .forward {
@@ -73,6 +88,13 @@
         margin-bottom: 6px;
         padding-bottom: 6px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      blockquote {
+        border-left: 3px solid #3b82f6;
+        margin-left: 0;
+        padding-left: 12px;
+        color: rgba(241, 245, 249, 0.8);
       }
     </style>
   </head>
@@ -91,7 +113,7 @@
     if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
     
     const height = iframe.contentDocument.body.scrollHeight;
-    iframe.style.height = `${height}px`;
+    iframe.style.height = `${height + 32}px`;
   }
 
   $effect(() => {
@@ -120,189 +142,221 @@
   });
 </script>
 
-<main class="flex flex-col flex-1 p-6">
+<main class="flex flex-col flex-1 p-6 md:p-8">
   {#if selectedMessage}
-    <div>
+    <div class="mx-auto w-full max-w-4xl animate-fadeIn">
       <div
-        class="flex justify-between items-center p-3 rounded-t-xl border border-slate-900 bg-slate-800/10"
+        class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-slate-800/80 bg-slate-900/40"
       >
-        <div>
-          <div class="mb-1 text-2xl font-bold text-blue-400">
+        <div class="p-4 pb-3 border-b border-slate-800/60">
+          <div class="mb-4 text-2xl font-bold text-blue-400">
             {selectedMessage.subject}
           </div>
-          <div class="mt-1 text-sm text-slate-300">
-            <span class="font-semibold text-slate-100"
-              >{selectedMessage.sender}</span
+          
+          <div class="flex justify-between items-end">
+            <div class="space-y-1">
+              <div class="text-base text-slate-200">
+                <span class="font-medium">{selectedMessage.sender}</span>
+              </div>
+              <div class="text-sm text-slate-400">
+                To: <span class="font-medium text-slate-300">{selectedMessage.to}</span>
+              </div>
+            </div>
+            
+            <div
+              class="flex gap-3 items-center"
             >
-          </div>
-          <div class="text-sm text-slate-300">
-            To: <span class="font-semibold text-slate-100"
-              >{selectedMessage.to}</span
-            >
-          </div>
-        </div>
-        <div
-          class="flex gap-2 items-center p-2 rounded-lg shadow-sm bg-slate-900"
-        >
-          {#if selectedFolder === "Trash"}
-            <button
-              class="flex flex-col justify-center items-center p-1.5 rounded-lg transition-all duration-200 hover:bg-green-400/20 focus:bg-green-400/30"
-              title="Restore"
-              onclick={() => selectedMessage && restoreMessage(selectedMessage)}
-              disabled={restoring}
-            >
-              {#if restoring}
-                <svg
-                  class="w-4 h-4 text-green-400 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  ><circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle><path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  ></path></svg
+              {#if selectedFolder === "Trash"}
+                <button
+                  class="flex flex-col justify-center items-center p-1.5 rounded-lg transition-all duration-200 hover:bg-green-400/20 focus:bg-green-400/30 focus:ring-2 focus:ring-green-400/30 focus:outline-none"
+                  title="Restore"
+                  onclick={() => selectedMessage && restoreMessage(selectedMessage)}
+                  disabled={restoring}
                 >
-              {:else}
-                <Icon
-                  src={ArrowUturnLeft}
-                  class="mb-0.5 w-4 h-4 text-green-400"
-                />
-              {/if}
-              <span class="text-sm font-medium text-green-400">Restore</span>
-            </button>
-          {:else if selectedFolder === "Starred"}
-            <button
-              class="flex flex-col justify-center items-center p-2 rounded-lg transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30"
-              title="Unstar"
-              onclick={() => selectedMessage && starMessage(selectedMessage)}
-              disabled={starring || !selectedMessage.starred}
-            >
-              {#if starring}
-                <svg
-                  class="w-5 h-5 text-yellow-400 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  ><circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle><path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  ></path></svg
+                  {#if restoring}
+                    <svg
+                      class="w-4 h-4 text-green-400 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      ><circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle><path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path></svg
+                    >
+                  {:else}
+                    <Icon
+                      src={ArrowUturnLeft}
+                      class="mb-0.5 w-4 h-4 text-green-400"
+                    />
+                  {/if}
+                  <span class="text-sm font-medium text-green-400">Restore</span>
+                </button>
+              {:else if selectedFolder === "Starred"}
+                <button
+                  class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  title="Unstar"
+                  onclick={() => selectedMessage && starMessage(selectedMessage)}
+                  disabled={starring || !selectedMessage.starred}
                 >
+                  {#if starring}
+                    <svg
+                      class="w-5 h-5 text-yellow-400 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      ><circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle><path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path></svg
+                    >
+                  {:else}
+                    <Icon
+                      src={Star}
+                      class="w-5 h-5 text-yellow-400"
+                      solid={true}
+                    />
+                  {/if}
+                </button>
               {:else}
-                <Icon
-                  src={Star}
-                  class="mb-1 w-5 h-5 text-yellow-400"
-                  solid={true}
-                />
-              {/if}
-              <span class="font-semibold text-yellow-400">Unstar</span>
-            </button>
-          {:else}
-            <button
-              class="p-2 rounded-lg transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30"
-              title="Star"
-              onclick={() => selectedMessage && starMessage(selectedMessage)}
-              disabled={starring || selectedMessage.starred}
-            >
-              {#if starring}
-                <svg
-                  class="w-5 h-5 text-yellow-400 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  ><circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle><path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  ></path></svg
+                <button
+                  class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  title="Star"
+                  onclick={() => selectedMessage && starMessage(selectedMessage)}
+                  disabled={starring || selectedMessage.starred}
                 >
-              {:else}
-                <Icon
-                  src={Star}
-                  class="w-5 h-5 text-yellow-400"
-                  solid={selectedMessage.starred}
-                />
+                  {#if starring}
+                    <svg
+                      class="w-5 h-5 text-yellow-400 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      ><circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle><path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path></svg
+                    >
+                  {:else}
+                    <Icon
+                      src={Star}
+                      class="w-5 h-5 text-yellow-400"
+                      solid={selectedMessage.starred}
+                    />
+                  {/if}
+                </button>
               {/if}
-            </button>
-          {/if}
-          <button
-            class="p-2 rounded-lg transition-all duration-200 hover:bg-blue-500/20 focus:bg-blue-500/30"
-            onclick={openCompose}
-            title="Reply"
-          >
-            <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
-          </button>
-          <button
-            class="p-2 rounded-lg transition-all duration-200 hover:bg-red-500/20 focus:bg-red-500/30"
-            title="Delete"
-            onclick={() => selectedMessage && deleteMessage(selectedMessage)}
-            disabled={deleting}
-          >
-            {#if deleting}
-              <svg
-                class="w-5 h-5 text-red-400 animate-spin"
-                fill="none"
-                viewBox="0 0 24 24"
-                ><circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle><path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8z"
-                ></path></svg
+              <button
+                class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-blue-500/20 focus:bg-blue-500/30 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                onclick={openCompose}
+                title="Reply"
               >
-            {:else}
-              <Icon src={Trash} class="w-5 h-5 text-red-400" />
-            {/if}
-          </button>
+                <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
+              </button>
+              <button
+                class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-red-500/20 focus:bg-red-500/30 focus:ring-2 focus:ring-red-400/30 focus:outline-none"
+                title="Delete"
+                onclick={() => selectedMessage && deleteMessage(selectedMessage)}
+                disabled={deleting}
+              >
+                {#if deleting}
+                  <svg
+                    class="w-5 h-5 text-red-400 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    ><circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle><path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    ></path></svg
+                  >
+                {:else}
+                  <Icon src={Trash} class="w-5 h-5 text-red-400" />
+                {/if}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div
-        class="flex-1 flex-shrink p-4 text-base rounded-b-xl border border-t-0 border-slate-900 bg-slate-800/10"
-      >
-        {#if detailLoading}
-          <div class="text-center text-slate-300">Loading message...</div>
-        {:else if detailError}
-          <div class="text-center text-red-500">{detailError}</div>
-        {:else}
-          <iframe
-            bind:this={iframe}
-            title="Message Content"
-            sandbox="allow-same-origin"
-            class="overflow-hidden w-full border-0"
-            style="min-height: 100px"
-          ></iframe>
-        {/if}
+      
+        <div class="px-6 py-6 bg-slate-900/80">
+          {#if detailLoading}
+            <div class="flex flex-col justify-center items-center p-8 h-32 text-center text-slate-300">
+              <svg class="mb-2 w-6 h-6 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Loading message...
+            </div>
+          {:else if detailError}
+            <div class="flex justify-center items-center p-8 h-32 text-center text-red-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {detailError}
+            </div>
+          {:else}
+            <iframe
+              bind:this={iframe}
+              title="Message Content"
+              sandbox="allow-same-origin"
+              class="overflow-hidden w-full rounded-lg border-0"
+              style="min-height: 100px"
+            ></iframe>
+          {/if}
+        </div>
       </div>
     </div>
   {:else}
-    <div class="flex flex-1 justify-center items-center text-lg text-slate-300">
-      Select a message to view its details.
+    <div class="flex flex-col flex-1 justify-center items-center h-full text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mb-6 w-20 h-20 text-slate-800/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      <p class="text-2xl font-semibold text-slate-500">Select a message to view</p>
+      <p class="mt-3 text-sm text-slate-600">Click on any message from the list to see its contents here</p>
     </div>
   {/if}
 </main>
+
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+</style>
