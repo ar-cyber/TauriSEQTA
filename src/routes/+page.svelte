@@ -531,10 +531,6 @@
                   </div>
                 {/if}
               </div>
-              <div 
-                class="absolute bottom-0 left-0 right-0 h-1.5 rounded-b-xl"
-                style="background-color: {lesson.colour};"
-              ></div>
             </div>
           {/each}
         </div>
