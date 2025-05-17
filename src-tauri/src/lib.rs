@@ -2,6 +2,8 @@
 mod netgrab;
 #[path = "auth/login.rs"]
 mod login;
+#[path = "utils/settings.rs"]
+mod settings;
 
 
 /// Boilerplate example command
@@ -9,7 +11,6 @@ mod login;
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
-
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -25,7 +26,9 @@ pub fn run() {
             login::save_session,
             login::create_login_window,
             login::logout,
-            login::force_reload
+            login::force_reload,
+            settings::get_settings,
+            settings::save_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

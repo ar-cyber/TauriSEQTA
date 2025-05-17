@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { invoke } from '@tauri-apps/api/core';
 	
 	import { seqtaFetch } from '../utils/seqtaFetch';
 
@@ -26,6 +27,18 @@
 	let homepageNotices = $state<any[]>([]);
 	let homepageLabels = $state<any[]>([]);
 	let loadingHomepageNotices = $state(true);
+
+	interface Shortcut {
+		name: string;
+		icon: string;
+		url: string;
+	}
+
+	let homepageShortcuts = $state<Shortcut[]>([
+		{ name: 'Outlook', icon: '📅', url: 'https://outlook.office.com' },
+		{ name: 'Office365', icon: '🏢', url: 'https://office365.com' },
+		{ name: 'Google', icon: '🌐', url: 'https://google.com' }
+	]);
 
 	function formatDate(date: Date): string {
 	  const y = date.getFullYear();
@@ -213,13 +226,25 @@
 	  return homepageLabels.find(l => l.id === labelId)?.title || '';
 	}
 
+	async function loadHomepageShortcuts() {
+	  try {
+		const settings = await invoke<{ shortcuts: Shortcut[] }>('get_settings');
+		if (settings.shortcuts && settings.shortcuts.length > 0) {
+		  homepageShortcuts = settings.shortcuts;
+		}
+	  } catch (e) {
+		// fallback to default
+	  }
+	}
+
 	onMount(async () => {
 	  await Promise.all([
 		loadLessons(),
 		loadAssessments(),
 		loadNotices(formatDate(new Date())),
 		fetchHomepageLabels(),
-		fetchHomepageNotices()
+		fetchHomepageNotices(),
+		loadHomepageShortcuts()
 	  ]);
 	});
   
@@ -239,9 +264,9 @@
 <div class="p-8 mx-auto max-w-7xl">
 	<div class="space-y-6">
 		<div class="flex gap-6">
-			{#each [{ name: 'Outlook', icon: '📅', url: 'https://outlook.office.com' }, { name: 'Office365', icon: '🏢', url: 'https://office365.com' }, { name: 'Google', icon: '🌐', url: 'https://google.com' }] as integration}
-			<a href={integration.url} target="_blank" class="flex flex-1 justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105 bg-slate-900">
-				<span class="mr-2 text-2xl">{integration.icon}</span> {integration.name}
+			{#each homepageShortcuts as shortcut}
+			<a href={shortcut.url} target="_blank" class="flex flex-1 justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105 bg-slate-900">
+				<span class="mr-2 text-2xl">{shortcut.icon}</span> {shortcut.name}
 			</a>
 			{/each}
 		</div>
