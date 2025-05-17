@@ -13,14 +13,20 @@ let loading = true;
 let saving = false;
 let saveSuccess = false;
 let saveError = '';
+let weatherEnabled = false;
+let weatherLocation = '';
 
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[] }>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_location: string }>('get_settings');
     shortcuts = settings.shortcuts || [];
+    weatherEnabled = settings.weather_enabled ?? false;
+    weatherLocation = settings.weather_location ?? '';
   } catch (e) {
     shortcuts = [];
+    weatherEnabled = false;
+    weatherLocation = '';
   }
   loading = false;
 }
@@ -30,7 +36,7 @@ async function saveSettings() {
   saveSuccess = false;
   saveError = '';
   try {
-    await invoke('save_settings', { newSettings: { shortcuts } });
+    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_location: weatherLocation } });
     saveSuccess = true;
   } catch (e) {
     saveError = 'Failed to save settings.';
@@ -101,9 +107,16 @@ onMount(loadSettings);
           <!-- Widget Settings (Placeholder) -->
           <div>
             <h3 class="text-base font-semibold mb-4">Widget Settings</h3>
-            <p class="mb-4 text-sm text-slate-400">Configure which widgets appear on your homepage and their display order.</p>
-            <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
-              <p class="text-slate-400 text-sm">Widget settings coming soon...</p>
+            <p class="mb-4 text-sm text-slate-400">Configure which widgets appear on your in DesQTA.</p>
+            <div class="p-4 bg-slate-800 rounded-lg animate-fade-in space-y-4">
+              <div class="flex items-center gap-4">
+                <input id="weather-enabled" type="checkbox" class="accent-blue-600 w-5 h-5" bind:checked={weatherEnabled} />
+                <label for="weather-enabled" class="text-slate-200 font-medium cursor-pointer">Show Weather Widget</label>
+              </div>
+              <div class="flex items-center gap-4 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-location" class="text-slate-400">Location (city or postcode):</label>
+                <input id="weather-location" class="px-3 py-2 rounded bg-slate-900 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-64" placeholder="e.g. Perth, 6000" bind:value={weatherLocation} />
+              </div>
             </div>
           </div>
         </div>

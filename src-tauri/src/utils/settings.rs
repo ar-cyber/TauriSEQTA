@@ -19,6 +19,8 @@ fn settings_file() -> PathBuf {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Settings {
     pub shortcuts: Vec<Shortcut>,
+    pub weather_enabled: bool,
+    pub weather_location: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

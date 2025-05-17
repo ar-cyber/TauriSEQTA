@@ -40,6 +40,12 @@
 		{ name: 'Google', icon: '🌐', url: 'https://google.com' }
 	]);
 
+	let weatherEnabled = $state(false);
+	let weatherLocation = $state('');
+	let weatherData: any = $state(null);
+	let loadingWeather = $state(false);
+	let weatherError = $state('');
+
 	function formatDate(date: Date): string {
 	  const y = date.getFullYear();
 	  const m = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -237,6 +243,46 @@
 	  }
 	}
 
+	async function loadWeatherSettings() {
+	  try {
+		const settings = await invoke<{ weather_enabled: boolean, weather_location: string }>('get_settings');
+		weatherEnabled = settings.weather_enabled ?? false;
+		weatherLocation = settings.weather_location ?? '';
+	  } catch (e) {
+		weatherEnabled = false;
+		weatherLocation = '';
+	  }
+	}
+
+	async function fetchWeather() {
+	  if (!weatherEnabled || !weatherLocation) {
+		weatherData = null;
+		return;
+	  }
+	  loadingWeather = true;
+	  weatherError = '';
+	  try {
+		// Use Open-Meteo geocoding API to get lat/lon
+		const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation)}&count=1&language=en&format=json`);
+		const geoJson = await geoRes.json();
+		if (!geoJson.results || !geoJson.results.length) throw new Error('Location not found');
+		const { latitude, longitude, name, country } = geoJson.results[0];
+		// Fetch weather
+		const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`);
+		const weatherJson = await weatherRes.json();
+		weatherData = {
+		  ...weatherJson.current_weather,
+		  location: name,
+		  country
+		};
+	  } catch (e) {
+		weatherError = 'Failed to load weather.';
+		weatherData = null;
+	  } finally {
+		loadingWeather = false;
+	  }
+	}
+
 	onMount(async () => {
 	  await Promise.all([
 		loadLessons(),
@@ -244,8 +290,10 @@
 		loadNotices(formatDate(new Date())),
 		fetchHomepageLabels(),
 		fetchHomepageNotices(),
-		loadHomepageShortcuts()
+		loadHomepageShortcuts(),
+		loadWeatherSettings()
 	  ]);
+	  if (weatherEnabled && weatherLocation) fetchWeather();
 	});
   
 	onDestroy(() => {
@@ -260,12 +308,16 @@
 	  if (diff === 1) return "Yesterday's Lessons";
 	  return currentSelectedDate.toLocaleDateString('en-AU', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
 	}
-  </script>
+
+	$effect(() => {
+	  if (weatherEnabled && weatherLocation) fetchWeather();
+	});
+</script>
 <div class="p-8 mx-auto max-w-7xl">
 	<div class="space-y-6">
-		<div class="flex gap-6">
+		<div class="flex gap-6 flex-wrap">
 			{#each homepageShortcuts as shortcut}
-			<a href={shortcut.url} target="_blank" class="flex flex-1 justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105 bg-slate-900">
+			<a href={shortcut.url} target="_blank" class="flex flex-1 min-w-[180px] max-w-xs justify-center items-center py-4 text-lg font-semibold rounded-2xl shadow transition-transform duration-300 hover:scale-105 bg-slate-900">
 				<span class="mr-2 text-2xl">{shortcut.icon}</span> {shortcut.name}
 			</a>
 			{/each}

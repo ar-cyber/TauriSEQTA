@@ -33,6 +33,12 @@
 	let userInfo = $state<UserInfo>();
 	let { children } = $props();
 
+	let weatherEnabled = $state(false);
+	let weatherLocation = $state('');
+	let weatherData: any = $state(null);
+	let loadingWeather = $state(false);
+	let weatherError = $state('');
+
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
 		needsSetup.set(!sessionExists);
@@ -115,6 +121,53 @@
 		}
 	}
 
+	async function loadWeatherSettings() {
+		try {
+			const settings = await invoke<{ weather_enabled: boolean, weather_location: string }>('get_settings');
+			weatherEnabled = settings.weather_enabled ?? false;
+			weatherLocation = settings.weather_location ?? '';
+		} catch (e) {
+			weatherEnabled = false;
+			weatherLocation = '';
+		}
+	}
+
+	async function fetchWeather() {
+		if (!weatherEnabled || !weatherLocation) {
+			weatherData = null;
+			return;
+		}
+		loadingWeather = true;
+		weatherError = '';
+		try {
+			const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation)}&count=1&language=en&format=json`);
+			const geoJson = await geoRes.json();
+			if (!geoJson.results || !geoJson.results.length) throw new Error('Location not found');
+			const { latitude, longitude, name, country } = geoJson.results[0];
+			const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`);
+			const weatherJson = await weatherRes.json();
+			weatherData = {
+				...weatherJson.current_weather,
+				location: name,
+				country
+			};
+		} catch (e) {
+			weatherError = 'Failed to load weather.';
+			weatherData = null;
+		} finally {
+			loadingWeather = false;
+		}
+	}
+
+	onMount(async () => {
+		await loadWeatherSettings();
+		if (weatherEnabled && weatherLocation) fetchWeather();
+	});
+
+	$effect(() => {
+		if (weatherEnabled && weatherLocation) fetchWeather();
+	});
+
 	/* Sidebar menu items */
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -158,6 +211,26 @@
 					{/if}
 				</a>
 			{/each}
+			{#if weatherEnabled && weatherLocation}
+				<div class="my-4 mx-2 rounded-2xl shadow bg-gradient-to-br from-blue-900 to-blue-700 text-white p-4 flex flex-col justify-center animate-fade-in">
+					{#if loadingWeather}
+						<div>Loading weather…</div>
+					{:else if weatherError}
+						<div class="text-red-400">{weatherError}</div>
+					{:else if weatherData}
+						<div class="flex flex-col gap-1">
+							<div class="text-base font-bold flex items-center gap-2">
+								<span>Weather in {weatherData.location}, {weatherData.country}</span>
+							</div>
+							<div class="flex items-center gap-2 mt-2">
+								<span class="text-2xl font-bold">{Math.round(weatherData.temperature)}°C</span>
+								<span class="text-lg">{weatherData.weathercode === 0 ? '☀️' : weatherData.weathercode < 4 ? '🌤️' : weatherData.weathercode < 45 ? '☁️' : '🌧️'}</span>
+								<span class="text-xs">{weatherData.windspeed} km/h wind</span>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 		<div>
 			<div class="flex justify-between">
