@@ -4,6 +4,7 @@
   import { Icon } from 'svelte-hero-icons';
   import { Plus, Inbox, PaperAirplane, PencilSquare, Trash, DocumentDuplicate, XMark, Star, ArrowUturnLeft } from 'svelte-hero-icons';
   import Editor from './ckeditor.svelte'
+  import '../../ck.css';
   // Example folders
   const folders = [
     { name: 'Inbox', icon: Inbox },
@@ -464,15 +465,15 @@
 
 <!-- Compose Modal -->
 {#if showComposeModal}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
-    <div class="bg-[var(--surface)] rounded-xl w-[32rem] max-w-full shadow-2xl flex flex-col border border-[var(--surface-alt)]">
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in" style="min-width: 75%; min-height: 75%;">
+    <div class="bg-[var(--surface)] rounded-xl shadow-2xl flex-col border border-[var(--surface-alt)]" style="min-height: 75%;">
       <div class="p-4 border-b border-[var(--surface-alt)] flex items-center justify-between rounded-t-xl">
         <h2 class="text-lg font-semibold">Compose Message</h2>
         <button class="p-2 rounded-lg hover:bg-[var(--surface-alt)] transition-all duration-200" on:click={() => showComposeModal = false}>
           <Icon src={XMark} class="w-6 h-6" />
         </button>
       </div>
-      <div class="p-4 flex flex-col gap-4">
+      <div class="p-4 flex flex-col gap-4" style="min-height: 75%;">
         <!-- Add some dropdowns here for querying; may require us to get the user's settings-->
         <!-- To be replaced with CKEditor-->
         <Editor />
