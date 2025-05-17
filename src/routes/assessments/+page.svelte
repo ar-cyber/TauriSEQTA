@@ -53,7 +53,40 @@
 
 		const activeCodes = activeSubjects.map((s: any) => s.code);
 
-		upcomingAssessments = JSON.parse(assessmentsRes).payload
+		// Fetch past assessments for each active subject
+		const pastAssessmentsPromises = activeSubjects.map(subject => 
+			seqtaFetch('/seqta/student/assessment/list/past?', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json; charset=utf-8' },
+				body: {
+					programme: subject.programme,
+					metaclass: subject.metaclass,
+					student: studentId
+				}
+			})
+		);
+
+		const pastAssessmentsResponses = await Promise.all(pastAssessmentsPromises);
+		const pastAssessments = pastAssessmentsResponses
+			.map(res => JSON.parse(res).payload.tasks || [])
+			.flat();
+
+		// Combine and process all assessments
+		const allAssessments = [
+			...JSON.parse(assessmentsRes).payload,
+			...pastAssessments
+		];
+
+		// Remove duplicates by id
+		const uniqueAssessmentsMap = new Map();
+		allAssessments.forEach((a: any) => {
+			if (!uniqueAssessmentsMap.has(a.id)) {
+				uniqueAssessmentsMap.set(a.id, a);
+			}
+		});
+		const uniqueAssessments = Array.from(uniqueAssessmentsMap.values());
+
+		upcomingAssessments = uniqueAssessments
 			.filter((a: any) => activeCodes.includes(a.code))
 			.map((a: any) => {
 				const prefName = `timetable.subject.colour.${a.code}`;
