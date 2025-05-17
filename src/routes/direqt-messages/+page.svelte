@@ -308,20 +308,22 @@
 </script>
 
 <div class="flex h-full">
-  <Sidebar 
-    selectedFolder={selectedFolder}
-    openFolder={openFolder}
-    openCompose={openCompose}
-  />
-  
-  <MessageList
-    selectedFolder={selectedFolder}
-    messages={messages}
-    loading={loading}
-    error={error}
-    selectedMessage={selectedMessage}
-    openMessage={openMessage}
-  />
+  <div class="flex h-full max-xl:flex-col">
+    <Sidebar 
+      selectedFolder={selectedFolder}
+      openFolder={openFolder}
+      openCompose={openCompose}
+    />
+    
+    <MessageList
+      selectedFolder={selectedFolder}
+      messages={messages}
+      loading={loading}
+      error={error}
+      selectedMessage={selectedMessage}
+      openMessage={openMessage}
+    />
+  </div>
   
   <MessageDetail
     selectedMessage={selectedMessage}

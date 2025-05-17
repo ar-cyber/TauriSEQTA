@@ -33,50 +33,65 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
+  // Configure DOMPurify to add target="_blank" to all links
+  DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+    if (node.tagName === 'A' && node.getAttribute('href')) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+
   function updateIframeContent() {
     if (!selectedMessage || !iframe || !iframe.contentWindow) return;
 
     const sanitizedContent = DOMPurify.sanitize(selectedMessage.body);
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: system-ui, -apple-system, sans-serif;
-              color: #f1f5f9;
-              margin: 0;
-              padding: 0;
-              background-color: transparent;
-            }
+    const html = /* html */`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #f1f5f9;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+      }
 
-            .forward {
-              border: 1px solid rgba(255, 255, 255, 0.1);
-              background-color: rgba(0, 0, 0, 0.05);
-              padding: 8px;
-              border-radius: 8px;
-              margin: 0;
-
-              .preamble {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.8);
-                margin-bottom: 6px;
-                padding-bottom: 6px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-              }
-            }
-          </style>
-        </head>
-        <body>${sanitizedContent}</body>
-      </html>
-    `;
+      .forward {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 8px;
+        border-radius: 8px;
+        margin: 0;
+      }
+      
+      .forward .preamble {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    </style>
+  </head>
+  <body>${sanitizedContent}</body>
+</html>`;
 
     const doc = iframe.contentWindow.document;
     doc.open();
     doc.write(html);
     doc.close();
+    
+    setTimeout(adjustIframeHeight, 100);
+  }
+  
+  function adjustIframeHeight() {
+    if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+    
+    const height = iframe.contentDocument.body.scrollHeight;
+    iframe.style.height = `${height}px`;
   }
 
   $effect(() => {
@@ -88,6 +103,19 @@
   onMount(() => {
     if (selectedMessage && iframe) {
       updateIframeContent();
+    }
+    
+    // Set up a resize observer to handle window resizing
+    if (window.ResizeObserver) {
+      const resizeObserver = new ResizeObserver(() => {
+        if (iframe) adjustIframeHeight();
+      });
+      
+      if (iframe) resizeObserver.observe(iframe);
+      
+      return () => {
+        if (iframe) resizeObserver.unobserve(iframe);
+      };
     }
   });
 </script>
@@ -266,7 +294,8 @@
             bind:this={iframe}
             title="Message Content"
             sandbox="allow-same-origin"
-            class="w-full border-0 min-h-[300px]"
+            class="overflow-hidden w-full border-0"
+            style="min-height: 100px"
           ></iframe>
         {/if}
       </div>
