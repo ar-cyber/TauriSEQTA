@@ -59,6 +59,9 @@
 				const prefName = `timetable.subject.colour.${a.code}`;
 				const c = colours.find((p: any) => p.name === prefName);
 				a.colour = c ? c.value : '#8e8e8e';
+				// Get the metaclass from the subject
+				const subject = activeSubjects.find((s: any) => s.code === a.code);
+				a.metaclass = subject?.metaclass;
 				return a;
 			})
 			.sort((a: any, b: any) => new Date(b.due).getTime() - new Date(a.due).getTime());
@@ -182,12 +185,14 @@
 											<span class="block text-base font-semibold" style="color: var(--text);">{assessment.title}</span>
 										</div>
 									</div>
-									<button 
-										class="px-4 py-2 rounded-lg bg-gray-400 text-white cursor-not-allowed"
-										disabled
-									>
-										View Details
-									</button>
+									<div class="flex gap-2">
+										<a
+											href="/assessments/{assessment.id}/{assessment.metaclass}"
+											class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors"
+										>
+											View Details
+										</a>
+									</div>
 								</div>
 							{/each}
 						</div>
@@ -215,12 +220,14 @@
 									</span>
 								</div>
 								<h4 class="font-bold mt-1" style="color: var(--text);">{assessment.title}</h4>
-								<button 
-									class="mt-2 inline-block px-3 py-1 text-sm rounded-lg bg-gray-400 text-white cursor-not-allowed"
-									disabled
-								>
-									View Details
-								</button>
+								<div class="flex gap-2">
+									<a
+										href="/assessments/{assessment.id}/{assessment.metaclass}"
+										class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors"
+									>
+										View Details
+									</a>
+								</div>
 							</div>
 						{/each}
 					</div>
