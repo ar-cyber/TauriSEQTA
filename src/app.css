@@ -36,4 +36,9 @@ body {
 * {
 	scrollbar-width: thin;
 	scrollbar-color: #3b82f6 #111827;
+}
+
+/* Make calendar icon in date inputs white on dark backgrounds */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 } 

@@ -22,6 +22,14 @@
   let selectedLabel: number | null = $state(null);
   let loading = $state(true);
   let error = $state<string | null>(null);
+  let selectedDate = $state(new Date());
+
+  function formatDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
 
   async function fetchLabels() {
     try {
@@ -55,7 +63,7 @@
         '/seqta/student/load/notices?',
         {
           method: 'POST',
-          body: { date: '2025-05-17' }
+          body: { date: formatDate(selectedDate) }
         }
       );
       const data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -78,6 +86,12 @@
     } finally {
       loading = false;
     }
+  }
+
+  function updateDate(event: Event) {
+    const input = event.target as HTMLInputElement;
+    selectedDate = new Date(input.value);
+    fetchNotices();
   }
 
   onMount(async () => {
@@ -105,6 +119,18 @@
 </script>
 
 <div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Notices</h1>
+    <div class="flex items-center gap-4">
+      <input
+        type="date"
+        value={formatDate(selectedDate)}
+        on:change={updateDate}
+        class="px-4 py-2 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+
   <!-- Label filter bar -->
   {#if labels.length > 0}
     <div class="flex flex-wrap gap-2 mb-6 bg-white/5 rounded-lg p-2">
