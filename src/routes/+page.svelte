@@ -362,6 +362,27 @@
   });
 </script>
 
+<style>
+	@keyframes gradient-shift {
+		0% {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 100% 50%;
+		}
+		100% {
+			background-position: 0% 50%;
+		}
+	}
+
+	.animate-gradient {
+		background-size: 200% 200%;
+		animation: gradient-shift 8s ease infinite;
+	}
+
+	/* Add any additional styles here */
+</style>
+
 <div
   class="p-8 mx-auto max-w-7xl min-h-screen bg-gradient-to-br from-slate-950 to-slate-900"
 >
@@ -375,7 +396,7 @@
           class="flex items-center p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
         >
           <div
-            class="flex justify-center items-center mr-4 w-12 h-12 text-2xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg"
+            class="flex justify-center items-center mr-4 w-12 h-12 text-2xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg animate-gradient"
           >
             {shortcut.icon}
           </div>
@@ -422,7 +443,7 @@
       {:else if lessons.length === 0}
         <div class="flex gap-12 justify-center items-center px-14 py-16 w-full">
           <div
-            class="flex justify-center items-center w-24 h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+            class="flex justify-center items-center w-24 h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-gradient"
           >
             <span class="text-5xl">Q</span>
           </div>
@@ -439,7 +460,7 @@
               class="relative flex flex-col min-w-[220px] max-w-[250px] rounded-xl transition-all duration-300 hover:scale-103 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
             >
               <div
-                class="absolute inset-0 bg-gradient-to-br rounded-xl"
+                class="absolute inset-0 bg-gradient-to-br rounded-xl animate-gradient"
                 style="background: linear-gradient(135deg, {lesson.colour}40, {lesson.colour}10); opacity: 0.6;"
               ></div>
               <div
@@ -455,7 +476,7 @@
                   >
                   {#if lesson.active}
                     <span
-                      class="px-2.5 py-1 ml-2 text-xs font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-sm"
+                      class="px-2.5 py-1 ml-2 text-xs font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-sm animate-gradient"
                       >Now</span
                     >
                   {/if}
@@ -521,7 +542,7 @@
       class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-600"
+        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-600 animate-gradient"
       ></div>
       <div
         class="flex justify-between items-center px-6 py-4 border-b border-slate-700/50"
@@ -556,7 +577,7 @@
             >
               <div class="flex gap-2 items-center mb-2">
                 <span
-                  class="px-2.5 py-1 text-xs font-medium rounded-full"
+                  class="px-2.5 py-1 text-xs font-medium rounded-full animate-gradient"
                   style="background: linear-gradient(135deg, {getHomepageLabelColor(
                     notice.label
                   )}, {getHomepageLabelColor(notice.label)}dd); color: white;"
@@ -582,7 +603,7 @@
       class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600"
+        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600 animate-gradient"
       ></div>
       <div
         class="flex flex-col gap-4 justify-between items-start px-6 py-4 border-b md:flex-row md:items-center border-slate-700/50"
@@ -616,7 +637,7 @@
       {:else if filteredAssessments.length === 0}
         <div class="flex flex-col justify-center items-center py-16">
           <div
-            class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+            class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient"
           >
             🎉
           </div>
@@ -629,7 +650,7 @@
               class="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] relative group"
             >
               <div
-                class="absolute inset-0 bg-gradient-to-br rounded-xl opacity-30"
+                class="absolute inset-0 bg-gradient-to-br rounded-xl opacity-30 animate-gradient"
                 style="background: linear-gradient(135deg, {a.colour}20, {a.colour}05);"
               ></div>
               <div
@@ -638,7 +659,7 @@
               ></div>
 
               <div
-                class="flex relative z-10 justify-center items-center h-16 bg-gradient-to-br rounded-xl shadow-lg min-w-16"
+                class="flex relative z-10 justify-center items-center h-16 bg-gradient-to-br rounded-xl shadow-lg min-w-16 animate-gradient"
                 style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);"
               >
                 <span class="text-2xl">📄</span>
