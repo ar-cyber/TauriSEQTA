@@ -282,7 +282,7 @@
           <!-- Editor -->
           <div class="overflow-y-auto flex-1 p-4 bg-slate-900">
             <div
-              class="flex flex-col h-full rounded-lg border bg-slate-800 border-slate-700"
+              class="flex flex-col p-4 h-full rounded-lg border bg-slate-800 border-slate-700"
             >
               <Editor bind:htmlContent={composeBody} />
             </div>

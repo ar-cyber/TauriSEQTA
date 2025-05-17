@@ -23,8 +23,6 @@
   // Make htmlContent bindable from parent components
   let { htmlContent = $bindable('') } = $props();
   
-  let output = $state(null);
-  let outputType = $state('');
   let commandListInstance = $state<any>(null);
 
   let element = $state<HTMLElement | null>(null);
@@ -103,26 +101,9 @@
       }
     }
   }
-  
-  function showJsonOutput() {
-    if (editor) {
-      output = editor.getJSON() as any;
-      outputType = 'json';
-    }
-  }
-  
-  function clearOutput() {
-    output = null;
-  }
-  
-  function copyOutput() {
-    if (output) {
-      navigator.clipboard.writeText(JSON.stringify(output));
-    }
-  }
 </script>
 
-<div class="prose prose-slate prose-invert sm:prose-xl lg:prose-3xl" bind:clientWidth={w}>
+<div class="h-full prose prose-slate prose-invert" bind:clientWidth={w}>
   <div 
     class="w-full" 
     bind:this={element} 
@@ -133,31 +114,3 @@
 </div>
 
 <CommandList bind:this={commandListInstance} />
-
-<div class="my-4 sm:flex">
-  <button
-    onclick={showJsonOutput}
-    class="m-2 border rounded-full px-4 py-2 border-slate-500 {outputType == 'json'
-      ? 'bg-blue-200'
-      : ''}">See JSON Output</button
-  >
-</div>
-
-{#if output}
-  <div class="flex-row-reverse sm:flex">
-    <button
-      class="p-2 font-semibold underline text-slate-700 hover:text-slate-800 cursor"
-      onclick={clearOutput}
-    >
-      Clear output
-    </button>
-    <button
-      class="p-2 font-semibold underline text-slate-700 hover:text-slate-800 cursor"
-      onclick={copyOutput}
-    >
-      Copy output
-    </button>
-  </div>
-  {JSON.stringify(output)}
-{/if}
-<hr />
