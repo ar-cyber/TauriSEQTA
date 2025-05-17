@@ -23,6 +23,10 @@
   
 	let lessonInterval: ReturnType<typeof setInterval> | null = null;
     
+	let homepageNotices = $state<any[]>([]);
+	let homepageLabels = $state<any[]>([]);
+	let loadingHomepageNotices = $state(true);
+
 	function formatDate(date: Date): string {
 	  const y = date.getFullYear();
 	  const m = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -188,8 +192,35 @@
 		}
 	}
 
+	async function fetchHomepageLabels() {
+	  const response = await seqtaFetch('/seqta/student/load/notices?', { method: 'POST', body: { mode: 'labels' } });
+	  const data = typeof response === 'string' ? JSON.parse(response) : response;
+	  homepageLabels = Array.isArray(data?.payload) ? data.payload : [];
+	}
+
+	async function fetchHomepageNotices() {
+	  loadingHomepageNotices = true;
+	  const response = await seqtaFetch('/seqta/student/load/notices?', { method: 'POST', body: { date: formatDate(new Date()) } });
+	  const data = typeof response === 'string' ? JSON.parse(response) : response;
+	  homepageNotices = Array.isArray(data?.payload) ? data.payload.slice(0, 50) : [];
+	  loadingHomepageNotices = false;
+	}
+
+	function getHomepageLabelColor(labelId: number): string {
+	  return homepageLabels.find(l => l.id === labelId)?.colour || '#910048';
+	}
+	function getHomepageLabelTitle(labelId: number): string {
+	  return homepageLabels.find(l => l.id === labelId)?.title || '';
+	}
+
 	onMount(async () => {
-	  await Promise.all([loadLessons(), loadAssessments(), loadNotices(formatDate(new Date()))]);
+	  await Promise.all([
+		loadLessons(),
+		loadAssessments(),
+		loadNotices(formatDate(new Date())),
+		fetchHomepageLabels(),
+		fetchHomepageNotices()
+	  ]);
 	});
   
 	onDestroy(() => {
@@ -265,6 +296,34 @@
 				{/each}
 			</div>
 			{/if}
+		</div>
+		
+		<!-- Notices Widget -->
+		<div class="rounded-2xl shadow bg-white/10 border-t-8 mb-6" style="border-top-color: #910048; border-top-width: 8px;">
+		  <div class="flex items-center justify-between px-4 pt-3 pb-2">
+			<h3 class="text-lg font-bold">Notices</h3>
+			<a href="/notices" class="text-blue-400 text-sm hover:underline">View all</a>
+		  </div>
+		  <div class="max-h-64 overflow-y-auto px-4 pb-3">
+			{#if loadingHomepageNotices}
+			  <div class="py-8 text-center text-[var(--text-muted)]">Loading...</div>
+			{:else if homepageNotices.length === 0}
+			  <div class="py-8 text-center text-[var(--text-muted)]">No notices.</div>
+			{:else}
+			  {#each homepageNotices as notice}
+				<div class="mb-4 last:mb-0 p-3 rounded-lg bg-[var(--surface-alt)]/80">
+				  <div class="flex items-center gap-2 mb-1">
+					<span class="font-semibold text-xs px-2 py-0.5 rounded" style="background: {getHomepageLabelColor(notice.label)}; color: white;">
+					  {getHomepageLabelTitle(notice.label)}
+					</span>
+					<span class="text-xs text-[var(--text-muted)]">{notice.staff}</span>
+				  </div>
+				  <div class="font-bold text-sm mb-1 truncate">{notice.title}</div>
+				  <div class="text-xs text-[var(--text-muted)] line-clamp-2">{@html notice.contents}</div>
+				</div>
+			  {/each}
+			{/if}
+		  </div>
 		</div>
 		
 		<div class="rounded-2xl shadow bg-slate-900">
