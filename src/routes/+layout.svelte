@@ -177,7 +177,6 @@
 		{ label: 'Courses', icon: BookOpen, hasSub: true, path: '/courses' },
 		{ label: 'Dashboard', icon: Squares2x2, path: '/dashboard' },
 		{ label: 'Direqt Messages', icon: ChatBubbleLeftRight, path: '/direqt-messages' },
-		{ label: 'Documents', icon: DocumentText, path: '/documents' },
 		{ label: 'Notices', icon: Bell, path: '/notices' },
 		{ label: 'Reports', icon: ChartBar, path: '/reports' },
 		{ label: 'Settings', icon: Cog6Tooth, path: '/settings' },
