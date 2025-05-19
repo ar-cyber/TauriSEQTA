@@ -24,7 +24,7 @@
   let activeSubjects = $state<any[]>([]);
   let notices = $state<any[]>([]);
 
-  let subjectFilters: Record<string, boolean> = {};
+  let subjectFilters = $state<Record<string, boolean>>({});
 
   let loadingLessons = $state<boolean>(true);
   let loadingAssessments = $state<boolean>(true);
@@ -57,6 +57,8 @@
   let weatherData: any = $state(null);
   let loadingWeather = $state(false);
   let weatherError = $state("");
+
+  let selectedTab = $state<'list' | 'board'>('list');
 
   function formatDate(date: Date): string {
     const y = date.getFullYear();
