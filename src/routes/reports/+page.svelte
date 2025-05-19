@@ -86,24 +86,6 @@ onMount(loadReports);
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-.shine-hover:hover .shine-effect {
-  opacity: 1;
-  transform: translateX(120%) skewX(-20deg);
-}
-.shine-effect {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.18) 100%);
-  opacity: 0;
-  transform: translateX(0) skewX(-20deg);
-  transition: opacity 0.3s, transform 0.7s cubic-bezier(.4,2.3,.3,1);
-  border-radius: 1rem;
-  z-index: 2;
-}
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
