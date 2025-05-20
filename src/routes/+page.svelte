@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { seqtaFetch } from "../utils/seqtaFetch";
+  import { cache } from "../utils/cache";
   import {
     Icon,
     ChevronLeft,
@@ -140,43 +141,69 @@
   async function loadAssessments() {
     loadingAssessments = true;
 
-    const [assessmentsRes, classesRes] = await Promise.all([
-      seqtaFetch("/seqta/student/assessment/list/upcoming?", {
-        method: "POST",
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-        body: { student: studentId },
-      }),
-      seqtaFetch("/seqta/student/load/subjects?", {
-        method: "POST",
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-        body: {},
-      }),
-    ]);
+    try {
+      // Check cache first
+      const cachedData = cache.get<{
+        assessments: any[];
+        subjects: any[];
+        filters: Record<string, boolean>;
+      }>('upcoming_assessments_data');
+      
+      if (cachedData) {
+        upcomingAssessments = cachedData.assessments;
+        activeSubjects = cachedData.subjects;
+        subjectFilters = cachedData.filters;
+        loadingAssessments = false;
+        return;
+      }
 
-    const colours = await loadLessonColours();
+      const [assessmentsRes, classesRes] = await Promise.all([
+        seqtaFetch("/seqta/student/assessment/list/upcoming?", {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: { student: studentId },
+        }),
+        seqtaFetch("/seqta/student/load/subjects?", {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: {},
+        }),
+      ]);
 
-    const classesResJson = JSON.parse(classesRes);
-    const activeClass = classesResJson.payload.find((c: any) => c.active);
-    activeSubjects = activeClass ? activeClass.subjects : [];
+      const colours = await loadLessonColours();
 
-    activeSubjects.forEach((s: any) => {
-      if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
-    });
+      const classesResJson = JSON.parse(classesRes);
+      const activeClass = classesResJson.payload.find((c: any) => c.active);
+      activeSubjects = activeClass ? activeClass.subjects : [];
 
-    const activeCodes = activeSubjects.map((s: any) => s.code);
+      activeSubjects.forEach((s: any) => {
+        if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
+      });
 
-    upcomingAssessments = JSON.parse(assessmentsRes)
-      .payload.filter((a: any) => activeCodes.includes(a.code))
-      .filter((a: any) => new Date(a.due) >= new Date())
-      .map((a: any) => {
-        const prefName = `timetable.subject.colour.${a.code}`;
-        const c = colours.find((p: any) => p.name === prefName);
-        a.colour = c ? c.value : "#8e8e8e";
-        return a;
-      })
-      .sort((a: any, b: any) => (a.due < b.due ? -1 : 1));
+      const activeCodes = activeSubjects.map((s: any) => s.code);
 
-    loadingAssessments = false;
+      upcomingAssessments = JSON.parse(assessmentsRes)
+        .payload.filter((a: any) => activeCodes.includes(a.code))
+        .filter((a: any) => new Date(a.due) >= new Date())
+        .map((a: any) => {
+          const prefName = `timetable.subject.colour.${a.code}`;
+          const c = colours.find((p: any) => p.name === prefName);
+          a.colour = c ? c.value : "#8e8e8e";
+          return a;
+        })
+        .sort((a: any, b: any) => (a.due < b.due ? -1 : 1));
+
+      // Cache all the data for 1 hour
+      cache.set('upcoming_assessments_data', {
+        assessments: upcomingAssessments,
+        subjects: activeSubjects,
+        filters: subjectFilters
+      }, 60);
+    } catch (e) {
+      console.error('Error loading assessments:', e);
+    } finally {
+      loadingAssessments = false;
+    }
   }
 
   async function loadNotices(dateStr: string) {
