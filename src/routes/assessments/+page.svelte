@@ -9,7 +9,7 @@
 	let activeSubjects = $state<any[]>([]);
 	let lessonColours = $state<any[]>([]);
 	let loadingAssessments = $state<boolean>(true);
-	let selectedTab = $state<'list' | 'board'>('list');
+	let selectedTab = $state<'list' | 'board' | 'calendar'>('list');
 	let subjectFilters: Record<string, boolean> = {};
 
 	const filteredAssessments = $derived(upcomingAssessments.filter((a: any) => subjectFilters[a.code]));
@@ -171,6 +171,60 @@
 		}
 	}
 
+	// Add calendar view functions
+	function getDaysInMonth(year: number, month: number) {
+		return new Date(year, month + 1, 0).getDate();
+	}
+
+	function getFirstDayOfMonth(year: number, month: number) {
+		return new Date(year, month, 1).getDay();
+	}
+
+	function getMonthName(month: number) {
+		return new Date(2000, month, 1).toLocaleString('default', { month: 'long' });
+	}
+
+	let currentDate = $state(new Date());
+	let currentMonth = $derived(currentDate.getMonth());
+	let currentYear = $derived(currentDate.getFullYear());
+
+	function getAssessmentsForDate(date: Date) {
+		return upcomingAssessments.filter(a => {
+			const assessmentDate = new Date(a.due);
+			return assessmentDate.getDate() === date.getDate() &&
+				   assessmentDate.getMonth() === date.getMonth() &&
+				   assessmentDate.getFullYear() === date.getFullYear();
+		});
+	}
+
+	function prevMonth() {
+		currentDate = new Date(currentYear, currentMonth - 1, 1);
+	}
+
+	function nextMonth() {
+		currentDate = new Date(currentYear, currentMonth + 1, 1);
+	}
+
+	// Utility: Convert hex color to RGB
+	function hexToRgb(hex: string) {
+		hex = hex.replace(/^#/, '');
+		if (hex.length === 3) {
+			hex = hex.split('').map(x => x + x).join('');
+		}
+		const num = parseInt(hex, 16);
+		return [
+			(num >> 16) & 255,
+			(num >> 8) & 255,
+			num & 255
+		];
+	}
+
+	// Utility: Check if color is light
+	function isColorLight(hex: string) {
+		const [r, g, b] = hexToRgb(hex);
+		return (r * 299 + g * 587 + b * 114) / 1000 > 150;
+	}
+
 	onMount(loadAssessments);
 </script>
 
@@ -190,6 +244,12 @@
 			>
 				Board View
 			</button>
+			<button 
+				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'calendar' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
+				onclick={() => selectedTab = 'calendar'}
+			>
+				Calendar View
+			</button>
 		</div>
 	</div>
 
@@ -200,6 +260,69 @@
 	{:else if filteredAssessments.length === 0}
 		<div class="flex justify-center items-center py-12">
 			<p style="color: var(--text);">No upcoming assessments 🎉</p>
+		</div>
+	{:else if selectedTab === 'calendar'}
+		<div class="bg-slate-800 rounded-xl p-6">
+			<div class="flex justify-between items-center mb-6">
+				<button 
+					class="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+					onclick={prevMonth}
+				>
+					←
+				</button>
+				<h2 class="text-xl font-bold" style="color: var(--text);">
+					{getMonthName(currentMonth)} {currentYear}
+				</h2>
+				<button 
+					class="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+					onclick={nextMonth}
+				>
+					→
+				</button>
+			</div>
+			
+			<div class="grid grid-cols-7 gap-2">
+				{#each ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as day}
+					<div class="text-center py-2 text-sm font-semibold" style="color: var(--text-muted);">
+						{day}
+					</div>
+				{/each}
+				
+				{#each Array(getFirstDayOfMonth(currentYear, currentMonth)) as _, i}
+					<div class="aspect-square"></div>
+				{/each}
+				
+				{#each Array(getDaysInMonth(currentYear, currentMonth)) as _, i}
+					{@const date = new Date(currentYear, currentMonth, i + 1)}
+					{@const assessments = getAssessmentsForDate(date)}
+					<div class="aspect-square p-1">
+						<div class="h-full rounded-lg border border-slate-700 p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800'}"
+							style={assessments.length > 0 && assessments[0].colour ? `background: ${assessments[0].colour};` : ''}>
+							<div class="text-sm mb-1" style="color: var(--text);">{i + 1}</div>
+							{#if assessments.length > 0}
+								<div class="space-y-1">
+									{#each assessments.slice(0, 2) as assessment}
+										{@const textColor = isColorLight(assessment.colour || '#8e8e8e') ? '#232428' : '#fff'}
+										<div class="flex items-center gap-1">
+											<div 
+												class="text-xs p-1 rounded truncate flex-1"
+												style={`background: rgba(0,0,0,0.08); color: ${textColor};`}
+											>
+												{assessment.title}
+											</div>
+										</div>
+									{/each}
+									{#if assessments.length > 2}
+										<div class="text-xs text-center" style="color: var(--text-muted);">
+											+{assessments.length - 2} more
+										</div>
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{:else if selectedTab === 'list'}
 		<div class="flex gap-6">
@@ -253,14 +376,6 @@
 											<span class="block text-base font-semibold" style="color: var(--text);">{assessment.title}</span>
 										</div>
 									</div>
-									<div class="flex gap-2">
-										<a
-											href="/assessments/{assessment.id}/{assessment.metaclass}"
-											class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors"
-										>
-											View Details
-										</a>
-									</div>
 								</div>
 							{/each}
 						</div>
@@ -288,14 +403,6 @@
 									</span>
 								</div>
 								<h4 class="font-bold mt-1" style="color: var(--text);">{assessment.title}</h4>
-								<div class="flex gap-2">
-									<a
-										href="/assessments/{assessment.id}/{assessment.metaclass}"
-										class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors"
-									>
-										View Details
-									</a>
-								</div>
 							</div>
 						{/each}
 					</div>

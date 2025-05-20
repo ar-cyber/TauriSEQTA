@@ -38,7 +38,7 @@
 
 ### Assessments
 - [ ] Add filtering and sorting options
-- [ ] Implement calendar view
+- [x] Implement calendar view
 - [ ] Add reminder notifications
 - [ ] Add progress tracking
 - [ ] Implement assessment categories
