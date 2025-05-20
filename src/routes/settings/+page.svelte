@@ -179,6 +179,22 @@ onMount(loadSettings);
           </div>
         </div>
       </section>
+
+      <!-- Plugins Section -->
+      <section class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up delay-300">
+        <div class="px-6 py-4 border-b border-slate-800">
+          <h2 class="text-lg font-semibold">Plugins</h2>
+          <p class="text-sm text-slate-400">Enhance your DesQTA experience with plugins</p>
+        </div>
+        <div class="p-6">
+          <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
+            <p class="text-slate-400 mb-4">Install additional features and customizations from our plugin store.</p>
+            <a href="/settings/plugins" class="inline-block px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow">
+              Open Plugin Store
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   {/if}
 </div>
