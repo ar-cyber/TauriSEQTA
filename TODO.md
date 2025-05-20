@@ -58,7 +58,7 @@
 
 ### Timetable
 - [ ] Add weekly/monthly view toggle
-- [ ] Implement export options
+- [x] Implement export options
 - [ ] Add conflict detection
 - [ ] Implement sharing
 - [ ] Add schedule change notifications
