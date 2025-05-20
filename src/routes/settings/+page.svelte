@@ -16,18 +16,21 @@ let saveSuccess = false;
 let saveError = '';
 let weatherEnabled = false;
 let weatherLocation = '';
+let remindersEnabled = true;
 
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_location: string }>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_location: string, reminders_enabled: boolean }>('get_settings');
     shortcuts = settings.shortcuts || [];
     weatherEnabled = settings.weather_enabled ?? false;
     weatherLocation = settings.weather_location ?? '';
+    remindersEnabled = settings.reminders_enabled ?? true;
   } catch (e) {
     shortcuts = [];
     weatherEnabled = false;
     weatherLocation = '';
+    remindersEnabled = true;
   }
   loading = false;
 }
@@ -37,7 +40,7 @@ async function saveSettings() {
   saveSuccess = false;
   saveError = '';
   try {
-    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_location: weatherLocation } });
+    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_location: weatherLocation, reminders_enabled: remindersEnabled } });
     saveSuccess = true;
   } catch (e) {
     saveError = 'Failed to save settings.';
@@ -54,6 +57,10 @@ function removeShortcut(idx: number) {
 }
 
 async function sendTestNotification() {
+  if (!remindersEnabled) {
+    alert('Reminders are currently disabled. Enable them to receive notifications.');
+    return;
+  }
   await notify({
     title: 'Test Notification',
     body: 'This is a test notification from DesQTA settings.',
@@ -162,7 +169,10 @@ onMount(loadSettings);
         </div>
         <div class="p-6">
           <div class="p-4 bg-slate-800 rounded-lg animate-fade-in flex flex-col gap-4">
-            <p class="text-slate-400 text-sm">Notification settings coming soon...</p>
+            <div class="flex items-center gap-3 mb-4">
+              <input id="reminders-enabled" type="checkbox" class="accent-blue-600 w-5 h-5" bind:checked={remindersEnabled} />
+              <label for="reminders-enabled" class="text-slate-200 font-medium cursor-pointer">Enable assessment reminder notifications</label>
+            </div>
             <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow w-fit" on:click={sendTestNotification}>
               Send Test Notification
             </button>

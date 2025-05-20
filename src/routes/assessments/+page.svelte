@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { seqtaFetch } from '../../utils/seqtaFetch';
 	import { cache } from '../../utils/cache';
+	import { notify } from '../../utils/notify';
 
 	const studentId = 69;
   
@@ -11,6 +12,7 @@
 	let loadingAssessments = $state<boolean>(true);
 	let selectedTab = $state<'list' | 'board' | 'calendar'>('list');
 	let subjectFilters: Record<string, boolean> = {};
+	let remindersEnabled = true;
 
 	const filteredAssessments = $derived(upcomingAssessments.filter((a: any) => subjectFilters[a.code]));
   
@@ -224,6 +226,34 @@
 		const [r, g, b] = hexToRgb(hex);
 		return (r * 299 + g * 587 + b * 114) / 1000 > 150;
 	}
+
+	function scheduleAssessmentReminders(assessments: any[]) {
+		if (!remindersEnabled) return;
+		const now = Date.now();
+		const scheduled = new Set(JSON.parse(localStorage.getItem('scheduledAssessmentReminders') || '[]'));
+
+		for (const a of assessments) {
+			const due = new Date(a.due).getTime();
+			const reminderTime = due - 24 * 60 * 60 * 1000; // 1 day before
+			if (reminderTime > now && !scheduled.has(a.id)) {
+				const timeout = reminderTime - now;
+				setTimeout(() => {
+					notify({
+						title: 'Assessment Reminder',
+						body: `${a.title} is due tomorrow!`,
+					});
+				}, timeout);
+				scheduled.add(a.id);
+			}
+		}
+		localStorage.setItem('scheduledAssessmentReminders', JSON.stringify(Array.from(scheduled)));
+	}
+
+	$effect(() => {
+		if (upcomingAssessments.length) {
+			scheduleAssessmentReminders(upcomingAssessments);
+		}
+	});
 
 	onMount(loadAssessments);
 </script>

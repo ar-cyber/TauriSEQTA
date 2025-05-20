@@ -16,11 +16,23 @@ fn settings_file() -> PathBuf {
     dir
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Settings {
     pub shortcuts: Vec<Shortcut>,
     pub weather_enabled: bool,
     pub weather_location: String,
+    pub reminders_enabled: bool,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            shortcuts: Vec::new(),
+            weather_enabled: false,
+            weather_location: String::new(),
+            reminders_enabled: true,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
