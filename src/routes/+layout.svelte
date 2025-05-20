@@ -2,6 +2,7 @@
 	import { invoke } from '@tauri-apps/api/core';
 	import { emit, listen } from '@tauri-apps/api/event'
 	import { seqtaFetch } from '../utils/seqtaFetch';
+	import { cache } from '../utils/cache';
 
 	import { onMount } from 'svelte';
 	import '../app.css';
@@ -110,12 +111,22 @@
 
 	async function loadUserInfo() {
 		try {
+			// Check cache first
+			const cachedUserInfo = cache.get<UserInfo>('userInfo');
+			if (cachedUserInfo) {
+				userInfo = cachedUserInfo;
+				return;
+			}
+
 			const res = await seqtaFetch('/seqta/student/login?', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json; charset=utf-8' },
 				body: {}
 			});
 			userInfo = JSON.parse(res).payload;
+			
+			// Cache the user info for 5 minutes
+			cache.set('userInfo', userInfo);
 		} catch (e) {
 			console.error('Failed to load user info:', e);
 		}
@@ -137,6 +148,14 @@
 			weatherData = null;
 			return;
 		}
+
+		// Check cache first
+		const cachedWeather = cache.get<any>('weather');
+		if (cachedWeather) {
+			weatherData = cachedWeather;
+			return;
+		}
+
 		loadingWeather = true;
 		weatherError = '';
 		try {
@@ -151,6 +170,9 @@
 				location: name,
 				country
 			};
+
+			// Cache weather data for 15 minutes
+			cache.set('weather', weatherData, 15 * 60 * 1000);
 		} catch (e) {
 			weatherError = 'Failed to load weather.';
 			weatherData = null;

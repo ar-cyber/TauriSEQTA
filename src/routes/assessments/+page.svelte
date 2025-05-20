@@ -15,6 +15,7 @@
   
 	async function loadLessonColours() {
 		if (lessonColours.length) return lessonColours;
+		
 		const res = await seqtaFetch('/seqta/student/load/prefs?', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json; charset=utf-8' },

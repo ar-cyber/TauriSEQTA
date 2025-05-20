@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { seqtaFetch } from '../../utils/seqtaFetch';
+import { cache } from '../../utils/cache';
 
 let reports = $state<any[]>([]);
 let loading = $state(true);
@@ -19,6 +20,15 @@ function formatDate(dateStr: string) {
 async function loadReports() {
   loading = true;
   error = '';
+
+  // Check cache first
+  const cachedReports = cache.get<any[]>('reports');
+  if (cachedReports) {
+    reports = cachedReports;
+    loading = false;
+    return;
+  }
+
   try {
     const response = await seqtaFetch('/seqta/student/load/reports?', {
       method: 'POST',
@@ -27,6 +37,8 @@ async function loadReports() {
     const data = typeof response === 'string' ? JSON.parse(response) : response;
     if (data.status === '200' && Array.isArray(data.payload)) {
       reports = data.payload;
+      // Cache reports for 5 minutes
+      cache.set('reports', reports);
     } else {
       error = 'Failed to load reports.';
     }
