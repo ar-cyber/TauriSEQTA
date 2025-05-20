@@ -31,7 +31,8 @@
     "dompurify": "^3.2.5",
     "file-saver": "^2.0.5",
     "jspdf": "^3.0.1",
-    "jspdf-autotable": "^5.0.2"
+    "jspdf-autotable": "^5.0.2",
+    "rss-parser": "^3.12.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
