@@ -2,6 +2,9 @@
 import { onMount } from 'svelte';
 import { seqtaFetch } from '../../utils/seqtaFetch';
 import { cache } from '../../utils/cache';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const studentId = 69;
 
@@ -10,6 +13,7 @@ let lessons = $state<any[]>([]);
 let lessonColours = $state<any[]>([]);
 let loadingLessons = $state<boolean>(true);
 let error = $state<string | null>(null);
+let showExportMenu = $state(false);
 
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -156,6 +160,49 @@ function timeToY(time: number, min: number, max: number): number {
 
 const timeBounds = $derived(getTimeBounds);
 
+// Export helpers
+function exportTimetableCSV() {
+  const header = ['Day', 'Subject', 'Code', 'From', 'Until', 'Room', 'Teacher'];
+  const sortedLessons = [...lessons].sort((a, b) => a.dayIdx - b.dayIdx || a.from.localeCompare(b.from));
+  const rows = sortedLessons.map(l => [
+    new Date(l.date).toLocaleDateString('en-AU', { weekday: 'long' }),
+    l.description || '',
+    l.code || '',
+    l.from,
+    l.until,
+    l.room || '',
+    l.staff || ''
+  ]);
+  const csv = [header, ...rows].map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  saveAs(blob, 'timetable.csv');
+}
+
+function exportTimetablePDF() {
+  const doc = new jsPDF();
+  const header = ['Day', 'Subject', 'Code', 'From', 'Until', 'Room', 'Teacher'];
+  const sortedLessons = [...lessons].sort((a, b) => a.dayIdx - b.dayIdx || a.from.localeCompare(b.from));
+  const rows = sortedLessons.map(l => [
+    new Date(l.date).toLocaleDateString('en-AU', { weekday: 'long' }),
+    l.description || '',
+    l.code || '',
+    l.from,
+    l.until,
+    l.room || '',
+    l.staff || ''
+  ]);
+  doc.text('Weekly Timetable', 14, 16);
+  autoTable(doc, {
+    head: [header],
+    body: rows,
+    startY: 22,
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [59, 130, 246] }, // blue
+    alternateRowStyles: { fillColor: [240, 240, 240] }
+  });
+  doc.save('timetable.pdf');
+}
+
 onMount(loadLessons);
 </script>
 
@@ -174,9 +221,19 @@ onMount(loadLessons);
         disabled={loadingLessons}
       >&#62;</button>
     </div>
+    <div class="relative inline-block text-left">
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors" onclick={() => showExportMenu = !showExportMenu}>
+        Export
+      </button>
+      {#if showExportMenu}
+        <div class="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-10">
+          <button class="block w-full text-left px-4 py-2 hover:bg-slate-700 text-white" onclick={exportTimetableCSV}>Export as CSV</button>
+          <button class="block w-full text-left px-4 py-2 hover:bg-slate-700 text-white" onclick={exportTimetablePDF}>Export as PDF</button>
+        </div>
+      {/if}
+    </div>
   </div>
 
-  {#key lessons}
   <div class="flex overflow-hidden flex-1 items-stretch">
     <div class="flex flex-col flex-1 w-full h-full justify-stretch">
       <!-- Header Row -->
@@ -249,5 +306,4 @@ onMount(loadLessons);
       {/if}
     </div>
   </div>
-  {/key}
 </div> 

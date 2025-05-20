@@ -32,7 +32,6 @@
 - [ ] Add input validation
 - [ ] Implement error logging and monitoring
 - [ ] Add security headers and CSP policies
-- [ ] Implement proper authentication flow
 
 ## 5. Feature Enhancements
 
@@ -46,11 +45,8 @@
 
 ### Reports
 - [ ] Add report categories and filtering
-- [ ] Implement report comparison
 - [ ] Add report sharing
 - [ ] Add report analytics
-- [ ] Implement export options (PDF, CSV)
-- [ ] Add report history
 
 ### Dashboard
 - [ ] Add customizable widgets
