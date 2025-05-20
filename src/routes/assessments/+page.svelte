@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { seqtaFetch } from '../../utils/seqtaFetch';
+	import { cache } from '../../utils/cache';
 
 	const studentId = 69;
   
@@ -14,93 +15,126 @@
 	const filteredAssessments = $derived(upcomingAssessments.filter((a: any) => subjectFilters[a.code]));
   
 	async function loadLessonColours() {
-		if (lessonColours.length) return lessonColours;
-		
+		// Check cache first
+		const cachedColours = cache.get<any[]>('lesson_colours');
+		if (cachedColours) {
+			lessonColours = cachedColours;
+			return lessonColours;
+		}
+
 		const res = await seqtaFetch('/seqta/student/load/prefs?', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json; charset=utf-8' },
 			body: { request: 'userPrefs', asArray: true, user: studentId }
 		});
 		lessonColours = JSON.parse(res).payload;
+		// Cache for 10 minutes
+		cache.set('lesson_colours', lessonColours, 10);
 		return lessonColours;
 	}
 
 	async function loadAssessments() {
 		loadingAssessments = true;
 
-		const [assessmentsRes, classesRes] = await Promise.all([
-			seqtaFetch('/seqta/student/assessment/list/upcoming?', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json; charset=utf-8' },
-				body: { student: studentId }
-			}),
-			seqtaFetch('/seqta/student/load/subjects?', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json; charset=utf-8' },
-				body: {}
-			})
-		]);
-
-		const colours = await loadLessonColours();
-
-		const classesResJson = JSON.parse(classesRes);
-		const activeClass = classesResJson.payload.find((c: any) => c.active);
-		activeSubjects = activeClass ? activeClass.subjects : [];
-
-		// Initialize subject filters on first run
-		activeSubjects.forEach((s: any) => {
-			if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
-		});
-
-		const activeCodes = activeSubjects.map((s: any) => s.code);
-
-		// Fetch past assessments for each active subject
-		const pastAssessmentsPromises = activeSubjects.map(subject => 
-			seqtaFetch('/seqta/student/assessment/list/past?', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json; charset=utf-8' },
-				body: {
-					programme: subject.programme,
-					metaclass: subject.metaclass,
-					student: studentId
-				}
-			})
-		);
-
-		const pastAssessmentsResponses = await Promise.all(pastAssessmentsPromises);
-		const pastAssessments = pastAssessmentsResponses
-			.map(res => JSON.parse(res).payload.tasks || [])
-			.flat();
-
-		// Combine and process all assessments
-		const allAssessments = [
-			...JSON.parse(assessmentsRes).payload,
-			...pastAssessments
-		];
-
-		// Remove duplicates by id
-		const uniqueAssessmentsMap = new Map();
-		allAssessments.forEach((a: any) => {
-			if (!uniqueAssessmentsMap.has(a.id)) {
-				uniqueAssessmentsMap.set(a.id, a);
+		try {
+			// Check cache first
+			const cachedData = cache.get<{
+				assessments: any[];
+				subjects: any[];
+				filters: Record<string, boolean>;
+			}>('assessments_overview_data');
+			
+			if (cachedData) {
+				upcomingAssessments = cachedData.assessments;
+				activeSubjects = cachedData.subjects;
+				subjectFilters = cachedData.filters;
+				loadingAssessments = false;
+				return;
 			}
-		});
-		const uniqueAssessments = Array.from(uniqueAssessmentsMap.values());
 
-		upcomingAssessments = uniqueAssessments
-			.filter((a: any) => activeCodes.includes(a.code))
-			.map((a: any) => {
-				const prefName = `timetable.subject.colour.${a.code}`;
-				const c = colours.find((p: any) => p.name === prefName);
-				a.colour = c ? c.value : '#8e8e8e';
-				// Get the metaclass from the subject
-				const subject = activeSubjects.find((s: any) => s.code === a.code);
-				a.metaclass = subject?.metaclass;
-				return a;
-			})
-			.sort((a: any, b: any) => new Date(b.due).getTime() - new Date(a.due).getTime());
+			const [assessmentsRes, classesRes] = await Promise.all([
+				seqtaFetch('/seqta/student/assessment/list/upcoming?', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json; charset=utf-8' },
+					body: { student: studentId }
+				}),
+				seqtaFetch('/seqta/student/load/subjects?', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json; charset=utf-8' },
+					body: {}
+				})
+			]);
 
-		loadingAssessments = false;
+			const colours = await loadLessonColours();
+
+			const classesResJson = JSON.parse(classesRes);
+			const activeClass = classesResJson.payload.find((c: any) => c.active);
+			activeSubjects = activeClass ? activeClass.subjects : [];
+
+			// Initialize subject filters on first run
+			activeSubjects.forEach((s: any) => {
+				if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
+			});
+
+			const activeCodes = activeSubjects.map((s: any) => s.code);
+
+			// Fetch past assessments for each active subject
+			const pastAssessmentsPromises = activeSubjects.map(subject => 
+				seqtaFetch('/seqta/student/assessment/list/past?', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json; charset=utf-8' },
+					body: {
+						programme: subject.programme,
+						metaclass: subject.metaclass,
+						student: studentId
+					}
+				})
+			);
+
+			const pastAssessmentsResponses = await Promise.all(pastAssessmentsPromises);
+			const pastAssessments = pastAssessmentsResponses
+				.map(res => JSON.parse(res).payload.tasks || [])
+				.flat();
+
+			// Combine and process all assessments
+			const allAssessments = [
+				...JSON.parse(assessmentsRes).payload,
+				...pastAssessments
+			];
+
+			// Remove duplicates by id
+			const uniqueAssessmentsMap = new Map();
+			allAssessments.forEach((a: any) => {
+				if (!uniqueAssessmentsMap.has(a.id)) {
+					uniqueAssessmentsMap.set(a.id, a);
+				}
+			});
+			const uniqueAssessments = Array.from(uniqueAssessmentsMap.values());
+
+			upcomingAssessments = uniqueAssessments
+				.filter((a: any) => activeCodes.includes(a.code))
+				.map((a: any) => {
+					const prefName = `timetable.subject.colour.${a.code}`;
+					const c = colours.find((p: any) => p.name === prefName);
+					a.colour = c ? c.value : '#8e8e8e';
+					// Get the metaclass from the subject
+					const subject = activeSubjects.find((s: any) => s.code === a.code);
+					a.metaclass = subject?.metaclass;
+					return a;
+				})
+				.sort((a: any, b: any) => new Date(b.due).getTime() - new Date(a.due).getTime());
+
+			// Cache all the data for 10 minutes
+			cache.set('assessments_overview_data', {
+				assessments: upcomingAssessments,
+				subjects: activeSubjects,
+				filters: subjectFilters
+			}, 10);
+		} catch (e) {
+			console.error('Error loading assessments:', e);
+		} finally {
+			loadingAssessments = false;
+		}
 	}
 
 	function buildAssessmentURL(programmeID: number, metaID: number, itemID?: number) {
