@@ -325,10 +325,11 @@
 				{#each Array(getDaysInMonth(currentYear, currentMonth)) as _, i}
 					{@const date = new Date(currentYear, currentMonth, i + 1)}
 					{@const assessments = getAssessmentsForDate(date)}
+					{@const isToday = date.toDateString() === new Date().toDateString()}
 					<div class="aspect-square p-1">
-						<div class="h-full rounded-lg border border-slate-700 p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800'}"
+						<div class="h-full rounded-lg border p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800'} {isToday ? 'border-blue-500 ring-4 ring-blue-500/30 animate-pulse-today' : 'border-slate-700'}"
 							style={assessments.length > 0 && assessments[0].colour ? `background: ${assessments[0].colour};` : ''}>
-							<div class="text-sm mb-1" style="color: var(--text);">{i + 1}</div>
+							<div class="text-base mb-1 {isToday ? 'font-bold text-blue-400 scale-110' : ''}" style="color: var(--text);">{i + 1}</div>
 							{#if assessments.length > 0}
 								<div class="space-y-1">
 									{#each assessments.slice(0, 2) as assessment}
@@ -457,6 +458,22 @@
 			transform: scale(1);
 			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
 		}
+	}
+
+	@keyframes pulse-today {
+		0% {
+			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+		}
+		70% {
+			box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+		}
+	}
+
+	.animate-pulse-today {
+		animation: pulse-today 2s infinite;
 	}
 
 	.highlight-subject {
