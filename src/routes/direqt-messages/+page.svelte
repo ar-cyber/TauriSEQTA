@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { seqtaFetch } from '../../utils/seqtaFetch';
   import { type Message, type Folder } from './types';
-  
+  import { cache } from '../../utils/cache';
+
   // Components
   import Sidebar from './components/Sidebar.svelte';
   import MessageList from './components/MessageList.svelte';
@@ -137,8 +138,16 @@
   async function openMessage(msg: Message) {
     selectedMessage = msg;
     msg.unread = false;
-    // If already loaded, don't fetch again
-    if (msg.body) return;
+    
+    // Check cache first
+    const cacheKey = `message_${msg.id}`;
+    const cachedContent = cache.get<string>(cacheKey);
+    
+    if (cachedContent) {
+      msg.body = cachedContent;
+      return;
+    }
+    
     detailLoading = true;
     detailError = null;
     try {
@@ -155,6 +164,8 @@
       const data = typeof response === 'string' ? JSON.parse(response) : response;
       if (data?.payload?.contents) {
         msg.body = data.payload.contents;
+        // Cache the message content for 24 hours
+        cache.set(cacheKey, msg.body, 1440); // 24 hours TTL
       } else {
         msg.body = '<em>No content.</em>';
       }
