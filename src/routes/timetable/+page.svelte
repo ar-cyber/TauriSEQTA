@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { seqtaFetch } from '../../utils/seqtaFetch';
+import { cache } from '../../utils/cache';
 
 const studentId = 69;
 
@@ -8,6 +9,7 @@ let weekStart: Date = getMonday(new Date());
 let lessons = $state<any[]>([]);
 let lessonColours = $state<any[]>([]);
 let loadingLessons = $state<boolean>(true);
+let error = $state<string | null>(null);
 
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -27,36 +29,63 @@ function formatDate(date: Date): string {
 }
 
 async function loadLessonColours() {
-  if (lessonColours.length) return lessonColours;
+  // Check cache first
+  const cachedColours = cache.get<any[]>('lesson_colours');
+  if (cachedColours) {
+    lessonColours = cachedColours;
+    return lessonColours;
+  }
+
   const res = await seqtaFetch('/seqta/student/load/prefs?', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
     body: { request: 'userPrefs', asArray: true, user: studentId }
   });
   lessonColours = JSON.parse(res).payload;
+  // Cache for 30 minutes
+  cache.set('lesson_colours', lessonColours, 30);
   return lessonColours;
 }
 
 async function loadLessons() {
   loadingLessons = true;
+  error = null;
   const from = formatDate(weekStart);
   const until = formatDate(new Date(weekStart.getTime() + 4 * 86400000));
-  const res = await seqtaFetch('/seqta/student/load/timetable?', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: { from, until, student: studentId }
-  });
-  const colours = await loadLessonColours();
-  lessons = JSON.parse(res).payload.items.map((lesson: any) => {
-    const colourPrefName = `timetable.subject.colour.${lesson.code}`;
-    const subjectColour = colours.find((c: any) => c.name === colourPrefName);
-    lesson.colour = subjectColour ? `${subjectColour.value}` : `#232428`;
-    lesson.from = lesson.from.substring(0, 5);
-    lesson.until = lesson.until.substring(0, 5);
-    lesson.dayIdx = (new Date(lesson.date).getDay() + 6) % 7; // 0=Mon, 4=Fri
-    return lesson;
-  });
-  loadingLessons = false;
+  
+  try {
+    // Check cache first
+    const cacheKey = `timetable_${from}_${until}`;
+    const cachedLessons = cache.get<any[]>(cacheKey);
+    if (cachedLessons) {
+      lessons = cachedLessons;
+      loadingLessons = false;
+      return;
+    }
+
+    const res = await seqtaFetch('/seqta/student/load/timetable?', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: { from, until, student: studentId }
+    });
+    const colours = await loadLessonColours();
+    lessons = JSON.parse(res).payload.items.map((lesson: any) => {
+      const colourPrefName = `timetable.subject.colour.${lesson.code}`;
+      const subjectColour = colours.find((c: any) => c.name === colourPrefName);
+      lesson.colour = subjectColour ? `${subjectColour.value}` : `#232428`;
+      lesson.from = lesson.from.substring(0, 5);
+      lesson.until = lesson.until.substring(0, 5);
+      lesson.dayIdx = (new Date(lesson.date).getDay() + 6) % 7; // 0=Mon, 4=Fri
+      return lesson;
+    });
+    // Cache for 30 minutes
+    cache.set(cacheKey, lessons, 30);
+  } catch (e) {
+    error = 'Failed to load timetable. Please try again.';
+    console.error('Error loading timetable:', e);
+  } finally {
+    loadingLessons = false;
+  }
 }
 
 function prevWeek() {
@@ -133,9 +162,17 @@ onMount(loadLessons);
 <div class="flex flex-col w-full h-full text-slate-50">
   <div class="flex justify-between items-center px-4 py-2 shadow bg-slate-800">
     <div class="flex gap-2 items-center">
-      <button class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110" onclick={prevWeek}>&#60;</button>
+      <button 
+        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        onclick={prevWeek}
+        disabled={loadingLessons}
+      >&#60;</button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
-      <button class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110" onclick={nextWeek}>&#62;</button>
+      <button 
+        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        onclick={nextWeek}
+        disabled={loadingLessons}
+      >&#62;</button>
     </div>
   </div>
 
@@ -150,7 +187,23 @@ onMount(loadLessons);
         {/each}
       </div>
       <!-- Time grid and lessons -->
-      {#if lessons.length}
+      {#if error}
+        <div class="flex flex-col justify-center items-center py-16">
+          <div class="w-16 h-16 rounded-full border-4 border-red-500/30 border-t-red-500 animate-spin"></div>
+          <p class="mt-4 text-red-400">{error}</p>
+          <button 
+            class="mt-4 px-4 py-2 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-500 transition-colors"
+            onclick={loadLessons}
+          >
+            Retry
+          </button>
+        </div>
+      {:else if loadingLessons}
+        <div class="flex flex-col justify-center items-center py-16">
+          <div class="w-16 h-16 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin"></div>
+          <p class="mt-4 text-slate-400">Loading timetable...</p>
+        </div>
+      {:else if lessons.length}
         <div class="relative flex-1 w-full h-full" style="height: {GRID_HEIGHT}px;">
           <!-- Time labels -->
           <div class="absolute top-0 left-0 z-10 w-14 h-full pointer-events-none">
@@ -186,9 +239,13 @@ onMount(loadLessons);
             {/each}
           </div>
         </div>
-      {/if}
-      {#if loadingLessons}
-        <div class="flex absolute inset-0 justify-center items-center"><span class="text-lg text-slate-400">Loading…</span></div>
+      {:else}
+        <div class="flex flex-col justify-center items-center py-16">
+          <div class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
+            📚
+          </div>
+          <p class="mt-4 text-xl text-slate-300">No lessons available for this week.</p>
+        </div>
       {/if}
     </div>
   </div>
