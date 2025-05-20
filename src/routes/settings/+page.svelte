@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
+import { notify } from '../../utils/notify';
 
 interface Shortcut {
   name: string;
@@ -50,6 +51,13 @@ function addShortcut() {
 
 function removeShortcut(idx: number) {
   shortcuts = shortcuts.filter((_, i) => i !== idx);
+}
+
+async function sendTestNotification() {
+  await notify({
+    title: 'Test Notification',
+    body: 'This is a test notification from DesQTA settings.',
+  });
 }
 
 onMount(loadSettings);
@@ -153,8 +161,11 @@ onMount(loadSettings);
           <p class="text-sm text-slate-400">Manage your notification preferences</p>
         </div>
         <div class="p-6">
-          <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
+          <div class="p-4 bg-slate-800 rounded-lg animate-fade-in flex flex-col gap-4">
             <p class="text-slate-400 text-sm">Notification settings coming soon...</p>
+            <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow w-fit" on:click={sendTestNotification}>
+              Send Test Notification
+            </button>
           </div>
         </div>
       </section>

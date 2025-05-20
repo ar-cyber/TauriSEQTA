@@ -50,8 +50,7 @@ impl Settings {
         let path = settings_file();
         fs::write(path, serde_json::to_string(self).unwrap())
     }
-} 
-
+}
 
 #[tauri::command]
 pub fn get_settings() -> Settings {

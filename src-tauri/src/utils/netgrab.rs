@@ -1,7 +1,7 @@
 use reqwest;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use serde_json::Value;
+use std::collections::HashMap;
 
 #[path = "../utils/session.rs"]
 mod session;
@@ -23,7 +23,7 @@ pub struct HomeworkResponse {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum RequestMethod {
     GET,
-    POST
+    POST,
 }
 
 /// Build an HTTP client with headers based on the saved session.
@@ -33,7 +33,7 @@ fn create_client() -> reqwest::Client {
 
     // Build the complete cookie string with JSESSIONID and additional cookies
     let mut cookie_parts = Vec::new();
-    
+
     // Add JSESSIONID first if it exists
     if !session.jsessionid.is_empty() {
         cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
@@ -60,7 +60,10 @@ fn create_client() -> reqwest::Client {
         reqwest::header::ACCEPT,
         "application/json, text/plain, */*".parse().unwrap(),
     );
-    headers.insert(reqwest::header::ACCEPT_LANGUAGE, "en-US,en;q=0.9".parse().unwrap());
+    headers.insert(
+        reqwest::header::ACCEPT_LANGUAGE,
+        "en-US,en;q=0.9".parse().unwrap(),
+    );
 
     if !session.base_url.is_empty() {
         headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
@@ -117,7 +120,7 @@ pub async fn fetch_api_data(
         Ok(resp) => {
             let response = resp.text().await.unwrap();
             Ok(response)
-        },
+        }
         Err(e) => Err(format!("HTTP request failed: {e}")),
     }
 }
@@ -127,26 +130,14 @@ pub async fn get_api_data(
     url: &str,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(
-        url,
-        RequestMethod::GET,
-        None,
-        None,
-        Some(parameters)
-    ).await
+    fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters)).await
 }
 
 #[tauri::command]
 pub async fn post_api_data(
     url: &str,
     data: Value,
-    parameters: HashMap<String, String>
+    parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(
-        url,
-        RequestMethod::POST,
-        None,
-        Some(data),
-        Some(parameters)
-    ).await
+    fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters)).await
 }
