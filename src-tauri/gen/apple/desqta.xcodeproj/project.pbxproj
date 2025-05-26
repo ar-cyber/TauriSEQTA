@@ -36,6 +36,7 @@
 		7A9A333D7D907FD7A4A2A715 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
 		7C72513F6234F641CFCB8158 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		8BA782E201782638A4CB56C2 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		97A86CFEBFE2C676B4A4B42A /* login.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = login.rs; sourceTree = "<group>"; };
 		9B5BFDD90823395B8C588B96 /* settings.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = settings.rs; sourceTree = "<group>"; };
 		A5B8154FB4AA440CBC2DD223 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A6307CF136FD1B70C6633161 /* main.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.rs; sourceTree = "<group>"; };
@@ -126,6 +127,7 @@
 				56EBD37AB388165FA1381000 /* lib.rs */,
 				A6307CF136FD1B70C6633161 /* main.rs */,
 				7D00FA4339CB82ABDF28AF41 /* auth */,
+				BACCCDF70E10AC47A1A54697 /* mobilechanges */,
 				D3E720EE38F246F17BBF0E94 /* utils */,
 			);
 			name = src;
@@ -154,6 +156,14 @@
 				1577F93783E32C5E2D9A9666 /* Info.plist */,
 			);
 			path = desqta_iOS;
+			sourceTree = "<group>";
+		};
+		BACCCDF70E10AC47A1A54697 /* mobilechanges */ = {
+			isa = PBXGroup;
+			children = (
+				97A86CFEBFE2C676B4A4B42A /* login.rs */,
+			);
+			path = mobilechanges;
 			sourceTree = "<group>";
 		};
 		D3E720EE38F246F17BBF0E94 /* utils */ = {

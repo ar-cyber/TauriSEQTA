@@ -24,7 +24,8 @@
 		Cog6Tooth,
 		CalendarDays,
 		GlobeAlt,
-		ArrowRightOnRectangle
+		ArrowRightOnRectangle,
+		Bars3
 	} from 'svelte-hero-icons';
 
 	import { writable } from 'svelte/store';
@@ -39,6 +40,9 @@
 	let weatherData: any = $state(null);
 	let loadingWeather = $state(false);
 	let weatherError = $state('');
+
+	let isMobileMenuOpen = $state(false);
+	let isMobile = $state(false);
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -190,6 +194,20 @@
 		if (weatherEnabled && weatherLocation) fetchWeather();
 	});
 
+	onMount(() => {
+		const checkMobile = () => {
+			isMobile = window.innerWidth < 768;
+			if (!isMobile) isMobileMenuOpen = false;
+		};
+		
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+		
+		return () => {
+			window.removeEventListener('resize', checkMobile);
+		};
+	});
+
 	/* Sidebar menu items */
 	const menu = [
 		{ label: 'Home', icon: Home, path: '/' },
@@ -206,9 +224,20 @@
 	];
 </script>
 
-<div class="flex pt-2 h-screen bg-slate-900">
+<div class="flex flex-col md:flex-row pt-2 h-screen bg-slate-900">
+	<!-- Mobile Menu Button -->
+	<button 
+		class="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg bg-slate-800 hover:bg-slate-700"
+		onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
+	>
+		<Icon src={Bars3} class="w-6 h-6" />
+	</button>
+
+	<!-- Sidebar -->
 	<aside
-		class="flex flex-col justify-between px-2 pb-2 space-y-2 w-64 h-full"
+		class="flex flex-col justify-between px-2 pb-2 space-y-2 w-full md:w-64 h-full fixed md:relative transform transition-transform duration-300 ease-in-out z-40 bg-slate-900"
+		class:translate-x-0={isMobileMenuOpen || !isMobile}
+		class:-translate-x-full={!isMobileMenuOpen && isMobile}
 	>
 		<div class="flex overflow-y-scroll flex-col gap-2 h-full">
 			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-slate-900">
@@ -216,7 +245,11 @@
 				<span class="text-lg font-bold tracking-wide">DesQTA</span>
 			</div>
 			{#each menu as item}
-				<a href={item.path} class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-slate-800 hover:scale-[1.03] group">
+				<a 
+					href={item.path} 
+					class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-slate-800 hover:scale-[1.03] group"
+					onclick={() => isMobile && (isMobileMenuOpen = false)}
+				>
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
 					<span class="text-base font-bold">{item.label}</span>
 					{#if item.hasSub}
@@ -286,14 +319,9 @@
 	</aside>
 
 	<!-- Main Content -->
-	<main class="overflow-y-scroll flex-1 w-full h-full overflow-clip rounded-tl-2xl bg-slate-950">
-		{@render children()}
-	</main>
-
-	<!-- First‑run overlay -->
-	{#if $needsSetup}
-		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
-			<div class="flex flex-col justify-center items-center p-8 space-y-5 max-w-xl rounded-2xl shadow-xl bg-slate-900">
+	<main class="flex-1 overflow-y-auto p-4 md:p-6">
+		{#if $needsSetup}
+			<div class="flex flex-col items-center justify-center h-full">
 				<h2 class="text-xl font-bold">Connect to your SEQTA instance</h2>
 				<p class="text-sm">
 					Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll
@@ -317,6 +345,16 @@
 					Sign in
 				</button>
 			</div>
-		</div>
-	{/if}
-</div> 
+		{:else}
+			<slot />
+		{/if}
+	</main>
+</div>
+
+<!-- Mobile Menu Overlay -->
+{#if isMobile && isMobileMenuOpen}
+	<div 
+		class="fixed inset-0 bg-black bg-opacity-50 z-30"
+		onclick={() => isMobileMenuOpen = false}
+	/>
+{/if} 
