@@ -258,24 +258,24 @@
 	onMount(loadAssessments);
 </script>
 
-<div class="p-6 space-y-6">
-	<div class="flex justify-between items-center">
-		<h1 class="text-2xl font-bold" style="color: var(--text);">Assessments</h1>
+<div class="p-4 sm:p-6 space-y-6">
+	<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+		<h1 class="text-2xl font-bold text-white">Assessments</h1>
 		<div class="flex gap-2">
 			<button 
-				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'list' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'list' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'list'}
 			>
 				List View
 			</button>
 			<button 
-				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'board' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'board' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'board'}
 			>
 				Board View
 			</button>
 			<button 
-				class="px-4 py-2 rounded-lg transition-colors {selectedTab === 'calendar' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'calendar' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'calendar'}
 			>
 				Calendar View
@@ -284,27 +284,31 @@
 	</div>
 
 	{#if loadingAssessments}
-		<div class="flex justify-center items-center py-12">
-			<p style="color: var(--text-muted);">Loading assessments...</p>
+		<div class="flex flex-col justify-center items-center py-12 sm:py-16">
+			<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
+			<p class="mt-4 text-sm sm:text-base text-slate-400">Loading assessments...</p>
 		</div>
 	{:else if filteredAssessments.length === 0}
-		<div class="flex justify-center items-center py-12">
-			<p style="color: var(--text);">No upcoming assessments 🎉</p>
+		<div class="flex flex-col justify-center items-center py-12 sm:py-16">
+			<div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
+				🎉
+			</div>
+			<p class="mt-4 text-lg sm:text-xl text-slate-300">No upcoming assessments!</p>
 		</div>
 	{:else if selectedTab === 'calendar'}
-		<div class="bg-slate-800 rounded-xl p-6">
+		<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-slate-700/50">
 			<div class="flex justify-between items-center mb-6">
 				<button 
-					class="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+					class="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 text-slate-300 hover:text-white"
 					onclick={prevMonth}
 				>
 					←
 				</button>
-				<h2 class="text-xl font-bold" style="color: var(--text);">
+				<h2 class="text-lg sm:text-xl font-bold text-white">
 					{getMonthName(currentMonth)} {currentYear}
 				</h2>
 				<button 
-					class="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+					class="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 text-slate-300 hover:text-white"
 					onclick={nextMonth}
 				>
 					→
@@ -313,7 +317,7 @@
 			
 			<div class="grid grid-cols-7 gap-2">
 				{#each ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as day}
-					<div class="text-center py-2 text-sm font-semibold" style="color: var(--text-muted);">
+					<div class="text-center py-2 text-xs sm:text-sm font-semibold text-slate-400">
 						{day}
 					</div>
 				{/each}
@@ -327,9 +331,9 @@
 					{@const assessments = getAssessmentsForDate(date)}
 					{@const isToday = date.toDateString() === new Date().toDateString()}
 					<div class="aspect-square p-1">
-						<div class="h-full rounded-lg border p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800'} {isToday ? 'border-blue-500 ring-4 ring-blue-500/30 animate-pulse-today' : 'border-slate-700'}"
-							style={assessments.length > 0 && assessments[0].colour ? `background: ${assessments[0].colour};` : ''}>
-							<div class="text-base mb-1 {isToday ? 'font-bold text-blue-400 scale-110' : ''}" style="color: var(--text);">{i + 1}</div>
+						<div class="h-full rounded-lg border p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800/30'} {isToday ? 'border-indigo-500 ring-4 ring-indigo-500/30 animate-pulse-today' : 'border-slate-700/50'}"
+							style={assessments.length > 0 && assessments[0].colour ? `background: ${assessments[0].colour}20;` : ''}>
+							<div class="text-sm sm:text-base mb-1 {isToday ? 'font-bold text-indigo-400 scale-110' : 'text-slate-300'}">{i + 1}</div>
 							{#if assessments.length > 0}
 								<div class="space-y-1">
 									{#each assessments.slice(0, 2) as assessment}
@@ -337,14 +341,14 @@
 										<div class="flex items-center gap-1">
 											<div 
 												class="text-xs p-1 rounded truncate flex-1"
-												style={`background: rgba(0,0,0,0.08); color: ${textColor};`}
+												style={`background: rgba(0,0,0,0.2); color: ${textColor};`}
 											>
 												{assessment.title}
 											</div>
 										</div>
 									{/each}
 									{#if assessments.length > 2}
-										<div class="text-xs text-center" style="color: var(--text-muted);">
+										<div class="text-xs text-center text-slate-400">
 											+{assessments.length - 2} more
 										</div>
 									{/if}
@@ -356,17 +360,16 @@
 			</div>
 		</div>
 	{:else if selectedTab === 'list'}
-		<div class="flex gap-6">
+		<div class="flex flex-col lg:flex-row gap-6">
 			<!-- Quick Navigation Sidebar -->
-			<div class="w-48 flex-shrink-0">
-				<div class="sticky top-6 bg-slate-800 rounded-xl p-4">
-					<h3 class="text-sm font-semibold mb-3" style="color: var(--text-muted);">Quick Jump</h3>
+			<div class="lg:w-48 flex-shrink-0">
+				<div class="sticky top-6 bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50">
+					<h3 class="text-sm font-semibold mb-3 text-slate-400">Quick Jump</h3>
 					<div class="space-y-2">
 						{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
 							<a 
 								href="#subject-{subject.code}"
-								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-900 transition-colors cursor-pointer"
-								style="color: var(--text);"
+								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 cursor-pointer text-slate-300 hover:text-white"
 								onclick={(e) => scrollToSubject(e, subject.code)}
 							>
 								<div class="w-2 h-2 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
@@ -380,23 +383,23 @@
 			<!-- Main Content -->
 			<div class="flex-1 space-y-6">
 				{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
-					<div id="subject-{subject.code}" class="bg-slate-800 rounded-xl overflow-hidden">
-						<div class="px-6 py-4 border-b" style="border-color: var(--surface);">
+					<div id="subject-{subject.code}" class="bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-slate-700/50">
+						<div class="px-4 sm:px-6 py-4 border-b border-slate-700/50">
 							<div class="flex items-center gap-3">
 								<div class="w-3 h-3 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
-								<h3 class="font-bold text-lg" style="color: var(--text);">{subject.title}</h3>
-								<span class="text-sm" style="color: var(--text-muted);">({subject.code})</span>
+								<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
+								<span class="text-sm text-slate-400">({subject.code})</span>
 							</div>
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-								<div class="flex gap-4 items-center p-4 rounded-xl bg-slate-900 transition-transform duration-300 hover:scale-105 border-l-8" style="border-color: {assessment.colour};">
-									<div class="flex justify-center items-center w-16 h-16 rounded-lg" style="background: var(--background); color: var(--surface);">
-										<span class="text-3xl">📄</span>
+								<div class="flex gap-4 items-center p-4 rounded-xl bg-slate-900/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] border-l-8" style="border-color: {assessment.colour};">
+									<div class="flex justify-center items-center w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 text-white">
+										<span class="text-2xl sm:text-3xl">📄</span>
 									</div>
-									<div class="flex-1">
-										<div class="flex items-center gap-2">
-											<div class="text-lg font-bold" style="color: var(--text);">
+									<div class="flex-1 min-w-0">
+										<div class="flex flex-wrap items-center gap-2">
+											<div class="text-sm sm:text-base font-bold text-white">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 											</div>
 											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
@@ -404,7 +407,7 @@
 											</span>
 										</div>
 										<div class="mt-2">
-											<span class="block text-base font-semibold" style="color: var(--text);">{assessment.title}</span>
+											<span class="block text-sm sm:text-base font-semibold text-white truncate">{assessment.title}</span>
 										</div>
 									</div>
 								</div>
@@ -415,25 +418,25 @@
 			</div>
 		</div>
 	{:else}
-		<div class="flex gap-4 overflow-x-auto pb-4">
+		<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10">
 			{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
-				<div class="flex-shrink-0 w-80">
-					<div class="bg-slate-800 rounded-xl p-4 mb-4 border-l-8" style="border-color: {subject.colour || '#8e8e8e'};">
-						<h3 class="font-bold text-lg" style="color: var(--text);">{subject.title}</h3>
-						<p class="text-sm" style="color: var(--text-muted);">{subject.code}</p>
+				<div class="flex-shrink-0 w-72 sm:w-80">
+					<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {subject.colour || '#8e8e8e'};">
+						<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
+						<p class="text-sm text-slate-400">{subject.code}</p>
 					</div>
 					<div class="space-y-4">
 						{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-							<div class="bg-slate-900 rounded-xl p-4 shadow-lg border-l-8" style="border-color: {assessment.colour};">
+							<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
 								<div class="flex items-center gap-2">
-									<div class="text-sm font-semibold" style="color: var(--text-muted);">
+									<div class="text-sm font-semibold text-slate-400">
 										{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 									</div>
 									<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
 										{getStatusBadge(assessment.status, assessment.due).text}
 									</span>
 								</div>
-								<h4 class="font-bold mt-1" style="color: var(--text);">{assessment.title}</h4>
+								<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
 							</div>
 						{/each}
 					</div>
@@ -444,31 +447,30 @@
 </div>
 
 <style>
-	/* Add any additional styles here */
 	@keyframes highlight {
 		0% {
 			transform: scale(1);
-			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+			box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
 		}
 		50% {
 			transform: scale(1.02);
-			box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.2);
+			box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.2);
 		}
 		100% {
 			transform: scale(1);
-			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+			box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
 		}
 	}
 
 	@keyframes pulse-today {
 		0% {
-			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+			box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
 		}
 		70% {
-			box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+			box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
 		}
 		100% {
-			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+			box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
 		}
 	}
 
@@ -478,5 +480,23 @@
 
 	.highlight-subject {
 		animation: highlight 1.5s ease-out;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar {
+		height: 6px;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-track {
+		background: rgba(0, 0, 0, 0.1);
+		border-radius: 3px;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-thumb {
+		background: rgba(99, 102, 241, 0.3);
+		border-radius: 3px;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+		background: rgba(99, 102, 241, 0.5);
 	}
 </style> 
