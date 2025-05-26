@@ -636,7 +636,7 @@
         class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600 animate-gradient"
       ></div>
       <div
-        class="flex flex-col gap-4 justify-between items-start px-6 py-4 border-b md:flex-row md:items-center border-slate-700/50"
+        class="flex flex-col gap-4 justify-between items-start px-4 sm:px-6 py-4 border-b md:flex-row md:items-center border-slate-700/50"
       >
         <span class="text-xl font-semibold text-white"
           >Upcoming Assessments</span
@@ -644,12 +644,12 @@
         <div class="flex flex-wrap gap-2" id="upcoming-filters">
           {#each activeSubjects as subj}
             <label
-              class="flex items-center px-3 py-1.5 text-sm rounded-full border transition-all duration-300 cursor-pointer bg-slate-800/70 border-slate-700/50 hover:border-indigo-500/50"
+              class="flex items-center px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm rounded-full border transition-all duration-300 cursor-pointer bg-slate-800/70 border-slate-700/50 hover:border-indigo-500/50"
             >
               <input
                 type="checkbox"
                 bind:checked={subjectFilters[subj.code]}
-                class="mr-2 w-4 h-4 text-indigo-500 rounded form-checkbox border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-900"
+                class="mr-2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500 rounded form-checkbox border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-900"
               />
               <span style="color: {subj.colour}">{subj.code}</span>
             </label>
@@ -658,26 +658,26 @@
       </div>
 
       {#if loadingAssessments}
-        <div class="flex flex-col justify-center items-center py-16">
+        <div class="flex flex-col justify-center items-center py-12 sm:py-16">
           <div
-            class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"
+            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"
           ></div>
-          <p class="mt-4 text-slate-400">Loading assessments...</p>
+          <p class="mt-4 text-sm sm:text-base text-slate-400">Loading assessments...</p>
         </div>
       {:else if filteredAssessments.length === 0}
-        <div class="flex flex-col justify-center items-center py-16">
+        <div class="flex flex-col justify-center items-center py-12 sm:py-16">
           <div
-            class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient"
+            class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient"
           >
             🎉
           </div>
-          <p class="mt-4 text-xl text-slate-300">Nothing coming up!</p>
+          <p class="mt-4 text-lg sm:text-xl text-slate-300">Nothing coming up!</p>
         </div>
       {:else}
-        <div class="p-6 space-y-5" id="upcoming-items">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
           {#each filteredAssessments as a}
             <div
-              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] relative group"
+              class="flex flex-col gap-4 p-4 sm:p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] relative group"
             >
               <div
                 class="absolute inset-0 bg-gradient-to-br rounded-xl opacity-30 animate-gradient"
@@ -688,41 +688,49 @@
                 style="border: 1px solid {a.colour}30;"
               ></div>
 
-              <div
-                class="flex relative z-10 justify-center items-center h-16 bg-gradient-to-br rounded-xl shadow-lg min-w-16 animate-gradient"
-                style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);"
-              >
-                <span class="text-2xl">📄</span>
+              <div class="relative z-10 flex items-center gap-4">
+                <div
+                  class="flex justify-center items-center h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br rounded-xl shadow-lg animate-gradient"
+                  style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);"
+                >
+                  <span class="text-xl sm:text-2xl">📄</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap gap-2 items-center">
+                    <div class="text-sm sm:text-base font-bold text-white">
+                      {new Date(a.due).toLocaleDateString("en-AU", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <span
+                      class="px-2 py-0.5 rounded-full text-xs font-medium text-white shadow-sm {getStatusBadge(
+                        a.status,
+                        a.due
+                      ).color}"
+                    >
+                      {getStatusBadge(a.status, a.due).text}
+                    </span>
+                  </div>
+                  <div class="mt-1">
+                    <span
+                      class="block text-xs font-semibold uppercase text-slate-400"
+                      >{a.subject}</span
+                    >
+                    <span class="block text-sm sm:text-base font-semibold text-white truncate"
+                      >{a.title}</span
+                    >
+                  </div>
+                </div>
               </div>
 
-              <div class="relative z-10 flex-1">
-                <div class="flex flex-wrap gap-3 items-center">
-                  <div class="text-lg font-bold text-white">
-                    {new Date(a.due).toLocaleDateString("en-AU", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </div>
-                  <span
-                    class="px-2.5 py-1 rounded-full text-xs font-medium text-white shadow-sm {getStatusBadge(
-                      a.status,
-                      a.due
-                    ).color}"
-                  >
-                    {getStatusBadge(a.status, a.due).text}
-                  </span>
+              {#if a.description}
+                <div class="relative z-10 text-sm text-slate-300 line-clamp-2">
+                  {a.description}
                 </div>
-                <div class="mt-2">
-                  <span
-                    class="block text-xs font-semibold uppercase text-slate-400"
-                    >{a.subject}</span
-                  >
-                  <span class="block text-base font-semibold text-white"
-                    >{a.title}</span
-                  >
-                </div>
-              </div>
+              {/if}
             </div>
           {/each}
         </div>
