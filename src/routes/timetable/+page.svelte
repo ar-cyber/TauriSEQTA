@@ -14,6 +14,7 @@ let lessonColours = $state<any[]>([]);
 let loadingLessons = $state<boolean>(true);
 let error = $state<string | null>(null);
 let showExportMenu = $state(false);
+let selectedDay = $state<number>(new Date().getDay() === 0 ? 1 : new Date().getDay());
 
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -203,6 +204,14 @@ function exportTimetablePDF() {
   doc.save('timetable.pdf');
 }
 
+function prevDay() {
+  selectedDay = selectedDay === 1 ? 5 : selectedDay - 1;
+}
+
+function nextDay() {
+  selectedDay = selectedDay === 5 ? 1 : selectedDay + 1;
+}
+
 onMount(loadLessons);
 </script>
 
@@ -240,9 +249,25 @@ onMount(loadLessons);
       <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full border-b-2 border-slate-800">
         <div class="w-14 bg-slate-800"></div>
         {#each dayLabels as day, index}
-          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-slate-900 text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''}">{day.toUpperCase()}</div>
+          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-slate-900 text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''} hidden sm:block">{day.toUpperCase()}</div>
         {/each}
       </div>
+
+      <!-- Mobile Day Navigation -->
+      <div class="sm:hidden flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-800">
+        <button 
+          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+          onclick={prevDay}
+          disabled={loadingLessons}
+        >&#60;</button>
+        <span class="text-base font-bold">{dayLabels[selectedDay - 1].toUpperCase()}</span>
+        <button 
+          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+          onclick={nextDay}
+          disabled={loadingLessons}
+        >&#62;</button>
+      </div>
+
       <!-- Time grid and lessons -->
       {#if error}
         <div class="flex flex-col justify-center items-center py-16">
@@ -271,9 +296,9 @@ onMount(loadLessons);
             {/each}
           </div>
           <!-- Day columns -->
-          <div class="grid absolute top-0 right-0 left-14 grid-cols-5 h-full">
+          <div class="grid absolute top-0 right-0 left-14 grid-cols-1 sm:grid-cols-5 h-full">
             {#each Array(5) as _, dayIdx}
-              <div class="relative h-full border-l border-slate-800">
+              <div class="relative h-full border-l border-slate-800 {dayIdx + 1 !== selectedDay ? 'hidden sm:block' : ''}">
                 {#each getLessonsFor(dayIdx) as lesson}
                   <div
                     class="flex absolute right-1 left-1 flex-col justify-center p-2 rounded-lg border-l-4 shadow-sm bg-slate-800"
@@ -306,4 +331,21 @@ onMount(loadLessons);
       {/if}
     </div>
   </div>
-</div> 
+</div>
+
+<style>
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(32px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.animate-fade-in {
+  animation: fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style> 
