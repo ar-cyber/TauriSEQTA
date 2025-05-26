@@ -417,20 +417,22 @@
 >
   <div class="space-y-8">
     <!-- Shortcuts Section -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
       {#each homepageShortcuts as shortcut}
         <a
           href={shortcut.url}
           target="_blank"
-          class="flex items-center p-4 rounded-2xl transition-all duration-300 hover:scale-105 bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
+          rel="noopener noreferrer"
+          class="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] overflow-hidden"
         >
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-purple-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div
-            class="flex justify-center items-center mr-4 w-12 h-12 text-2xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg animate-gradient"
+            class="relative flex justify-center items-center w-12 h-12 sm:w-14 sm:h-14 mb-3 text-2xl sm:text-3xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg animate-gradient"
           >
             {shortcut.icon}
           </div>
           <span
-            class="text-lg font-medium text-white transition-colors group-hover:text-indigo-200"
+            class="relative text-sm sm:text-base font-medium text-white transition-colors group-hover:text-indigo-200 text-center"
             >{shortcut.name}</span
           >
         </a>
@@ -442,10 +444,9 @@
       class="overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="flex justify-between items-center px-6 py-4 bg-gradient-to-r border-b border-slate-700/50 from-slate-800/70 to-slate-800/30"
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 sm:px-6 py-4 bg-gradient-to-r border-b border-slate-700/50 from-slate-800/70 to-slate-800/30"
       >
-        <span class="text-xl font-semibold text-white">{lessonsSubtitle()}</span
-        >
+        <span class="text-xl font-semibold text-white">{lessonsSubtitle()}</span>
         <div class="flex gap-3">
           <button
             onclick={prevDay}
@@ -470,23 +471,23 @@
           <p class="mt-4 text-slate-400">Loading your schedule...</p>
         </div>
       {:else if lessons.length === 0}
-        <div class="flex gap-12 justify-center items-center px-14 py-16 w-full">
+        <div class="flex flex-col sm:flex-row gap-6 sm:gap-12 justify-center items-center px-4 sm:px-14 py-12 sm:py-16 w-full">
           <div
-            class="flex justify-center items-center w-24 h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-gradient"
+            class="flex justify-center items-center w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-gradient"
           >
-            <span class="text-5xl">Q</span>
+            <span class="text-3xl sm:text-5xl">Q</span>
           </div>
-          <p class="text-2xl text-slate-300">
+          <p class="text-xl sm:text-2xl text-slate-300 text-center">
             No lessons available for this day.
           </p>
         </div>
       {:else}
         <div
-          class="flex overflow-x-auto gap-5 px-6 py-6 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 sm:p-6"
         >
           {#each lessons as lesson, i}
             <div
-              class="relative flex flex-col min-w-[220px] max-w-[250px] rounded-xl transition-all duration-300 hover:scale-103 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
+              class="relative flex flex-col min-w-0 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
             >
               <div
                 class="absolute inset-0 bg-gradient-to-br rounded-xl animate-gradient"
@@ -497,10 +498,10 @@
                 style="border: 1px solid {lesson.colour}50;"
               ></div>
               <div
-                class="flex relative flex-col flex-1 gap-2 p-3 backdrop-blur-sm"
+                class="flex relative flex-col flex-1 gap-2 p-3 sm:p-4 backdrop-blur-sm"
               >
                 <div class="flex justify-between items-center">
-                  <span class="text-lg font-bold text-white"
+                  <span class="text-base sm:text-lg font-bold text-white truncate"
                     >{lesson.description}</span
                   >
                   {#if lesson.active}
@@ -510,19 +511,19 @@
                     >
                   {/if}
                 </div>
-                <div class="flex items-center mt-1 text-slate-300">
+                <div class="flex items-center mt-1 text-sm sm:text-base text-slate-300">
                   <Icon
                     src={AcademicCap}
                     class="mr-1.5 w-4 h-4 text-slate-400"
                   />
-                  {lesson.staff}
+                  <span class="truncate">{lesson.staff}</span>
                 </div>
-                <div class="flex items-center text-slate-300">
+                <div class="flex items-center text-sm sm:text-base text-slate-300">
                   <Icon
                     src={BuildingOffice}
                     class="mr-1.5 w-4 h-4 text-slate-400"
                   />
-                  {lesson.room}
+                  <span class="truncate">{lesson.room}</span>
                 </div>
                 <div
                   class="inline-flex items-center px-3 py-1.5 mt-3 font-mono text-sm rounded-lg bg-slate-800/50 w-fit"
