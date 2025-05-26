@@ -409,6 +409,23 @@
 		animation: gradient-shift 8s ease infinite;
 	}
 
+	.timetable-container {
+		display: flex;
+		flex-direction: row;
+		overflow-x: auto;
+		gap: 1rem;
+		padding: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.timetable-container {
+			flex-direction: column;
+			overflow-x: unset;
+			overflow-y: unset;
+			gap: 1rem;
+		}
+	}
+
 	/* Add any additional styles here */
 </style>
 
@@ -482,12 +499,10 @@
           </p>
         </div>
       {:else}
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 sm:p-6"
-        >
+        <div class="timetable-container">
           {#each lessons as lesson, i}
             <div
-              class="relative flex flex-col min-w-0 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
+              class="relative flex flex-col min-w-[280px] max-w-xs w-full rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
             >
               <div
                 class="absolute inset-0 bg-gradient-to-br rounded-xl animate-gradient"
