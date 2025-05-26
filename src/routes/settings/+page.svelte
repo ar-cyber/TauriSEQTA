@@ -70,110 +70,122 @@ async function sendTestNotification() {
 onMount(loadSettings);
 </script>
 
-<div class="max-w-4xl mx-auto p-8">
-  <div class="flex justify-between items-center mb-8 animate-fade-in-up">
-    <h1 class="text-2xl font-bold">Settings</h1>
-    <div class="flex gap-2 items-center">
+<div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
+    <h1 class="text-xl sm:text-2xl font-bold">Settings</h1>
+    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full sm:w-auto">
       <button 
-        class="px-6 py-2 rounded bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow-lg"
+        class="w-full sm:w-auto px-6 py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600 focus:ring-2 focus:ring-green-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow-lg"
         on:click={saveSettings} 
         disabled={saving}
       >
-        Save Changes
+        {#if saving}
+          <div class="flex items-center justify-center gap-2">
+            <div class="w-4 h-4 rounded-full border-2 animate-spin border-white/30 border-t-white"></div>
+            <span>Saving...</span>
+          </div>
+        {:else}
+          Save Changes
+        {/if}
       </button>
       {#if saveSuccess}
-        <span class="text-green-400 animate-fade-in">Settings saved successfully!</span>
+        <span class="text-green-400 animate-fade-in text-sm sm:text-base">Settings saved successfully!</span>
       {/if}
       {#if saveError}
-        <span class="text-red-400 animate-fade-in">{saveError}</span>
+        <span class="text-red-400 animate-fade-in text-sm sm:text-base">{saveError}</span>
       {/if}
     </div>
   </div>
 
   {#if loading}
     <div class="flex justify-center items-center py-12 animate-fade-in">
-      <p class="text-slate-400">Loading settings...</p>
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
+        <p class="text-slate-400 text-sm sm:text-base">Loading settings...</p>
+      </div>
     </div>
   {:else}
-    <div class="space-y-8">
+    <div class="space-y-6 sm:space-y-8">
       <!-- Homepage Settings -->
-      <section class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up">
-        <div class="px-6 py-4 border-b border-slate-800">
-          <h2 class="text-lg font-semibold">Homepage</h2>
-          <p class="text-sm text-slate-400">Customize your homepage experience</p>
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
+          <h2 class="text-base sm:text-lg font-semibold">Homepage</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Customize your homepage experience</p>
         </div>
-        <div class="p-6 space-y-6">
+        <div class="p-4 sm:p-6 space-y-6">
           <!-- Shortcuts -->
           <div>
-            <h3 class="text-base font-semibold mb-4">Quick Access Shortcuts</h3>
-            <p class="mb-4 text-sm text-slate-400">Add shortcuts to frequently used websites that will appear at the top of your homepage.</p>
-            <div class="space-y-4">
+            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Quick Access Shortcuts</h3>
+            <p class="mb-4 text-xs sm:text-sm text-slate-400">Add shortcuts to frequently used websites that will appear at the top of your homepage.</p>
+            <div class="space-y-3 sm:space-y-4">
               {#each shortcuts as shortcut, idx}
-                <div class="flex gap-2 items-center bg-slate-800 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700 animate-fade-in">
-                  <input class="w-24 px-2 py-1 rounded bg-slate-900 focus:ring-2 focus:ring-blue-500 transition" placeholder="Name" bind:value={shortcut.name} />
-                  <input class="w-16 px-2 py-1 rounded bg-slate-900 focus:ring-2 focus:ring-blue-500 transition" placeholder="Icon (emoji)" bind:value={shortcut.icon} />
-                  <input class="flex-1 px-2 py-1 rounded bg-slate-900 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={shortcut.url} />
+                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-slate-800/50 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
+                  <input class="w-full sm:w-24 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Name" bind:value={shortcut.name} />
+                  <input class="w-full sm:w-16 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Icon (emoji)" bind:value={shortcut.icon} />
+                  <input class="w-full sm:flex-1 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={shortcut.url} />
                   <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeShortcut(idx)} title="Remove">✕</button>
                 </div>
               {/each}
-              <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow" on:click={addShortcut}>Add Shortcut</button>
+              <button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addShortcut}>Add Shortcut</button>
             </div>
           </div>
-          <!-- Widget Settings (Placeholder) -->
+          <!-- Widget Settings -->
           <div>
-            <h3 class="text-base font-semibold mb-4">Widget Settings</h3>
-            <p class="mb-4 text-sm text-slate-400">Configure which widgets appear on your in DesQTA.</p>
-            <div class="p-4 bg-slate-800 rounded-lg animate-fade-in space-y-4">
+            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Widget Settings</h3>
+            <p class="mb-4 text-xs sm:text-sm text-slate-400">Configure which widgets appear on your in DesQTA.</p>
+            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in space-y-4">
               <div class="flex items-center gap-4">
-                <input id="weather-enabled" type="checkbox" class="accent-blue-600 w-5 h-5" bind:checked={weatherEnabled} />
-                <label for="weather-enabled" class="text-slate-200 font-medium cursor-pointer">Show Weather Widget</label>
+                <input id="weather-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={weatherEnabled} />
+                <label for="weather-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Show Weather Widget</label>
               </div>
-              <div class="flex items-center gap-4 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
-                <label for="weather-location" class="text-slate-400">Location (city or postcode):</label>
-                <input id="weather-location" class="px-3 py-2 rounded bg-slate-900 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-64" placeholder="e.g. Perth, 6000" bind:value={weatherLocation} />
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-location" class="text-xs sm:text-sm text-slate-400">Location (city or postcode):</label>
+                <input id="weather-location" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g. Perth, 6000" bind:value={weatherLocation} />
               </div>
             </div>
           </div>
         </div>
       </section>
+
       <!-- Appearance Settings -->
-      <section class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up delay-100">
-        <div class="px-6 py-4 border-b border-slate-800">
-          <h2 class="text-lg font-semibold">Appearance</h2>
-          <p class="text-sm text-slate-400">Customize how DesQTA looks</p>
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-100">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
+          <h2 class="text-base sm:text-lg font-semibold">Appearance</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Customize how DesQTA looks</p>
         </div>
-        <div class="p-6 space-y-6">
-          <!-- Theme Settings (Placeholder) -->
+        <div class="p-4 sm:p-6 space-y-6">
+          <!-- Theme Settings -->
           <div>
-            <h3 class="text-base font-semibold mb-4">Theme</h3>
-            <p class="mb-4 text-sm text-slate-400">Choose your preferred color scheme and theme settings.</p>
-            <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
-              <p class="text-slate-400 text-sm">Theme settings coming soon...</p>
+            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Theme</h3>
+            <p class="mb-4 text-xs sm:text-sm text-slate-400">Choose your preferred color scheme and theme settings.</p>
+            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
+              <p class="text-xs sm:text-sm text-slate-400">Theme settings coming soon...</p>
             </div>
           </div>
-          <!-- Layout Settings (Placeholder) -->
+          <!-- Layout Settings -->
           <div>
-            <h3 class="text-base font-semibold mb-4">Layout</h3>
-            <p class="mb-4 text-sm text-slate-400">Adjust the layout and sizing of various elements.</p>
-            <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
-              <p class="text-slate-400 text-sm">Layout settings coming soon...</p>
+            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Layout</h3>
+            <p class="mb-4 text-xs sm:text-sm text-slate-400">Adjust the layout and sizing of various elements.</p>
+            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
+              <p class="text-xs sm:text-sm text-slate-400">Layout settings coming soon...</p>
             </div>
           </div>
         </div>
       </section>
+
       <!-- Notification Settings -->
-      <section class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up delay-200">
-        <div class="px-6 py-4 border-b border-slate-800">
-          <h2 class="text-lg font-semibold">Notifications</h2>
-          <p class="text-sm text-slate-400">Manage your notification preferences</p>
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
+          <h2 class="text-base sm:text-lg font-semibold">Notifications</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Manage your notification preferences</p>
         </div>
-        <div class="p-6">
-          <div class="p-4 bg-slate-800 rounded-lg animate-fade-in flex flex-col gap-4">
-            <div class="flex items-center gap-3 mb-4">
-              <input id="reminders-enabled" type="checkbox" class="accent-blue-600 w-5 h-5" bind:checked={remindersEnabled} />
-              <label for="reminders-enabled" class="text-slate-200 font-medium cursor-pointer">Enable assessment reminder notifications</label>
+        <div class="p-4 sm:p-6">
+          <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <input id="reminders-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={remindersEnabled} />
+              <label for="reminders-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Enable assessment reminder notifications</label>
             </div>
-            <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow w-fit" on:click={sendTestNotification}>
+            <button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={sendTestNotification}>
               Send Test Notification
             </button>
           </div>
@@ -181,15 +193,15 @@ onMount(loadSettings);
       </section>
 
       <!-- Plugins Section -->
-      <section class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up delay-300">
-        <div class="px-6 py-4 border-b border-slate-800">
-          <h2 class="text-lg font-semibold">Plugins</h2>
-          <p class="text-sm text-slate-400">Enhance your DesQTA experience with plugins</p>
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
+          <h2 class="text-base sm:text-lg font-semibold">Plugins</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Enhance your DesQTA experience with plugins</p>
         </div>
-        <div class="p-6">
-          <div class="p-4 bg-slate-800 rounded-lg animate-fade-in">
-            <p class="text-slate-400 mb-4">Install additional features and customizations from our plugin store.</p>
-            <a href="/settings/plugins" class="inline-block px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow">
+        <div class="p-4 sm:p-6">
+          <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
+            <p class="text-xs sm:text-sm text-slate-400 mb-4">Install additional features and customizations from our plugin store.</p>
+            <a href="/settings/plugins" class="inline-block w-full sm:w-auto text-center px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow">
               Open Plugin Store
             </a>
           </div>
