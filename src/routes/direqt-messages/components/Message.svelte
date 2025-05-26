@@ -142,30 +142,28 @@
   });
 </script>
 
-<main class="flex flex-col flex-1 p-6 md:p-8">
+<main class="flex flex-col flex-1 p-4 sm:p-6 md:p-8">
   {#if selectedMessage}
     <div class="mx-auto w-full max-w-4xl animate-fadeIn">
       <div
-        class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-slate-800/80 bg-slate-900/40"
+        class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-slate-800/50 bg-slate-900/40"
       >
-        <div class="p-4 pb-3 border-b border-slate-800/60">
-          <div class="mb-4 text-2xl font-bold text-blue-400">
+        <div class="p-4 sm:p-6 pb-3 border-b border-slate-800/50">
+          <div class="mb-4 text-xl sm:text-2xl font-bold text-indigo-400">
             {selectedMessage.subject}
           </div>
           
-          <div class="flex justify-between items-end">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div class="space-y-1">
-              <div class="text-base text-slate-200">
+              <div class="text-sm sm:text-base text-slate-200">
                 <span class="font-medium">{selectedMessage.sender}</span>
               </div>
-              <div class="text-sm text-slate-400">
+              <div class="text-xs sm:text-sm text-slate-400">
                 To: <span class="font-medium text-slate-300">{selectedMessage.to}</span>
               </div>
             </div>
             
-            <div
-              class="flex gap-3 items-center"
-            >
+            <div class="flex gap-2 sm:gap-3 items-center">
               {#if selectedFolder === "Trash"}
                 <button
                   class="flex flex-col justify-center items-center p-1.5 rounded-lg transition-all duration-200 hover:bg-green-400/20 focus:bg-green-400/30 focus:ring-2 focus:ring-green-400/30 focus:outline-none"
@@ -174,56 +172,24 @@
                   disabled={restoring}
                 >
                   {#if restoring}
-                    <svg
-                      class="w-4 h-4 text-green-400 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      ><circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle><path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8z"
-                      ></path></svg
-                    >
+                    <div class="w-4 h-4 rounded-full border-2 animate-spin border-green-400/30 border-t-green-400"></div>
                   {:else}
                     <Icon
                       src={ArrowUturnLeft}
                       class="mb-0.5 w-4 h-4 text-green-400"
                     />
                   {/if}
-                  <span class="text-sm font-medium text-green-400">Restore</span>
+                  <span class="text-xs sm:text-sm font-medium text-green-400">Restore</span>
                 </button>
               {:else if selectedFolder === "Starred"}
                 <button
-                  class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
                   title="Unstar"
                   onclick={() => selectedMessage && starMessage(selectedMessage)}
                   disabled={starring || !selectedMessage.starred}
                 >
                   {#if starring}
-                    <svg
-                      class="w-5 h-5 text-yellow-400 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      ><circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle><path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8z"
-                      ></path></svg
-                    >
+                    <div class="w-5 h-5 rounded-full border-2 animate-spin border-yellow-400/30 border-t-yellow-400"></div>
                   {:else}
                     <Icon
                       src={Star}
@@ -234,129 +200,102 @@
                 </button>
               {:else}
                 <button
-                  class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
                   title="Star"
                   onclick={() => selectedMessage && starMessage(selectedMessage)}
                   disabled={starring || selectedMessage.starred}
                 >
                   {#if starring}
-                    <svg
-                      class="w-5 h-5 text-yellow-400 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      ><circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle><path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8z"
-                      ></path></svg
-                    >
+                    <div class="w-5 h-5 rounded-full border-2 animate-spin border-yellow-400/30 border-t-yellow-400"></div>
                   {:else}
                     <Icon
                       src={Star}
                       class="w-5 h-5 text-yellow-400"
-                      solid={selectedMessage.starred}
                     />
                   {/if}
                 </button>
               {/if}
+              
               <button
-                class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-blue-500/20 focus:bg-blue-500/30 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
-                onclick={openCompose}
-                title="Reply"
-              >
-                <Icon src={PencilSquare} class="w-5 h-5 text-blue-400" />
-              </button>
-              <button
-                class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-200 hover:bg-red-500/20 focus:bg-red-500/30 focus:ring-2 focus:ring-red-400/30 focus:outline-none"
+                class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-red-400/20 focus:bg-red-400/30 focus:ring-2 focus:ring-red-400/30 focus:outline-none"
                 title="Delete"
                 onclick={() => selectedMessage && deleteMessage(selectedMessage)}
                 disabled={deleting}
               >
                 {#if deleting}
-                  <svg
-                    class="w-5 h-5 text-red-400 animate-spin"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    ><circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="4"
-                    ></circle><path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8z"
-                    ></path></svg
-                  >
+                  <div class="w-5 h-5 rounded-full border-2 animate-spin border-red-400/30 border-t-red-400"></div>
                 {:else}
-                  <Icon src={Trash} class="w-5 h-5 text-red-400" />
+                  <Icon
+                    src={Trash}
+                    class="w-5 h-5 text-red-400"
+                  />
                 {/if}
+              </button>
+              
+              <button
+                class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-indigo-400/20 focus:bg-indigo-400/30 focus:ring-2 focus:ring-indigo-400/30 focus:outline-none"
+                title="Reply"
+                onclick={openCompose}
+              >
+                <Icon
+                  src={PencilSquare}
+                  class="w-5 h-5 text-indigo-400"
+                />
               </button>
             </div>
           </div>
         </div>
-      
-        <div class="px-6 py-6 bg-slate-900/80">
+        
+        <div class="p-4 sm:p-6">
           {#if detailLoading}
-            <div class="flex flex-col justify-center items-center p-8 h-32 text-center text-slate-300">
-              <svg class="mb-2 w-6 h-6 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Loading message...
+            <div class="flex justify-center items-center py-12">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
             </div>
           {:else if detailError}
-            <div class="flex justify-center items-center p-8 h-32 text-center text-red-500">
+            <div class="flex justify-center items-center py-12 text-red-400">
               <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {detailError}
+              <span class="text-sm sm:text-base">{detailError}</span>
             </div>
           {:else}
             <iframe
               bind:this={iframe}
-              title="Message Content"
-              sandbox="allow-same-origin"
-              class="overflow-hidden w-full rounded-lg border-0"
-              style="min-height: 100px"
+              class="w-full border-0"
+              sandbox="allow-same-origin allow-scripts"
+              title="Message content"
             ></iframe>
           {/if}
         </div>
       </div>
     </div>
   {:else}
-    <div class="flex flex-col flex-1 justify-center items-center h-full text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="mb-6 w-20 h-20 text-slate-800/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-      <p class="text-2xl font-semibold text-slate-500">Select a message to view</p>
-      <p class="mt-3 text-sm text-slate-600">Click on any message from the list to see its contents here</p>
+    <div class="flex flex-col justify-center items-center h-full text-center text-slate-400">
+      <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+      </div>
+      <p class="mt-4 text-sm sm:text-base">Select a message to view its contents.</p>
     </div>
   {/if}
 </main>
 
 <style>
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
     }
   }
-  
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
   }
 </style>

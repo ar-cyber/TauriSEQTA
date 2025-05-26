@@ -319,7 +319,7 @@
 </script>
 
 <div class="flex h-full">
-  <div class="flex h-full max-xl:flex-col">
+  <div class="flex h-full w-full max-xl:flex-col">
     <Sidebar 
       selectedFolder={selectedFolder}
       openFolder={openFolder}
@@ -336,19 +336,59 @@
     />
   </div>
   
-  <MessageDetail
-    selectedMessage={selectedMessage}
-    selectedFolder={selectedFolder}
-    detailLoading={detailLoading}
-    detailError={detailError}
-    openCompose={openCompose}
-    starMessage={starMessage}
-    deleteMessage={deleteMessage}
-    restoreMessage={restoreMessage}
-    starring={starring}
-    deleting={deleting}
-    restoring={restoring}
-  />
+  <!-- Message detail view - full screen on mobile -->
+  <div class="hidden xl:block flex-1">
+    <MessageDetail
+      selectedMessage={selectedMessage}
+      selectedFolder={selectedFolder}
+      detailLoading={detailLoading}
+      detailError={detailError}
+      openCompose={openCompose}
+      starMessage={starMessage}
+      deleteMessage={deleteMessage}
+      restoreMessage={restoreMessage}
+      starring={starring}
+      deleting={deleting}
+      restoring={restoring}
+    />
+  </div>
+
+  <!-- Mobile message detail view -->
+  {#if selectedMessage}
+    <div class="xl:hidden fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-sm">
+      <div class="h-full flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-slate-800/50">
+          <button
+            class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+            onclick={() => selectedMessage = null}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm font-medium">Back</span>
+          </button>
+          <span class="text-sm font-medium text-slate-300">Message</span>
+          <div class="w-8"></div> <!-- Spacer for alignment -->
+        </div>
+        
+        <div class="flex-1 overflow-y-auto">
+          <MessageDetail
+            selectedMessage={selectedMessage}
+            selectedFolder={selectedFolder}
+            detailLoading={detailLoading}
+            detailError={detailError}
+            openCompose={openCompose}
+            starMessage={starMessage}
+            deleteMessage={deleteMessage}
+            restoreMessage={restoreMessage}
+            starring={starring}
+            deleting={deleting}
+            restoring={restoring}
+          />
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <ComposeModal
@@ -370,5 +410,39 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-slideIn {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  .animate-scaleIn {
+    animation: scale-in 0.3s ease-out;
   }
 </style> 
