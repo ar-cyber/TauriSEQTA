@@ -15,21 +15,36 @@ let saving = false;
 let saveSuccess = false;
 let saveError = '';
 let weatherEnabled = false;
-let weatherLocation = '';
+let forceUseLocation = false;
+let weatherCity = '';
+let weatherCountry = '';
 let remindersEnabled = true;
 
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_location: string, reminders_enabled: boolean }>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean}>('get_settings');
     shortcuts = settings.shortcuts || [];
     weatherEnabled = settings.weather_enabled ?? false;
-    weatherLocation = settings.weather_location ?? '';
+    forceUseLocation = settings.force_use_location ?? false;
+    weatherCity = settings.weather_city ?? '';
+    weatherCountry = settings.weather_country ?? '';
     remindersEnabled = settings.reminders_enabled ?? true;
+
+    console.log('Loading settings', {
+    shortcuts,
+    weatherEnabled,
+    weatherCity,
+    weatherCountry,
+    remindersEnabled,
+    forceUseLocation
+    });
   } catch (e) {
     shortcuts = [];
     weatherEnabled = false;
-    weatherLocation = '';
+    forceUseLocation = false;
+    weatherCity = '';
+    weatherCountry = '';
     remindersEnabled = true;
   }
   loading = false;
@@ -39,11 +54,21 @@ async function saveSettings() {
   saving = true;
   saveSuccess = false;
   saveError = '';
+  console.log('Saving settings', {
+    shortcuts,
+    weatherEnabled,
+    weatherCity,
+    weatherCountry,
+    remindersEnabled,
+    forceUseLocation
+  });
   try {
-    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_location: weatherLocation, reminders_enabled: remindersEnabled } });
+    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_city: weatherCity, weather_country: weatherCountry, reminders_enabled: remindersEnabled, force_use_location: forceUseLocation} });
     saveSuccess = true;
+    setTimeout(() => location.reload(), 1500)
   } catch (e) {
     saveError = 'Failed to save settings.';
+    console.log(e);
   }
   saving = false;
 }
@@ -121,7 +146,7 @@ onMount(loadSettings);
               {#each shortcuts as shortcut, idx}
                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-slate-800/50 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
                   <input class="w-full sm:w-24 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Name" bind:value={shortcut.name} />
-                  <input class="w-full sm:w-16 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Icon (emoji)" bind:value={shortcut.icon} />
+                  <input class="w-full sm:w-22 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Icon emoji" bind:value={shortcut.icon} />
                   <input class="w-full sm:flex-1 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={shortcut.url} />
                   <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeShortcut(idx)} title="Remove">✕</button>
                 </div>
@@ -138,9 +163,16 @@ onMount(loadSettings);
                 <input id="weather-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={weatherEnabled} />
                 <label for="weather-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Show Weather Widget</label>
               </div>
+              <div class="flex items-center gap-4">
+                <input id="force-use-location" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={forceUseLocation} />
+                <label for="force-use-location" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Only use Fallback Location for Weather</label>
+                <p class="text-xs sm:text-sm text-slate-400">Useful if you use a VPN or want to choose the location, though the system sometimes does not work.</p>
+              </div>
               <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
-                <label for="weather-location" class="text-xs sm:text-sm text-slate-400">Location (city or postcode):</label>
-                <input id="weather-location" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g. Perth, 6000" bind:value={weatherLocation} />
+                <label for="weather-city" class="text-xs sm:text-sm text-slate-400">Fallback City</label>
+                <input id="weather-city" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Perth" bind:value={weatherCity} />
+                <label for="weather-country" class="text-xs sm:text-sm text-slate-400">Fallback Country Code (If unsure, visit https://countrycode.org)</label>
+                <input id="weather-country" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="AU" bind:value={weatherCountry} />
               </div>
             </div>
           </div>
