@@ -168,10 +168,13 @@ onMount(loadSettings);
                 <label for="force-use-location" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Only use Fallback Location for Weather</label>
                 <p class="text-xs sm:text-sm text-slate-400">Useful if you use a VPN or want to choose the location, though the system sometimes does not work.</p>
               </div>
-              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
-                <label for="weather-city" class="text-xs sm:text-sm text-slate-400">Fallback City</label>
+              <div class="flex flex-col items-start gap-2 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-city" class="text-xs sm:text-sm text-slate-400">Fallback City:</label>
                 <input id="weather-city" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Perth" bind:value={weatherCity} />
-                <label for="weather-country" class="text-xs sm:text-sm text-slate-400">Fallback Country Code (If unsure, visit https://countrycode.org)</label>
+              </div>
+              <div class="flex flex-col items-start gap-2 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-country" class="text-xs sm:text-sm text-slate-400">Fallback Country Code</label>
+                <a href="https://countrycode.org" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-400 hover:underline">If unsure, visit countrycode.org</a>
                 <input id="weather-country" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="AU" bind:value={weatherCountry} />
               </div>
             </div>
