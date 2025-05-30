@@ -162,7 +162,9 @@
 								<div class="relative w-full h-16 rounded-xl bg-slate-800 overflow-hidden border border-slate-700 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
 									<div class="absolute top-0 left-0 h-full transition-all duration-500 bg-blue-600" style="width: {firstCriterion.results.percentage}%"></div>
 									<div class="relative z-10 flex items-center justify-center h-full">
-										<span class="text-3xl font-extrabold tracking-wide text-white drop-shadow animate-fade-in" style="text-shadow: 0 2px 8px #000a">{firstCriterion.results.grade}</span>
+										<span class="text-3xl font-extrabold tracking-wide text-white drop-shadow animate-fade-in" style="text-shadow: 0 2px 8px #000a">
+										{firstCriterion.results.grade || firstCriterion.results.percentage.toFixed(2) + '%'}
+										</span>
 									</div>
 								</div>
 							</div>
