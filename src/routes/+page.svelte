@@ -484,7 +484,7 @@
           {#each lessons as lesson, i}
             <div
               class="relative flex flex-col max-w-xs w-full group border-t-4"
-              style="border-color: {lesson.colour};"
+              style="border-color: {lesson.colour}; box-shadow: inset 0px 10px 10px -10px {lesson.colour};"
             >
               <div
                 class="flex relative flex-col flex-1 gap-2 p-3 sm:p-4 backdrop-blur-sm"
