@@ -393,21 +393,28 @@
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-								<div class="flex gap-4 items-center p-4 rounded-xl bg-slate-900/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] border-l-8" style="border-color: {assessment.colour};">
-									<div class="flex justify-center items-center w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-										<span class="text-2xl sm:text-3xl">📄</span>
-									</div>
-									<div class="flex-1 min-w-0">
-										<div class="flex flex-wrap items-center gap-2">
-											<div class="text-sm sm:text-base font-bold text-white">
-												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+								<div class="p-4 rounded-xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+									<div class="flex items-start justify-between gap-4">
+										<div class="flex-1 min-w-0">
+											<div class="flex items-center gap-2 mb-1">
+												<div class="w-3 h-3 rounded-full" style="background-color: {assessment.colour}"></div>
+												<span class="text-sm font-medium text-slate-400">{assessment.code}</span>
 											</div>
-											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
-												{getStatusBadge(assessment.status, assessment.due).text}
-											</span>
+											<h3 class="text-lg font-semibold mb-2">{assessment.title}</h3>
+											<div class="text-sm text-slate-400">
+												Due: {new Date(assessment.due).toLocaleDateString()}
+											</div>
 										</div>
-										<div class="mt-2">
-											<span class="block text-sm sm:text-base font-semibold text-white truncate">{assessment.title}</span>
+										<div class="flex flex-col items-end gap-2">
+											<div class="px-2 py-1 text-xs font-medium rounded-full {getStatusBadge(assessment.status, assessment.due).color}">
+												{getStatusBadge(assessment.status, assessment.due).text}
+											</div>
+											<a 
+												href="/assessments/{assessment.id}/{assessment.metaclass}" 
+												class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 text-white transition-all duration-200 hover:bg-blue-500 hover:scale-105"
+											>
+												View Details
+											</a>
 										</div>
 									</div>
 								</div>
