@@ -36,7 +36,9 @@
 	let { children } = $props();
 
 	let weatherEnabled = $state(false);
-	let weatherLocation = $state('');
+	let forceUseLocation = $state(true);
+	let weatherCity = $state('');
+	let weatherCountry = $state('');
 	let weatherData: any = $state(null);
 	let loadingWeather = $state(false);
 	let weatherError = $state('');
@@ -138,17 +140,78 @@
 
 	async function loadWeatherSettings() {
 		try {
-			const settings = await invoke<{ weather_enabled: boolean, weather_location: string }>('get_settings');
+			const settings = await invoke<{ weather_enabled: boolean, force_use_location: boolean, weather_city: string }>('get_settings');
 			weatherEnabled = settings.weather_enabled ?? false;
-			weatherLocation = settings.weather_location ?? '';
+			weatherCity = settings.weather_city ?? '';
+			weatherCountry = settings.weather_country ?? '';
+			forceUseLocation = settings.force_use_location ?? false;
 		} catch (e) {
 			weatherEnabled = false;
-			weatherLocation = '';
+			weatherCity = '';
+			weatherCountry = '';
+		}
+	}
+
+	async function fetchWeatherWithIP() {
+		if (!weatherEnabled) {
+			weatherData = null;
+			return;
+		}
+
+		// Check cache first
+		const cachedWeather = cache.get<any>('weather');
+		if (cachedWeather) {
+			weatherData = cachedWeather;
+			return;
+		}
+
+		loadingWeather = true;
+		weatherError = '';
+
+		try {
+			let latitude: number, longitude: number, name: string, country: string;
+
+			// Try IP-based geolocation
+			try {
+				const ipRes = await fetch('http://ip-api.com/json/');
+				const ipJson = await ipRes.json();
+				if (ipJson.status !== 'success') throw new Error('IP Geolocation failed');
+
+				latitude = ipJson.lat;
+				longitude = ipJson.lon;
+				name = ipJson.city;
+				country = ipJson.country;
+			} catch (geoError) {
+				// Fallback to manual location
+				const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=1&language=en&format=json`);
+				const geoJson = await geoRes.json();
+				if (!geoJson.results || !geoJson.results.length) throw new Error('Location not found via fallback');
+
+				({ latitude, longitude, name, country } = geoJson.results[0]);
+			}
+
+			const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`);
+			const weatherJson = await weatherRes.json();
+
+			weatherData = {
+				...weatherJson.current_weather,
+				location: name,
+				country
+			};
+
+			// Cache weather data for 15 minutes
+			cache.set('weather', weatherData, 15 * 60 * 1000);
+		} catch (e) {
+			console.log(e)
+			weatherError = `Failed to load weather: ${e}`;
+			weatherData = null;
+		} finally {
+			loadingWeather = false;
 		}
 	}
 
 	async function fetchWeather() {
-		if (!weatherEnabled || !weatherLocation) {
+		if (!weatherEnabled || !weatherCity) {
 			weatherData = null;
 			return;
 		}
@@ -163,7 +226,8 @@
 		loadingWeather = true;
 		weatherError = '';
 		try {
-			const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation)}&count=1&language=en&format=json`);
+			console.log(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=1&language=en&format=json`);
+			const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=1&language=en&format=json`);
 			const geoJson = await geoRes.json();
 			if (!geoJson.results || !geoJson.results.length) throw new Error('Location not found');
 			const { latitude, longitude, name, country } = geoJson.results[0];
@@ -178,7 +242,8 @@
 			// Cache weather data for 15 minutes
 			cache.set('weather', weatherData, 15 * 60 * 1000);
 		} catch (e) {
-			weatherError = 'Failed to load weather.';
+			console.log(e)
+			weatherError = `Failed to load weather: ${e}`;
 			weatherData = null;
 		} finally {
 			loadingWeather = false;
@@ -187,12 +252,17 @@
 
 	onMount(async () => {
 		await loadWeatherSettings();
-		if (weatherEnabled && weatherLocation) fetchWeather();
+		if (weatherEnabled) {
+			if (forceUseLocation) fetchWeather();
+			else fetchWeatherWithIP();
+		} 
 	});
 
 	$effect(() => {
-		if (weatherEnabled && weatherLocation) fetchWeather();
-	});
+		if (weatherEnabled) {
+			if (forceUseLocation) fetchWeather();
+			else fetchWeatherWithIP();
+		} 	});
 
 	onMount(() => {
 		const checkMobile = () => {
@@ -265,7 +335,7 @@
 					{/if}
 				</a>
 			{/each}
-			{#if weatherEnabled && weatherLocation}
+			{#if weatherEnabled}
 				<div class="my-4 mx-2 rounded-2xl shadow bg-gradient-to-br from-blue-900 to-blue-700 text-white p-4 flex flex-col justify-center animate-fade-in">
 					{#if loadingWeather}
 						<div>Loading weather…</div>
