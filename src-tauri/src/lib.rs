@@ -66,8 +66,8 @@ pub fn run() {
                                     },
                                     _ => {
                                         println!("[Desqta] Unknown parameter: {}", key);
-                                    }
-                                }
+                        }
+                    }
                             } else {
                                 println!("[Desqta] Invalid parameter format: {}", param);
                             }

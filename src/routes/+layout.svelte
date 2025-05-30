@@ -46,6 +46,9 @@
 	let isMobileMenuOpen = $state(false);
 	let isMobile = $state(false);
 
+	// Add hovered state for login UI
+	let hovered = $state<'extension' | 'web' | ''>('');
+
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
 		needsSetup.set(!sessionExists);
@@ -140,7 +143,7 @@
 
 	async function loadWeatherSettings() {
 		try {
-			const settings = await invoke<{ weather_enabled: boolean, force_use_location: boolean, weather_city: string }>('get_settings');
+			const settings = await invoke<{ weather_enabled: boolean, force_use_location: boolean, weather_city: string, weather_country?: string }>('get_settings');
 			weatherEnabled = settings.weather_enabled ?? false;
 			weatherCity = settings.weather_city ?? '';
 			weatherCountry = settings.weather_country ?? '';
@@ -391,29 +394,162 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-950 rounded-tl-2xl">
 		{#if $needsSetup}
-			<div class="flex flex-col items-center justify-center h-full">
-				<h2 class="text-xl font-bold">Connect to your SEQTA instance</h2>
-				<p class="text-sm">
-					Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll
-					securely save your session cookie.
-				</p>
-				<div class="flex items-center w-full">
-					<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
-					<input
-						type="text"
-						bind:value={seqtaUrl}
-						placeholder="https://schoolname.seqta.com"
-						class="px-3 py-2 w-full rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
-					/>
-				</div>
-				<button
-					onclick={startLogin}
-					class="flex justify-center items-center py-2 w-full font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
-					style="background: #2563eb; color: white;"
+			<style>
+				.auth-panels {
+					display: flex;
+					width: 100%;
+					height: 100vh;
+					min-height: 600px;
+					background: #111;
+				}
+				.auth-panel {
+					flex: 1 1 0%;
+					transition: flex-basis 0.4s cubic-bezier(0.4,0,0.2,1), flex-grow 0.4s cubic-bezier(0.4,0,0.2,1), background 0.4s, box-shadow 0.4s;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					position: relative;
+					cursor: pointer;
+					min-width: 0;
+					min-height: 0;
+				}
+				.auth-panel.ext {
+					background: linear-gradient(120deg, rgba(36,99,235,0.25) 0%, rgba(36,99,235,0.10) 100%), rgba(0,0,0,0.7);
+					backdrop-filter: blur(16px) saturate(1.2);
+					box-shadow: 0 8px 32px 0 rgba(36,99,235,0.15);
+				}
+				.auth-panel.web {
+					background: linear-gradient(120deg, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.10) 100%), rgba(0,0,0,0.7);
+					backdrop-filter: blur(16px) saturate(1.2);
+					box-shadow: 0 8px 32px 0 rgba(139,92,246,0.15);
+				}
+				.auth-panel.collapsed {
+					flex-basis: 15%;
+					flex-grow: 0;
+					flex-shrink: 1;
+					justify-content: center;
+				}
+				.auth-panel.expanded {
+					flex-basis: 70%;
+					flex-grow: 1;
+					flex-shrink: 0;
+					justify-content: center;
+				}
+				.auth-label {
+					font-size: 2rem;
+					font-weight: 700;
+					letter-spacing: 0.1em;
+					color: #fff;
+					opacity: 0.7;
+					user-select: none;
+					text-align: center;
+					writing-mode: vertical-rl;
+					text-orientation: mixed;
+				}
+				.auth-panel.expanded .auth-label {
+					writing-mode: initial;
+					text-orientation: initial;
+					font-size: 2rem;
+					margin-bottom: 1.5rem;
+				}
+				@media (max-width: 900px) {
+					.auth-panels {
+						flex-direction: column;
+						height: 100vh;
+					}
+					.auth-panel {
+						min-height: 40vh;
+						min-width: 100vw;
+					}
+					.auth-panel.collapsed {
+						flex-basis: 15vh;
+					}
+					.auth-panel.expanded {
+						flex-basis: 70vh;
+					}
+					.auth-label {
+						writing-mode: initial;
+						font-size: 1.5rem;
+					}
+				}
+			</style>
+			<div class="auth-panels">
+				<!-- Extension Panel -->
+				<div
+					class="auth-panel ext {hovered === 'extension' ? 'expanded' : 'collapsed'}"
+					onmouseenter={() => hovered = 'extension'}
+					onmouseleave={() => hovered = ''}
+					role="button"
+					tabindex="0"
 				>
-					<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
-					Sign in
-				</button>
+					{#if hovered === 'extension'}
+						<div style="width:100%;max-width:480px;padding:2.5rem;">
+							<div class="auth-label">Extension Authentication</div>
+							<div class="space-y-4 text-slate-100 mt-4">
+								<p class="text-base">
+									For the best experience, use our browser extension for seamless authentication and extra features.
+								</p>
+								<div>
+									<h3 class="font-semibold mb-2">Supported Browsers:</h3>
+									<ul class="list-disc list-inside space-y-2 text-base">
+										<li>Google Chrome</li>
+										<li>Mozilla Firefox</li>
+									</ul>
+								</div>
+								<div>
+									<h3 class="font-semibold mb-2">Features:</h3>
+									<ul class="list-disc list-inside space-y-2 text-base">
+										<li>Automatic session management</li>
+										<li>Secure cookie handling</li>
+										<li>Enhanced performance</li>
+										<li>Additional browser integration features</li>
+									</ul>
+								</div>
+								<p class="text-base text-slate-300">
+									Don't have the extension? Use the web version instead.
+								</p>
+							</div>
+						</div>
+					{:else}
+						<div class="auth-label">Extension</div>
+					{/if}
+				</div>
+				<!-- Web Auth Panel -->
+				<div
+					class="auth-panel web {hovered === 'web' ? 'expanded' : 'collapsed'}"
+					onmouseenter={() => hovered = 'web'}
+					onmouseleave={() => hovered = ''}
+					role="button"
+					tabindex="0"
+				>
+					{#if hovered === 'web'}
+						<div style="width:100%;max-width:480px;padding:2.5rem;">
+							<div class="auth-label">Web Authentication</div>
+							<p class="text-base mb-4">
+								Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
+							</p>
+							<div class="flex items-center w-full mb-4">
+								<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
+								<input
+									type="text"
+									bind:value={seqtaUrl}
+									placeholder="https://schoolname.seqta.com"
+									class="px-3 py-2 w-full rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
+								/>
+							</div>
+							<button
+								onclick={startLogin}
+								class="flex justify-center items-center py-2 w-full font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
+								style="background: #8b5cf6; color: white;"
+							>
+								<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
+								Sign in with Web
+							</button>
+						</div>
+					{:else}
+						<div class="auth-label">Web</div>
+					{/if}
+				</div>
 			</div>
 		{:else}
 			{@render children()}
