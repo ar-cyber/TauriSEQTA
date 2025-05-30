@@ -319,7 +319,7 @@
 	</aside>
 
 	<!-- Main Content -->
-	<main class="flex-1 overflow-y-auto p-4 md:p-6">
+	<main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-950 rounded-tl-2xl">
 		{#if $needsSetup}
 			<div class="flex flex-col items-center justify-center h-full">
 				<h2 class="text-xl font-bold">Connect to your SEQTA instance</h2>
@@ -346,7 +346,7 @@
 				</button>
 			</div>
 		{:else}
-			<slot />
+			{@render children()}
 		{/if}
 	</main>
 </div>
@@ -356,5 +356,8 @@
 	<div 
 		class="fixed inset-0 bg-black bg-opacity-50 z-30"
 		onclick={() => isMobileMenuOpen = false}
-	/>
+		role="button"
+		tabindex="0"
+		onkeydown={(e) => e.key === 'Enter' && (isMobileMenuOpen = false)}
+	></div>
 {/if} 

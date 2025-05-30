@@ -408,25 +408,6 @@
 		background-size: 200% 200%;
 		animation: gradient-shift 8s ease infinite;
 	}
-
-	.timetable-container {
-		display: flex;
-		flex-direction: row;
-		overflow-x: auto;
-		gap: 1rem;
-		padding: 1rem;
-	}
-
-	@media (max-width: 768px) {
-		.timetable-container {
-			flex-direction: column;
-			overflow-x: unset;
-			overflow-y: unset;
-			gap: 1rem;
-		}
-	}
-
-	/* Add any additional styles here */
 </style>
 
 <div
@@ -461,7 +442,7 @@
       class="overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 sm:px-6 py-4 bg-gradient-to-r border-b border-slate-700/50 from-slate-800/70 to-slate-800/30"
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-3 sm:px-4 py-3 bg-gradient-to-r border-b border-slate-700/50 from-slate-800/70 to-slate-800/30"
       >
         <span class="text-xl font-semibold text-white">{lessonsSubtitle()}</span>
         <div class="flex gap-3">
@@ -499,19 +480,12 @@
           </p>
         </div>
       {:else}
-        <div class="timetable-container">
+        <div class="flex overflow-x-scroll">
           {#each lessons as lesson, i}
             <div
-              class="relative flex flex-col min-w-[280px] max-w-xs w-full rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] group"
+              class="relative flex flex-col max-w-xs w-full group border-t-4"
+              style="border-color: {lesson.colour};"
             >
-              <div
-                class="absolute inset-0 bg-gradient-to-br rounded-xl animate-gradient"
-                style="background: linear-gradient(135deg, {lesson.colour}40, {lesson.colour}10); opacity: 0.6;"
-              ></div>
-              <div
-                class="absolute inset-0 rounded-xl border"
-                style="border: 1px solid {lesson.colour}50;"
-              ></div>
               <div
                 class="flex relative flex-col flex-1 gap-2 p-3 sm:p-4 backdrop-blur-sm"
               >
@@ -541,19 +515,19 @@
                   <span class="truncate">{lesson.room}</span>
                 </div>
                 <div
-                  class="inline-flex items-center px-3 py-1.5 mt-3 font-mono text-sm rounded-lg bg-slate-800/50 w-fit"
+                  class="inline-flex items-center px-3 py-1.5 mt-3 font-mono text-sm rounded-lg bg-slate-800/50 w-fit mb-auto"
                 >
                   <Icon src={Clock} class="mr-1.5 w-4 h-4 text-indigo-400" />
                   {lesson.from} – {lesson.until}
                 </div>
                 {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                  <div class="mt-1 text-xs text-slate-400">
+                  <div class="text-xs text-slate-400">
                     {lesson.attendanceTitle}
                   </div>
                 {/if}
 
                 {#if lesson.programmeID !== 0}
-                  <div class="flex gap-3 mt-auto">
+                  <div class="flex gap-3">
                     <button
                       class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:bg-indigo-500/30 text-slate-300 hover:text-white border-slate-700/50 hover:border-indigo-500/50"
                       aria-label="View Assessment"
@@ -587,15 +561,12 @@
       class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-600 animate-gradient"
-      ></div>
-      <div
-        class="flex justify-between items-center px-6 py-4 border-b border-slate-700/50"
+        class="flex justify-between items-center px-4 py-3 bg-gradient-to-br from-slate-800/70 to-slate-800/30 border-b border-slate-700/50"
       >
         <h3 class="text-xl font-semibold text-white">Notices</h3>
         <a
           href="/notices"
-          class="px-3 py-1.5 text-sm text-indigo-200 rounded-lg transition-all duration-300 hover:bg-indigo-500/20 hover:text-white"
+          class="px-3 py-1.5 text-nowrap text-sm text-indigo-200 rounded-lg transition-all duration-300 hover:bg-indigo-500/20 hover:text-white"
         >
           View all
           <Icon src={ArrowTopRightOnSquare} class="inline ml-1 w-4 h-4" />
@@ -648,15 +619,12 @@
       class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
     >
       <div
-        class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600 animate-gradient"
-      ></div>
-      <div
-        class="flex flex-col gap-4 justify-between items-start px-4 sm:px-6 py-4 border-b md:flex-row md:items-center border-slate-700/50"
+        class="flex justify-between items-center px-4 py-3 bg-gradient-to-br from-slate-800/70 to-slate-800/30 border-b border-slate-700/50"
       >
-        <span class="text-xl font-semibold text-white"
+        <span class="text-xl font-semibold text-white text-nowrap pr-4"
           >Upcoming Assessments</span
         >
-        <div class="flex flex-wrap gap-2" id="upcoming-filters">
+        <div class="flex gap-2 overflow-x-scroll" id="upcoming-filters">
           {#each activeSubjects as subj}
             <label
               class="flex items-center px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm rounded-full border transition-all duration-300 cursor-pointer bg-slate-800/70 border-slate-700/50 hover:border-indigo-500/50"
