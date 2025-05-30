@@ -441,8 +441,8 @@
 				.auth-panel .blur-overlay {
 					position: absolute;
 					top: 0; left: 0; right: 0; bottom: 0;
-					background: rgba(255,255,255,0.08);
-					backdrop-filter: blur(24px) saturate(1.2);
+					background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.10) 100%);
+					backdrop-filter: blur(32px) saturate(1.2);
 					z-index: 1;
 					pointer-events: none;
 				}
@@ -578,6 +578,7 @@
 					onclick={() => { if (!selected) selected = 'extension'; }}
 					role="button"
 					tabindex="0"
+					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && !selected && (selected = 'extension')}
 				>
 					<div class="blur-overlay"></div>
 					<div class="panel-content">
@@ -623,6 +624,7 @@
 					onclick={() => { if (!selected) selected = 'web'; }}
 					role="button"
 					tabindex="0"
+					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && !selected && (selected = 'web')}
 				>
 					<div class="blur-overlay"></div>
 					<div class="panel-content">
@@ -630,27 +632,31 @@
 							{#if selected === 'web'}
 								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
 							{/if}
-							<div class="auth-label">Web Authentication</div>
-							<p class="text-base mb-4">
-								Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
-							</p>
-							<div class="flex items-center w-full mb-4">
-								<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
-								<input
-									type="text"
-									bind:value={seqtaUrl}
-									placeholder="https://schoolname.seqta.com"
-									class="px-3 py-2 w-full rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
-								/>
+							<div style="width:100%;max-width:480px;padding:2.5rem;">
+								<div class="auth-label">Web Authentication</div>
+								<p class="text-base mb-4">
+									Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
+								</p>
+								<div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
+									<div class="flex items-center w-full mb-2">
+										<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
+										<input
+											type="text"
+											bind:value={seqtaUrl}
+											placeholder="https://schoolname.seqta.com"
+											class="px-3 py-2 flex-1 rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
+										/>
+									</div>
+									<button
+										onclick={startLogin}
+										class="flex justify-center items-center py-2 w-11/12 font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
+										style="background: #8b5cf6; color: white;"
+									>
+										<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
+										Sign in with Web
+									</button>
+								</div>
 							</div>
-							<button
-								onclick={startLogin}
-								class="flex justify-center items-center py-2 w-full font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
-								style="background: #8b5cf6; color: white;"
-							>
-								<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
-								Sign in with Web
-							</button>
 						{:else}
 							<div class="auth-label">Web</div>
 						{/if}
