@@ -20,8 +20,10 @@ fn settings_file() -> PathBuf {
 pub struct Settings {
     pub shortcuts: Vec<Shortcut>,
     pub weather_enabled: bool,
-    pub weather_location: String,
+    pub weather_city: String,
+    pub weather_country: String,
     pub reminders_enabled: bool,
+    pub force_use_location: bool,
 }
 
 impl Default for Settings {
@@ -29,7 +31,9 @@ impl Default for Settings {
         Self {
             shortcuts: Vec::new(),
             weather_enabled: false,
-            weather_location: String::new(),
+            force_use_location: false,
+            weather_city: String::new(),
+            weather_country: String::new(),
             reminders_enabled: true,
         }
     }
