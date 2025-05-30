@@ -46,8 +46,9 @@
 	let isMobileMenuOpen = $state(false);
 	let isMobile = $state(false);
 
-	// Add hovered state for login UI
+	// Add hovered and selected state for login UI
 	let hovered = $state<'extension' | 'web' | ''>('');
+	let selected = $state<'extension' | 'web' | ''>('');
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -395,16 +396,29 @@
 	<main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-950 rounded-tl-2xl">
 		{#if $needsSetup}
 			<style>
+				.auth-header {
+					width: 100%;
+					text-align: center;
+					font-size: 2.2rem;
+					font-weight: 800;
+					color: #fff;
+					letter-spacing: 0.03em;
+					margin-bottom: 2.5rem;
+					margin-top: 2.5rem;
+					z-index: 10;
+					text-shadow: 0 2px 16px rgba(0,0,0,0.25);
+				}
 				.auth-panels {
 					display: flex;
 					width: 100%;
 					height: 100vh;
 					min-height: 600px;
 					background: #111;
+					position: relative;
 				}
 				.auth-panel {
 					flex: 1 1 0%;
-					transition: flex-basis 0.4s cubic-bezier(0.4,0,0.2,1), flex-grow 0.4s cubic-bezier(0.4,0,0.2,1), background 0.4s, box-shadow 0.4s;
+					transition: flex-basis 0.5s cubic-bezier(0.4,0,0.2,1), flex-grow 0.5s cubic-bezier(0.4,0,0.2,1), background 0.4s, box-shadow 0.4s;
 					display: flex;
 					align-items: center;
 					justify-content: center;
@@ -412,6 +426,7 @@
 					cursor: pointer;
 					min-width: 0;
 					min-height: 0;
+					overflow: hidden;
 				}
 				.auth-panel.ext {
 					background: linear-gradient(120deg, rgba(36,99,235,0.25) 0%, rgba(36,99,235,0.10) 100%), rgba(0,0,0,0.7);
@@ -422,6 +437,23 @@
 					background: linear-gradient(120deg, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.10) 100%), rgba(0,0,0,0.7);
 					backdrop-filter: blur(16px) saturate(1.2);
 					box-shadow: 0 8px 32px 0 rgba(139,92,246,0.15);
+				}
+				.auth-panel .blur-overlay {
+					position: absolute;
+					top: 0; left: 0; right: 0; bottom: 0;
+					background: rgba(255,255,255,0.08);
+					backdrop-filter: blur(24px) saturate(1.2);
+					z-index: 1;
+					pointer-events: none;
+				}
+				.auth-panel > .panel-content {
+					position: relative;
+					z-index: 2;
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
 				}
 				.auth-panel.collapsed {
 					flex-basis: 15%;
@@ -435,6 +467,21 @@
 					flex-shrink: 0;
 					justify-content: center;
 				}
+				.auth-panel.full {
+					flex-basis: 100%;
+					flex-grow: 1;
+					flex-shrink: 0;
+					justify-content: center;
+					z-index: 20;
+					cursor: default;
+				}
+				.auth-panel.hide {
+					flex-basis: 0%;
+					flex-grow: 0;
+					flex-shrink: 1;
+					opacity: 0;
+					pointer-events: none;
+				}
 				.auth-label {
 					font-size: 2rem;
 					font-weight: 700;
@@ -446,13 +493,49 @@
 					writing-mode: vertical-rl;
 					text-orientation: mixed;
 				}
-				.auth-panel.expanded .auth-label {
+				.auth-panel.expanded .auth-label,
+				.auth-panel.full .auth-label {
 					writing-mode: initial;
 					text-orientation: initial;
 					font-size: 2rem;
 					margin-bottom: 1.5rem;
 				}
+				.auth-panel.full .panel-content {
+					align-items: center;
+					justify-content: center;
+				}
+				.auth-backdrop {
+					position: fixed;
+					top: 0; left: 0; right: 0; bottom: 0;
+					background: rgba(0,0,0,0.25);
+					z-index: 15;
+					transition: opacity 0.3s;
+				}
+				.auth-back-btn {
+					position: absolute;
+					top: 2rem;
+					right: 2rem;
+					background: rgba(0,0,0,0.5);
+					color: #fff;
+					border: none;
+					border-radius: 0.5rem;
+					padding: 0.5rem 1.2rem;
+					font-size: 1rem;
+					font-weight: 600;
+					cursor: pointer;
+					z-index: 30;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+					transition: background 0.2s;
+				}
+				.auth-back-btn:hover {
+					background: rgba(0,0,0,0.7);
+				}
 				@media (max-width: 900px) {
+					.auth-header {
+						font-size: 1.5rem;
+						margin-bottom: 1.2rem;
+						margin-top: 1.2rem;
+					}
 					.auth-panels {
 						flex-direction: column;
 						height: 100vh;
@@ -467,23 +550,41 @@
 					.auth-panel.expanded {
 						flex-basis: 70vh;
 					}
+					.auth-panel.full {
+						flex-basis: 100vh;
+					}
 					.auth-label {
 						writing-mode: initial;
 						font-size: 1.5rem;
 					}
 				}
 			</style>
+			<div class="auth-header">Choose Authentication Method</div>
+			{#if selected}
+				<div
+					class="auth-backdrop"
+					role="button"
+					tabindex="0"
+					onclick={() => selected = ''}
+					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && (selected = '')}
+				></div>
+			{/if}
 			<div class="auth-panels">
 				<!-- Extension Panel -->
 				<div
-					class="auth-panel ext {hovered === 'extension' ? 'expanded' : 'collapsed'}"
-					onmouseenter={() => hovered = 'extension'}
-					onmouseleave={() => hovered = ''}
+					class="auth-panel ext {selected === 'extension' ? 'full' : selected === 'web' ? 'hide' : hovered === 'extension' ? 'expanded' : 'collapsed'}"
+					onmouseenter={() => { if (!selected) hovered = 'extension'; }}
+					onmouseleave={() => { if (!selected) hovered = ''; }}
+					onclick={() => { if (!selected) selected = 'extension'; }}
 					role="button"
 					tabindex="0"
 				>
-					{#if hovered === 'extension'}
-						<div style="width:100%;max-width:480px;padding:2.5rem;">
+					<div class="blur-overlay"></div>
+					<div class="panel-content">
+						{#if selected === 'extension' || (!selected && hovered === 'extension')}
+							{#if selected === 'extension'}
+								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
+							{/if}
 							<div class="auth-label">Extension Authentication</div>
 							<div class="space-y-4 text-slate-100 mt-4">
 								<p class="text-base">
@@ -509,21 +610,26 @@
 									Don't have the extension? Use the web version instead.
 								</p>
 							</div>
-						</div>
-					{:else}
-						<div class="auth-label">Extension</div>
-					{/if}
+						{:else}
+							<div class="auth-label">Extension</div>
+						{/if}
+					</div>
 				</div>
 				<!-- Web Auth Panel -->
 				<div
-					class="auth-panel web {hovered === 'web' ? 'expanded' : 'collapsed'}"
-					onmouseenter={() => hovered = 'web'}
-					onmouseleave={() => hovered = ''}
+					class="auth-panel web {selected === 'web' ? 'full' : selected === 'extension' ? 'hide' : hovered === 'web' ? 'expanded' : 'collapsed'}"
+					onmouseenter={() => { if (!selected) hovered = 'web'; }}
+					onmouseleave={() => { if (!selected) hovered = ''; }}
+					onclick={() => { if (!selected) selected = 'web'; }}
 					role="button"
 					tabindex="0"
 				>
-					{#if hovered === 'web'}
-						<div style="width:100%;max-width:480px;padding:2.5rem;">
+					<div class="blur-overlay"></div>
+					<div class="panel-content">
+						{#if selected === 'web' || (!selected && hovered === 'web')}
+							{#if selected === 'web'}
+								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
+							{/if}
 							<div class="auth-label">Web Authentication</div>
 							<p class="text-base mb-4">
 								Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
@@ -545,10 +651,10 @@
 								<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
 								Sign in with Web
 							</button>
-						</div>
-					{:else}
-						<div class="auth-label">Web</div>
-					{/if}
+						{:else}
+							<div class="auth-label">Web</div>
+						{/if}
+					</div>
 				</div>
 			</div>
 		{:else}
