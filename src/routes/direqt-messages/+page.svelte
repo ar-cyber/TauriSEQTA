@@ -17,7 +17,6 @@
   let selectedFolder = $state<Folder>('Inbox');
   let selectedMessage = $state<Message | null>(null);
   let showComposeModal = $state(false);
-  let composeTo = $state('');
   let composeSubject = $state('');
   let composeBody = $state('');
 
@@ -192,28 +191,11 @@
 
   function openCompose() {
     showComposeModal = true;
-    composeTo = '';
     composeSubject = '';
     composeBody = '';
   }
 
   function closeModal() {
-    showComposeModal = false;
-  }
-
-  function sendMessage() {
-    if (!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()) return;
-    messages = [...messages, {
-      id: Math.max(0, ...messages.map(m => m.id)) + 1,
-      folder: 'Sent',
-      sender: 'You',
-      to: composeTo,
-      subject: composeSubject,
-      preview: composeBody.slice(0, 60),
-      body: composeBody,
-      date: new Date().toISOString().slice(0, 16).replace('T', ' '),
-      unread: false
-    }];
     showComposeModal = false;
   }
 
@@ -334,24 +316,25 @@
       selectedMessage={selectedMessage}
       openMessage={openMessage}
     />
+    
+    <!-- Message detail view - full screen on mobile -->
+    <div class="hidden xl:block flex-1">
+      <MessageDetail
+        selectedMessage={selectedMessage}
+        selectedFolder={selectedFolder}
+        detailLoading={detailLoading}
+        detailError={detailError}
+        openCompose={openCompose}
+        starMessage={starMessage}
+        deleteMessage={deleteMessage}
+        restoreMessage={restoreMessage}
+        starring={starring}
+        deleting={deleting}
+        restoring={restoring}
+      />
+    </div>
   </div>
   
-  <!-- Message detail view - full screen on mobile -->
-  <div class="hidden xl:block flex-1">
-    <MessageDetail
-      selectedMessage={selectedMessage}
-      selectedFolder={selectedFolder}
-      detailLoading={detailLoading}
-      detailError={detailError}
-      openCompose={openCompose}
-      starMessage={starMessage}
-      deleteMessage={deleteMessage}
-      restoreMessage={restoreMessage}
-      starring={starring}
-      deleting={deleting}
-      restoring={restoring}
-    />
-  </div>
 
   <!-- Mobile message detail view -->
   {#if selectedMessage}
@@ -393,10 +376,8 @@
 
 <ComposeModal
   showComposeModal={showComposeModal}
-  composeTo={composeTo}
   composeSubject={composeSubject}
   composeBody={composeBody}
-  sendMessage={sendMessage}
   closeModal={closeModal}
 />
 
