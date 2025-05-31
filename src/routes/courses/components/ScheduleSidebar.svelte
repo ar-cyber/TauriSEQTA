@@ -159,7 +159,7 @@ function getJumpButtonText(target: any) {
     {#if jumpTarget}
       {@const buttonText = getJumpButtonText(jumpTarget)}
       <button 
-        class="w-full px-4 py-3 text-left hover:bg-slate-800 border-l-2 border-transparent hover:border-emerald-500 transition-all bg-gradient-to-r from-emerald-900/20 to-transparent border-emerald-500/30"
+        class="w-full px-4 py-3 text-left hover:bg-slate-800 border-l-2 hover:border-emerald-500 transition-all bg-gradient-to-r from-emerald-900/20 to-transparent border-emerald-500/30"
         onclick={jumpToToday}>
         <div class="font-medium text-emerald-300 text-sm">🕐 {buttonText.title}</div>
         <div class="text-xs text-emerald-400/80 mt-1">
