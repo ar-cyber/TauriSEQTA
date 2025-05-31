@@ -13,7 +13,6 @@ import type {
   TermSchedule,
   WeeklyLessonContent 
 } from './types';
-import { page } from '$app/stores';
 
 let folders: Folder[] = [];
 let activeSubjects: Subject[] = [];
@@ -145,35 +144,75 @@ function handleSelectLesson(event: CustomEvent<{
   selectLesson(event.detail.termSchedule, event.detail.lesson, event.detail.lessonIndex);
 }
 
-onMount(async () => {
-  await loadSubjects();
-  // Auto-select subject and lesson if query params are present
-  const url = new URL(window.location.href);
-  const code = url.searchParams.get('code');
-  const date = url.searchParams.get('date');
-  if (code) {
-    const subj = activeSubjects.find(s => s.code === code) || otherFolders.flatMap(f => f.subjects).find(s => s.code === code);
-    if (subj) {
-      await selectSubject(subj);
-      if (date && coursePayload && coursePayload.d) {
-        // Find the lesson closest to the date
-        const targetDate = new Date(date);
-        let closest: { termSchedule: TermSchedule; lesson: Lesson; lessonIndex: number; diff: number } | null = null;
-        for (const termSchedule of coursePayload.d) {
-          termSchedule.l.forEach((lesson: Lesson, lessonIndex: number) => {
-            const lessonDate = new Date(lesson.d);
-            const diff = Math.abs(lessonDate.getTime() - targetDate.getTime());
-            if (!closest || diff < closest.diff) {
-              closest = { termSchedule, lesson, lessonIndex, diff };
-            }
-          });
-        }
-        if (closest) {
-          selectLesson(closest.termSchedule, closest.lesson, closest.lessonIndex);
-        }
+function getQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    code: params.get('code'),
+    date: params.get('date'),
+  };
+}
+
+async function autoSelectFromQuery() {
+  const { code, date } = getQueryParams();
+  if (!code || !date) return;
+  // Find the subject by code
+  const subject = activeSubjects.find(s => s.code === code);
+  if (!subject) return;
+  // Load course content for the subject
+  loadingCourse = true;
+  courseError = null;
+  coursePayload = null;
+  parsedDocument = null;
+  selectedTerm = null;
+  selectedWeek = null;
+  selectedLesson = null;
+  selectedLessonContent = null;
+  try {
+    const res = await seqtaFetch('/seqta/student/load/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: {
+        programme: subject.programme.toString(),
+        metaclass: subject.metaclass.toString()
+      }
+    });
+    const data = JSON.parse(res);
+    coursePayload = data.payload;
+    if (coursePayload?.document) {
+      try {
+        parsedDocument = JSON.parse(coursePayload.document);
+      } catch (e) {
+        console.error('Failed to parse document JSON:', e);
       }
     }
+    // Find the lesson closest to the date
+    if (coursePayload?.d && coursePayload?.w) {
+      let closest = { termSchedule: null, lesson: null, lessonIndex: -1, diff: Infinity };
+      const targetDate = new Date(date);
+      coursePayload.d.forEach((termSchedule, termIdx) => {
+        termSchedule.l.forEach((lesson, lessonIndex) => {
+          const lessonDate = new Date(lesson.d);
+          const diff = Math.abs(lessonDate.getTime() - targetDate.getTime());
+          if (diff < closest.diff) {
+            closest = { termSchedule, lesson, lessonIndex, diff };
+          }
+        });
+      });
+      if (closest.lesson && closest.termSchedule) {
+        selectedSubject = subject;
+        selectLesson(closest.termSchedule, closest.lesson, closest.lessonIndex);
+      }
+    }
+  } catch (e) {
+    courseError = e instanceof Error ? e.message : String(e);
+  } finally {
+    loadingCourse = false;
   }
+}
+
+onMount(async () => {
+  await loadSubjects();
+  await autoSelectFromQuery();
 });
 </script>
 

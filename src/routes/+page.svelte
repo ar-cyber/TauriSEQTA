@@ -542,11 +542,8 @@
                     <button
                       class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:bg-indigo-500/30 text-slate-300 hover:text-white border-slate-700/50 hover:border-indigo-500/50"
                       aria-label="View Course"
-                      onclick={() => {
-                        const code = lesson.code;
-                        const date = lesson.date;
-                        location.href = `/courses?code=${encodeURIComponent(code)}&date=${encodeURIComponent(date)}`;
-                      }}
+                      onclick={() =>
+                        (location.href = `/courses?code=${lesson.code}&date=${lesson.date}`)}
                     >
                       <Icon src={BookOpen} class="w-5 h-5" />
                     </button>
