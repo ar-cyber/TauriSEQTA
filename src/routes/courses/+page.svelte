@@ -13,6 +13,7 @@ import type {
   TermSchedule,
   WeeklyLessonContent 
 } from './types';
+import { page } from '$app/stores';
 
 let folders: Folder[] = [];
 let activeSubjects: Subject[] = [];
@@ -144,7 +145,36 @@ function handleSelectLesson(event: CustomEvent<{
   selectLesson(event.detail.termSchedule, event.detail.lesson, event.detail.lessonIndex);
 }
 
-onMount(loadSubjects);
+onMount(async () => {
+  await loadSubjects();
+  // Auto-select subject and lesson if query params are present
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get('code');
+  const date = url.searchParams.get('date');
+  if (code) {
+    const subj = activeSubjects.find(s => s.code === code) || otherFolders.flatMap(f => f.subjects).find(s => s.code === code);
+    if (subj) {
+      await selectSubject(subj);
+      if (date && coursePayload && coursePayload.d) {
+        // Find the lesson closest to the date
+        const targetDate = new Date(date);
+        let closest: { termSchedule: TermSchedule; lesson: Lesson; lessonIndex: number; diff: number } | null = null;
+        for (const termSchedule of coursePayload.d) {
+          termSchedule.l.forEach((lesson: Lesson, lessonIndex: number) => {
+            const lessonDate = new Date(lesson.d);
+            const diff = Math.abs(lessonDate.getTime() - targetDate.getTime());
+            if (!closest || diff < closest.diff) {
+              closest = { termSchedule, lesson, lessonIndex, diff };
+            }
+          });
+        }
+        if (closest) {
+          selectLesson(closest.termSchedule, closest.lesson, closest.lessonIndex);
+        }
+      }
+    }
+  }
+});
 </script>
 
 <div class="flex w-full h-full bg-black">
