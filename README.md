@@ -21,11 +21,7 @@
 
 - **Custom Homepage**: A personalized homepage that displays upcoming assessments, lessons, and notices with subject-specific colors.
 
-- **Assessments Page**: 
-  - Displays all assessments, including past ones, sorted by the newest first.
-  - Features a Kanban-style board view where each subject has its own column.
-  - Status badges for assessments indicating "Marked," "Overdue," "Due Soon," and "Upcoming."
-
+- **All SEQTA functionality kept**: Most SEQTA actions can be preformed here.
 
 - **Timetable Colors**: Integration of timetable colors for subjects to enhance visual identification throuhout the entire app.
 
@@ -59,11 +55,16 @@ Run the script
 ```
 npm run tauri dev
 ```
+> [!WARNING]
+> Do NOT run `npm run dev` as it starts the backend webui only; the pages loaded by DesQTA are built to be run by a framework not present in regular browsers. This is the same with `npm run build`; it will only build the webpage files, not the app.
+
 > [!IMPORTANT]  
-> To run the dev script youy MUST have both [rust cargo](https://www.rust-lang.org/tools/install) and pnpm (`npm install -g pnpm`) on your system or it will not build
+> To run the dev script you **<ins>MUST</ins>** have [rust, cargo (included with rust)](https://www.rust-lang.org/tools/install) and pnpm (`npm install -g pnpm`) on your system or it will not build.
+>
 
 > [!CAUTION]
 > You should not build this - it is not stable and certain features (such as logging in) are buggy. <br><br> If you understand the risks, you can build using ```npm run tauri build```
+
 
 
 ## Folder Structure
