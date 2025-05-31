@@ -70,287 +70,161 @@ npm run tauri dev
 ## Folder Structure
 
 <details>
-
 <summary>Folder Structure:</summary>
-<pre>
-<code>
-\---DesQTA # Main Repo
-    |   .gitignore # Git stuff
-    |   bun.lockb  # Bun Lockfile
-    |   LICENSE  # Git stuff
-    |   package-lock.json  # Lockfile for npm
-    |   package.json  # Project's metadata and dependencies.
-    |   pnpm-lock.yaml  # Lockfile
-    |   postcss.config.js  # Configuration for PostCSS
-    |   README.md # Git stuff
-    |   svelte.config.js  # Configuration for Svelte
-    |   tailwind.config.js  # Configuration for Tailwind
-    |   TODO.md # Git stuff
-    |   tsconfig.json  # TypeScript compiler configuration.
-    |   vite.config.js  # Configuration for the Vite build tool.
-    |
-    +---.github  # Github-specific files
-    |   \---workflows  # Workflows
-    |           build.yml  # Build workflow
-    |
-    +---.vscode  # VSCode workspace settings
-    |       extensions.json  # Reccomended VSCode extensions
-    |       settings.json  # Required project-specific VSCode settings
-    |
-    +---src  # Source Directory
-    |   |   app.css  # Global styles
-    |   |   app.html  # Base HTML template
-    |   |
-    |   +---components  # Reusable Svelte components.
-    |   |   |
-    |   |   \---Editor  # Editor module components.
-    |   |       |   Editor.svelte
-    |   |       |   EditorStyles.css
-    |   |       |
-    |   |       \---Plugins  # Editor plugin system.
-    |   |           |
-    |   |           \---Commands
-    |   |                   command.ts
-    |   |                   CommandList.svelte
-    |   |                   stores.ts
-    |   |                   suggestion.ts
-    |   |
-    |   +---routes  # Route-based pages for the app
-    |   |   |   +layout.svelte
-    |   |   |   +layout.ts
-    |   |   |   +page.svelte
-    |   |   |
-    |   |   +---assessments  # Assessments page
-    |   |   |   |   +page.svelte
-    |   |   |   |
-    |   |   |   \---[id]
-    |   |   |       \---[metaclass]
-    |   |   |               +page.svelte
-    |   |   |               +page.ts
-    |   |   |
-    |   |   +---courses  # Courses Page
-    |   |   |   |   +page.svelte
-    |   |   |   |   types.ts
-    |   |   |   |   utils.ts
-    |   |   |   |
-    |   |   |   \---components
-    |   |   |           CourseContent.svelte
-    |   |   |           LinkPreview.svelte
-    |   |   |           ScheduleSidebar.svelte
-    |   |   |           SubjectSidebar.svelte
-    |   |   |
-    |   |   +---dashboard  # Dashboard Page
-    |   |   |       +page.svelte
-    |   |   |
-    |   |   +---direqt-messages  # Direqt Messages Page
-    |   |   |   |   +page.svelte
-    |   |   |   |   types.ts
-    |   |   |   |
-    |   |   |   \---components
-    |   |   |           ComposeModal.svelte
-    |   |   |           Message.svelte
-    |   |   |           MessageList.svelte
-    |   |   |           Sidebar.svelte
-    |   |   |
-    |   |   +---news  # News Page
-    |   |   |       +page.svelte
-    |   |   |
-    |   |   +---notices  # Notices Page
-    |   |   |       +page.svelte
-    |   |   |
-    |   |   +---reports  # Reports Page
-    |   |   |       +page.svelte
-    |   |   |
-    |   |   +---settings  # Settings Page
-    |   |   |   |   +page.svelte
-    |   |   |   |
-    |   |   |   \---plugins # Plugin-specific settings.
-    |   |   |           +page.svelte
-    |   |   |
-    |   |   +---timetable  # Timetable Page
-    |   |   |       +page.svelte
-    |   |   |
-    |   |   \---welcome  # Welcome page
-    |   |           +page.svelte
-    |   |
-    |   \---utils  # General Utilities
-    |           cache.ts
-    |           notify.ts
-    |           seqtaFetch.ts
-    |
-    +---src-tauri  # Tauri Backend (Rust).
-    |   |   .gitignore
-    |   |   2
-    |   |   build.rs
-    |   |   Cargo.lock
-    |   |   Cargo.toml
-    |   |   tauri.conf.json
-    |   |
-    |   +---capabilities  # Platform capabilities/permissions
-    |   |       default.json
-    |   |
-    |   +---gen  # XCode Project Files for iOS devices
-    |   |   |
-    |   |   \---apple
-    |   |       |   .gitignore
-    |   |       |   ExportOptions.plist
-    |   |       |   LaunchScreen.storyboard
-    |   |       |   Podfile
-    |   |       |   project.yml
-    |   |       |
-    |   |       +---Assets.xcassets  # iOS icon and UI assets.
-    |   |       |   |   Contents.json
-    |   |       |   |
-    |   |       |   \---AppIcon.appiconset
-    |   |       |           AppIcon-20x20@1x.png
-    |   |       |           AppIcon-20x20@2x-1.png
-    |   |       |           AppIcon-20x20@2x.png
-    |   |       |           AppIcon-20x20@3x.png
-    |   |       |           AppIcon-29x29@1x.png
-    |   |       |           AppIcon-29x29@2x-1.png
-    |   |       |           AppIcon-29x29@2x.png
-    |   |       |           AppIcon-29x29@3x.png
-    |   |       |           AppIcon-40x40@1x.png
-    |   |       |           AppIcon-40x40@2x-1.png
-    |   |       |           AppIcon-40x40@2x.png
-    |   |       |           AppIcon-40x40@3x.png
-    |   |       |           AppIcon-512@2x.png
-    |   |       |           AppIcon-60x60@2x.png
-    |   |       |           AppIcon-60x60@3x.png
-    |   |       |           AppIcon-76x76@1x.png
-    |   |       |           AppIcon-76x76@2x.png
-    |   |       |           AppIcon-83.5x83.5@2x.png
-    |   |       |           Contents.json
-    |   |       |
-    |   |       +---desqta.xcodeproj  # Xcode project structure.
-    |   |       |   |   project.pbxproj
-    |   |       |   |
-    |   |       |   +---project.xcworkspace
-    |   |       |   |   |   contents.xcworkspacedata
-    |   |       |   |   |
-    |   |       |   |   \---xcshareddata
-    |   |       |   |           WorkspaceSettings.xcsettings
-    |   |       |   |
-    |   |       |   \---xcshareddata
-    |   |       |       \---xcschemes
-    |   |       |               desqta_iOS.xcscheme
-    |   |       |
-    |   |       +---desqta_iOS  # iOS-specific metadata.
-    |   |       |       desqta_iOS.entitlements
-    |   |       |       Info.plist
-    |   |       |
-    |   |       \---Sources  # Objective-C/Swift bridging code.
-    |   |           \---desqta
-    |   |               |   main.mm
-    |   |               |
-    |   |               \---bindings
-    |   |                       bindings.h
-    |   |
-    |   +---icons  # App icons for all platforms.
-    |   |   |   128x128.png
-    |   |   |   128x128@2x.png
-    |   |   |   32x32.png
-    |   |   |   64x64.png
-    |   |   |   icon.icns
-    |   |   |   icon.ico
-    |   |   |   icon.png
-    |   |   |   Square107x107Logo.png
-    |   |   |   Square142x142Logo.png
-    |   |   |   Square150x150Logo.png
-    |   |   |   Square284x284Logo.png
-    |   |   |   Square30x30Logo.png
-    |   |   |   Square310x310Logo.png
-    |   |   |   Square44x44Logo.png
-    |   |   |   Square71x71Logo.png
-    |   |   |   Square89x89Logo.png
-    |   |   |   StoreLogo.png
-    |   |   |
-    |   |   +---android  # Android-specific icons
-    |   |   |   +---mipmap-hdpi
-    |   |   |   |       ic_launcher.png
-    |   |   |   |       ic_launcher_foreground.png
-    |   |   |   |       ic_launcher_round.png
-    |   |   |   |
-    |   |   |   +---mipmap-mdpi
-    |   |   |   |       ic_launcher.png
-    |   |   |   |       ic_launcher_foreground.png
-    |   |   |   |       ic_launcher_round.png
-    |   |   |   |
-    |   |   |   +---mipmap-xhdpi
-    |   |   |   |       ic_launcher.png
-    |   |   |   |       ic_launcher_foreground.png
-    |   |   |   |       ic_launcher_round.png
-    |   |   |   |
-    |   |   |   +---mipmap-xxhdpi
-    |   |   |   |       ic_launcher.png
-    |   |   |   |       ic_launcher_foreground.png
-    |   |   |   |       ic_launcher_round.png
-    |   |   |   |
-    |   |   |   \---mipmap-xxxhdpi
-    |   |   |           ic_launcher.png
-    |   |   |           ic_launcher_foreground.png
-    |   |   |           ic_launcher_round.png
-    |   |   |
-    |   |   \---ios  # iOS icon sizes.
-    |   |           AppIcon-20x20@1x.png
-    |   |           AppIcon-20x20@2x-1.png
-    |   |           AppIcon-20x20@2x.png
-    |   |           AppIcon-20x20@3x.png
-    |   |           AppIcon-29x29@1x.png
-    |   |           AppIcon-29x29@2x-1.png
-    |   |           AppIcon-29x29@2x.png
-    |   |           AppIcon-29x29@3x.png
-    |   |           AppIcon-40x40@1x.png
-    |   |           AppIcon-40x40@2x-1.png
-    |   |           AppIcon-40x40@2x.png
-    |   |           AppIcon-40x40@3x.png
-    |   |           AppIcon-512@2x.png
-    |   |           AppIcon-60x60@2x.png
-    |   |           AppIcon-60x60@3x.png
-    |   |           AppIcon-76x76@1x.png
-    |   |           AppIcon-76x76@2x.png
-    |   |           AppIcon-83.5x83.5@2x.png
-    |   |
-    |   \---src  # Rust source files
-    |       |   lib.rs
-    |       |   main.rs
-    |       |
-    |       +---auth  # Authentication logic
-    |       |       login.rs
-    |       |
-    |       +---mobilechanges  # Mobile-specific overrides
-    |       |       login.rs
-    |       |
-    |       \---utils  # Backend utility
-    |               netgrab.rs
-    |               session.rs
-    |               settings.rs  # settings object for user settings
-    |
-    \---static  # Static app assets
-        |   32x32.png
-        |   app.css
-        |   favicon.png
-        |   svelte.svg
-        |   tauri.svg
-        |   vite.svg
-        |
-        \---images
-            |
-            \---editor  # Icons used in the editor
-                \---commands
-                        bulletlist.png
-                        divider.png
-                        heading.png
-                        heading2.png
-                        heading3.png
-                        hideblock.png
-                        numberedlist.png
-                        quote.png
-                        table.png
-                        text.png
-                        todos.png
-</code>
-</pre>
+
+### Root Directory
+- `.gitignore` - Git ignore rules
+- `bun.lockb` - Bun Lockfile
+- `LICENSE` - License file
+- `package-lock.json` - Lockfile for npm
+- `package.json` - Project's metadata and dependencies
+- `pnpm-lock.yaml` - Lockfile
+- `postcss.config.js` - Configuration for PostCSS
+- `README.md` - Project documentation
+- `svelte.config.js` - Configuration for Svelte
+- `tailwind.config.js` - Configuration for Tailwind
+- `TODO.md` - Project todos
+- `tsconfig.json` - TypeScript compiler configuration
+- `vite.config.js` - Configuration for the Vite build tool
+
+### `.github`
+- `workflows/`
+  - `build.yml` - Build workflow
+
+### `.vscode`
+- `extensions.json` - Recommended VSCode extensions
+- `settings.json` - Required project-specific VSCode settings
+
+### `src` - Source Directory
+- `app.css` - Global styles
+- `app.html` - Base HTML template
+
+#### `components` - Reusable Svelte components.
+- `Editor/` - Editor module components.
+  - `Editor.svelte`
+  - `EditorStyles.css`
+  - `Plugins/` - Editor plugin system.
+    - `Commands/`
+      - `command.ts`
+      - `CommandList.svelte`
+      - `stores.ts`
+      - `suggestion.ts`
+
+#### `routes` - Route-based pages for the app
+- `+layout.svelte`
+- `+layout.ts`
+- `+page.svelte`
+
+##### `assessments` - Assessments page
+- `+page.svelte`
+- `[id]/`
+  - `[metaclass]/`
+    - `+page.svelte`
+    - `+page.ts`
+
+##### `courses` - Courses Page
+- `+page.svelte`
+- `types.ts`
+- `utils.ts`
+- `components/`
+  - `CourseContent.svelte`
+  - `LinkPreview.svelte`
+  - `ScheduleSidebar.svelte`
+  - `SubjectSidebar.svelte`
+
+##### `dashboard` - Dashboard Page
+- `+page.svelte`
+
+##### `direqt-messages` - Direqt Messages Page
+- `+page.svelte`
+- `types.ts`
+- `components/`
+  - `ComposeModal.svelte`
+  - `Message.svelte`
+  - `MessageList.svelte`
+  - `Sidebar.svelte`
+
+##### `news` - News Page
+- `+page.svelte`
+
+##### `notices` - Notices Page
+- `+page.svelte`
+
+##### `reports` - Reports Page
+- `+page.svelte`
+
+##### `settings` - Settings Page
+- `+page.svelte`
+- `plugins/` - Plugin store (coming soom)
+  - `+page.svelte`
+
+##### `timetable` - Timetable Page
+- `+page.svelte`
+
+##### `welcome` - Welcome page
+- `+page.svelte`
+
+#### `utils` - General Utilities
+- `cache.ts`
+- `notify.ts`
+- `seqtaFetch.ts`
+
+### `src-tauri` - Tauri Backend (Rust).
+- `.gitignore`
+- `build.rs`
+- `Cargo.lock`
+- `Cargo.toml`
+- `tauri.conf.json`
+
+#### `capabilities` - Platform capabilities/permissions
+- `default.json`
+
+#### `gen` - XCode Project Files for iOS devices
+- `apple/`
+  - `.gitignore`
+  - `ExportOptions.plist`
+  - `LaunchScreen.storyboard`
+  - `Podfile`
+  - `project.yml`
+  - `Assets.xcassets/` - iOS icon and UI assets
+    - `Contents.json`
+    - `AppIcon.appiconset/` - iOS app icons
+  - `desqta.xcodeproj/` - Xcode project structure
+  - `desqta_iOS/` - iOS-specific metadata
+  - `Sources/` - Objective-C/Swift bridging code
+    - `desqta/`
+      - `main.mm`
+      - `bindings/`
+        - `bindings.h`
+
+#### `icons`
+- Various icon files for different platforms
+- `android/` - Android-specific icons
+  - `mipmap-hdpi/`
+  - `mipmap-mdpi/`
+  - `mipmap-xhdpi/`
+  - `mipmap-xxhdpi/`
+  - `mipmap-xxxhdpi/`
+- `ios/` - iOS icon sizes
+
+#### `src` - Rust source files
+- `lib.rs`
+- `main.rs`
+- `auth/` - Authentication logic
+  - `login.rs`
+- `mobilechanges/` - Mobile-specific overrides
+  - `login.rs`
+- `utils/` - Backend utility
+  - `netgrab.rs`
+  - `session.rs`
+  - `settings.rs` - Settings object for user settings
+
+### `static`
+- Various static assets
+- `images/`
+  - `editor/` - Icons used in the editor
+    - `commands/` - Command icons
+
 </details>
 
 ## Contributors
