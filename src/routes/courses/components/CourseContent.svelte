@@ -1,5 +1,4 @@
 <script lang="ts">
-import { onMount } from 'svelte';
 import { 
   renderDraftJSText, 
   sanitizeHtml, 
@@ -23,11 +22,19 @@ import type {
   LinkPreview as LinkPreviewType
 } from '../types';
 
-export let coursePayload: CoursePayload;
-export let parsedDocument: ParsedDocument | null = null;
-export let selectedLessonContent: WeeklyLessonContent | null = null;
+let { 
+  coursePayload, 
+  parsedDocument = null, 
+  selectedLessonContent = null, 
+  showingOverview = true 
+}: {
+  coursePayload: CoursePayload;
+  parsedDocument?: ParsedDocument | null;
+  selectedLessonContent?: WeeklyLessonContent | null;
+  showingOverview?: boolean;
+} = $props();
 
-let linkPreviews: Map<string, LinkPreviewType | null> = new Map();
+let linkPreviews: Map<string, LinkPreviewType | null> = $state(new Map());
 
 function isModule<T extends Module>(module: Module, contentCheck: (content: any) => boolean): module is T {
   return 'content' in module && contentCheck(module.content);
@@ -54,7 +61,7 @@ async function loadLinkPreview(url: string) {
     linkPreviews.set(url, null);
     const preview = await fetchLinkPreview(url);
     linkPreviews.set(url, preview);
-    linkPreviews = linkPreviews; // Trigger reactivity
+    linkPreviews = linkPreviews;
   }
 }
 
@@ -93,13 +100,45 @@ function parseLessonDocument(lessonContent: WeeklyLessonContent) {
     return null;
   }
 }
+
+function sortModules(modules: Module[]): Module[] {
+  if (!modules || modules.length === 0) return [];
+  
+  const moduleMap = new Map<string, Module>();
+  modules.forEach(module => {
+    moduleMap.set(module.uuid, module);
+  });
+  
+  const firstModule = modules.find(module => 
+    !module.prevModule || !moduleMap.has(module.prevModule)
+  );
+  
+  if (!firstModule) {
+    return modules;
+  }
+  
+  const orderedModules: Module[] = [];
+  let currentModule: Module | undefined = firstModule;
+  
+  while (currentModule && orderedModules.length < modules.length) {
+    orderedModules.push(currentModule);
+    currentModule = currentModule.nextModule ? moduleMap.get(currentModule.nextModule) : undefined;
+  }
+  
+  modules.forEach(module => {
+    if (!orderedModules.includes(module)) {
+      orderedModules.push(module);
+    }
+  });
+  
+  return orderedModules;
+}
 </script>
 
 <div class="relative flex-1 overflow-y-auto">
   <!-- Mesh Gradient Background -->
   <div class="absolute inset-0 -z-10 pointer-events-none" style="background: radial-gradient(circle at 20% 30%, #7b8cff 30%, transparent 60%), radial-gradient(circle at 80% 70%, #e66465 30%, transparent 60%), radial-gradient(circle at 60% 20%, #fff 20%, transparent 60%), radial-gradient(circle at 80% 20%, #b993ff 40%, transparent 70%), radial-gradient(circle at 10% 80%, #ffb6b9 30%, transparent 60%); filter: blur(12px); opacity: 0.85;"></div>
-  {#if selectedLessonContent}
-    <!-- Lesson Content -->
+  {#if !showingOverview && selectedLessonContent}
     <div class="p-6">
       <h1 class="text-3xl font-bold text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-6 rounded-xl mb-6">
         {selectedLessonContent.t}
@@ -138,8 +177,9 @@ function parseLessonDocument(lessonContent: WeeklyLessonContent) {
       {#if selectedLessonContent.document}
         {@const lessonDoc = parseLessonDocument(selectedLessonContent)}
         {#if lessonDoc?.document?.modules}
+          {@const sortedModules = sortModules(lessonDoc.document.modules)}
           <div class="prose prose-invert prose-indigo max-w-none">
-            {#each lessonDoc.document.modules as module}
+            {#each sortedModules as module}
               {@const renderedModule = renderModule(module)}
               {#if renderedModule}
                 {#if renderedModule.type === 'title'}
@@ -160,15 +200,15 @@ function parseLessonDocument(lessonContent: WeeklyLessonContent) {
       {/if}
     </div>
   {:else}
-    <!-- Main Course Content -->
     <div class="p-6">
       <h1 class="text-3xl font-bold text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-6 rounded-xl mb-6">
         {coursePayload.t}
       </h1>
 
       {#if parsedDocument?.document?.modules}
+        {@const sortedModules = sortModules(parsedDocument.document.modules)}
         <div class="prose prose-invert prose-indigo max-w-none">
-          {#each parsedDocument.document.modules as module}
+          {#each sortedModules as module}
             {@const renderedModule = renderModule(module)}
             {#if renderedModule}
               {#if renderedModule.type === 'title'}

@@ -14,25 +14,24 @@ import type {
   WeeklyLessonContent 
 } from './types';
 
-let folders: Folder[] = [];
-let activeSubjects: Subject[] = [];
-let otherFolders: Folder[] = [];
-let loading = true;
-let error: string | null = null;
+let folders: Folder[] = $state([]);
+let activeSubjects: Subject[] = $state([]);
+let otherFolders: Folder[] = $state([]);
+let loading = $state(true);
+let error: string | null = $state(null);
 
-let expandedFolders: Record<string, boolean> = {};
-let selectedSubject: Subject | null = null;
-let coursePayload: CoursePayload | null = null;
-let parsedDocument: ParsedDocument | null = null;
-let loadingCourse = false;
-let courseError: string | null = null;
-let search = '';
+let expandedFolders: Record<string, boolean> = $state({});
+let selectedSubject: Subject | null = $state(null);
+let coursePayload: CoursePayload | null = $state(null);
+let parsedDocument: ParsedDocument | null = $state(null);
+let loadingCourse = $state(false);
+let courseError: string | null = $state(null);
+let search = $state('');
 
 // Schedule navigation state
-let selectedTerm: number | null = null;
-let selectedWeek: number | null = null;
-let selectedLesson: Lesson | null = null;
-let selectedLessonContent: WeeklyLessonContent | null = null;
+let selectedLesson: Lesson | null = $state(null);
+let selectedLessonContent: WeeklyLessonContent | null = $state(null);
+let showingOverview = $state(true); // Start with overview by default
 
 async function loadSubjects() {
   loading = true;
@@ -60,8 +59,6 @@ async function loadCourseContent(subject: Subject) {
   courseError = null;
   coursePayload = null;
   parsedDocument = null;
-  selectedTerm = null;
-  selectedWeek = null;
   selectedLesson = null;
   selectedLessonContent = null;
   
@@ -94,20 +91,28 @@ async function loadCourseContent(subject: Subject) {
 
 async function selectSubject(subject: Subject) {
   selectedSubject = subject;
+  showingOverview = true; // Reset to overview when selecting a new subject
+  selectedLesson = null;
+  selectedLessonContent = null;
   await loadCourseContent(subject);
 }
 
 function selectLesson(termSchedule: TermSchedule, lesson: Lesson, lessonIndex: number) {
-  selectedTerm = termSchedule.t;
-  selectedWeek = termSchedule.w;
   selectedLesson = lesson;
+  showingOverview = false;
   
   // Find the corresponding weekly lesson content
-  if (coursePayload?.w && coursePayload.w[termSchedule.n] && coursePayload.w[termSchedule.n][lessonIndex]) {
+  if (coursePayload?.w?.[termSchedule.n]?.[lessonIndex]) {
     selectedLessonContent = coursePayload.w[termSchedule.n][lessonIndex];
   } else {
     selectedLessonContent = null;
   }
+}
+
+function selectOverview() {
+  showingOverview = true;
+  selectedLesson = null;
+  selectedLessonContent = null;
 }
 
 function subjectMatches(subj: Subject) {
@@ -136,12 +141,12 @@ function handleToggleFolder(event: CustomEvent<string>) {
   expandedFolders[event.detail] = !expandedFolders[event.detail];
 }
 
-function handleSelectLesson(event: CustomEvent<{
-  termSchedule: TermSchedule;
-  lesson: Lesson;
-  lessonIndex: number;
-}>) {
-  selectLesson(event.detail.termSchedule, event.detail.lesson, event.detail.lessonIndex);
+function handleSelectLesson(data: { termSchedule: TermSchedule; lesson: Lesson; lessonIndex: number }) {
+  selectLesson(data.termSchedule, data.lesson, data.lessonIndex);
+}
+
+function handleSelectOverview() {
+  selectOverview();
 }
 
 function getQueryParams() {
@@ -163,8 +168,6 @@ async function autoSelectFromQuery() {
   courseError = null;
   coursePayload = null;
   parsedDocument = null;
-  selectedTerm = null;
-  selectedWeek = null;
   selectedLesson = null;
   selectedLessonContent = null;
   try {
@@ -187,7 +190,7 @@ async function autoSelectFromQuery() {
     }
     // Find the lesson closest to the date
     if (coursePayload?.d && coursePayload?.w) {
-      let closest = { termSchedule: null, lesson: null, lessonIndex: -1, diff: Infinity };
+      let closest: { termSchedule: TermSchedule | null, lesson: Lesson | null, lessonIndex: number, diff: number } = { termSchedule: null, lesson: null, lessonIndex: -1, diff: Infinity };
       const targetDate = new Date(date);
       coursePayload.d.forEach((termSchedule, termIdx) => {
         termSchedule.l.forEach((lesson, lessonIndex) => {
@@ -248,7 +251,10 @@ onMount(async () => {
         <ScheduleSidebar
           schedule={coursePayload.d}
           {selectedLesson}
-          on:selectLesson={handleSelectLesson}
+          {showingOverview}
+          {coursePayload}
+          onSelectLesson={handleSelectLesson}
+          onSelectOverview={handleSelectOverview}
         />
 
         <!-- Main Content -->
@@ -256,6 +262,7 @@ onMount(async () => {
           {coursePayload}
           {parsedDocument}
           {selectedLessonContent}
+          {showingOverview}
         />
       {:else}
         <div class="flex justify-center items-center w-full">

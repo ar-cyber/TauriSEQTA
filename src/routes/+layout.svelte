@@ -649,7 +649,7 @@
 									</div>
 									<button
 										onclick={startLogin}
-										class="flex justify-center items-center py-2 w-11/12 font-semibold rounded-lg transition-transform duration-300 hover:scale-105"
+										class="flex justify-center items-center py-2 w-11/12 font-semibold rounded-lg transition-transform duration-300"
 										style="background: #8b5cf6; color: white;"
 									>
 										<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />

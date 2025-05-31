@@ -168,4 +168,6 @@ export interface LinkPreview {
   description: string;
   image: string;
   url: string;
+  imageWidth?: number;
+  imageHeight?: number;
 } 
