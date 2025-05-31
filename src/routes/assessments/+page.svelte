@@ -255,7 +255,49 @@
 		}
 	});
 
-	onMount(loadAssessments);
+	function getQueryParams() {
+		const params = new URLSearchParams(window.location.search);
+		return {
+			code: params.get('code'),
+			date: params.get('date'),
+		};
+	}
+
+	function highlightAssessmentFromQuery() {
+		const { code, date } = getQueryParams();
+		if (!code || !date) return;
+		// Find the assessment with the matching code and closest due date
+		let closest = null;
+		let minDiff = Infinity;
+		const targetDate = new Date(date);
+		for (const a of upcomingAssessments) {
+			if (a.code !== code) continue;
+			const dueDate = new Date(a.due);
+			const diff = Math.abs(dueDate.getTime() - targetDate.getTime());
+			if (diff < minDiff) {
+				closest = a;
+				minDiff = diff;
+			}
+		}
+		if (closest) {
+			// Try to find the DOM element for this assessment and scroll/highlight
+			setTimeout(() => {
+				const selector = `[data-assessment-id="${closest.id}"]`;
+				const el = document.querySelector(selector);
+				if (el) {
+					el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					el.classList.add('highlight-subject');
+					setTimeout(() => el.classList.remove('highlight-subject'), 1500);
+				}
+			}, 300);
+		}
+	}
+
+	const originalOnMount = onMount;
+	onMount(async () => {
+		await loadAssessments();
+		highlightAssessmentFromQuery();
+	});
 </script>
 
 <div class="p-4 sm:p-6 space-y-6">
@@ -393,7 +435,7 @@
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-								<div class="p-4 rounded-xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+								<div class="p-4 rounded-xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10" data-assessment-id={assessment.id}>
 									<div class="flex items-start justify-between gap-4">
 										<div class="flex-1 min-w-0">
 											<div class="flex items-center gap-2 mb-1">

@@ -532,10 +532,7 @@
                       class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:bg-indigo-500/30 text-slate-300 hover:text-white border-slate-700/50 hover:border-indigo-500/50"
                       aria-label="View Assessment"
                       onclick={() =>
-                        (location.href = buildAssessmentURL(
-                          lesson.programmeID,
-                          lesson.metaID
-                        ))}
+                        (location.href = `/assessments?code=${lesson.code}&date=${lesson.date}`)}
                     >
                       <Icon src={DocumentText} class="w-5 h-5" />
                     </button>
