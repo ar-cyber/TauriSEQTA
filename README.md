@@ -59,7 +59,7 @@ npm run tauri dev
 > Do NOT run `npm run dev` as it starts the backend webui only; the pages loaded by DesQTA are built to be run by a framework not present in regular browsers. This is the same with `npm run build`; it will only build the webpage files, not the app.
 
 > [!IMPORTANT]  
-> To run the dev script you **<ins>MUST</ins>** have both [rust, cargo (included with rust)](https://www.rust-lang.org/tools/install) and pnpm (`npm install -g pnpm`) on your system or it will not build.
+> To run the dev script you **<ins>MUST</ins>** have [rust, cargo (included with rust)](https://www.rust-lang.org/tools/install) and pnpm (`npm install -g pnpm`) on your system or it will not build.
 >
 
 > [!CAUTION]
