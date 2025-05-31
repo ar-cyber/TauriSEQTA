@@ -1,23 +1,18 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { seqtaFetch } from '../../utils/seqtaFetch';
-
-interface Subject {
-  code: string;
-  classunit: number;
-  description: string;
-  metaclass: number;
-  title: string;
-  programme: number;
-  marksbook_type: string;
-}
-interface Folder {
-  code: string;
-  subjects: Subject[];
-  description: string;
-  active?: number;
-  id: number;
-}
+import SubjectSidebar from './components/SubjectSidebar.svelte';
+import ScheduleSidebar from './components/ScheduleSidebar.svelte';
+import CourseContent from './components/CourseContent.svelte';
+import type { 
+  Subject, 
+  Folder, 
+  CoursePayload, 
+  ParsedDocument,
+  Lesson,
+  TermSchedule,
+  WeeklyLessonContent 
+} from './types';
 
 let folders: Folder[] = [];
 let activeSubjects: Subject[] = [];
@@ -27,7 +22,17 @@ let error: string | null = null;
 
 let expandedFolders: Record<string, boolean> = {};
 let selectedSubject: Subject | null = null;
+let coursePayload: CoursePayload | null = null;
+let parsedDocument: ParsedDocument | null = null;
+let loadingCourse = false;
+let courseError: string | null = null;
 let search = '';
+
+// Schedule navigation state
+let selectedTerm: number | null = null;
+let selectedWeek: number | null = null;
+let selectedLesson: Lesson | null = null;
+let selectedLessonContent: WeeklyLessonContent | null = null;
 
 async function loadSubjects() {
   loading = true;
@@ -50,12 +55,59 @@ async function loadSubjects() {
   }
 }
 
-function toggleFolder(code: string) {
-  expandedFolders[code] = !expandedFolders[code];
+async function loadCourseContent(subject: Subject) {
+  loadingCourse = true;
+  courseError = null;
+  coursePayload = null;
+  parsedDocument = null;
+  selectedTerm = null;
+  selectedWeek = null;
+  selectedLesson = null;
+  selectedLessonContent = null;
+  
+  try {
+    const res = await seqtaFetch('/seqta/student/load/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: {
+        programme: subject.programme.toString(),
+        metaclass: subject.metaclass.toString()
+      }
+    });
+    const data = JSON.parse(res);
+    coursePayload = data.payload;
+    
+    // Parse the main document JSON string
+    if (coursePayload?.document) {
+      try {
+        parsedDocument = JSON.parse(coursePayload.document);
+      } catch (e) {
+        console.error('Failed to parse document JSON:', e);
+      }
+    }
+  } catch (e) {
+    courseError = e instanceof Error ? e.message : String(e);
+  } finally {
+    loadingCourse = false;
+  }
 }
 
-function selectSubject(subject: Subject) {
+async function selectSubject(subject: Subject) {
   selectedSubject = subject;
+  await loadCourseContent(subject);
+}
+
+function selectLesson(termSchedule: TermSchedule, lesson: Lesson, lessonIndex: number) {
+  selectedTerm = termSchedule.t;
+  selectedWeek = termSchedule.w;
+  selectedLesson = lesson;
+  
+  // Find the corresponding weekly lesson content
+  if (coursePayload?.w && coursePayload.w[termSchedule.n] && coursePayload.w[termSchedule.n][lessonIndex]) {
+    selectedLessonContent = coursePayload.w[termSchedule.n][lessonIndex];
+  } else {
+    selectedLessonContent = null;
+  }
 }
 
 function subjectMatches(subj: Subject) {
@@ -75,67 +127,125 @@ function folderMatches(folder: Folder) {
   );
 }
 
+// Event handlers with proper typing
+function handleSelectSubject(event: CustomEvent<Subject>) {
+  selectSubject(event.detail);
+}
+
+function handleToggleFolder(event: CustomEvent<string>) {
+  expandedFolders[event.detail] = !expandedFolders[event.detail];
+}
+
+function handleSelectLesson(event: CustomEvent<{
+  termSchedule: TermSchedule;
+  lesson: Lesson;
+  lessonIndex: number;
+}>) {
+  selectLesson(event.detail.termSchedule, event.detail.lesson, event.detail.lessonIndex);
+}
+
 onMount(loadSubjects);
 </script>
 
 <div class="flex w-full h-full bg-black">
-  <aside class="flex flex-col w-80 h-full border-r bg-slate-950 border-slate-800">
-    <div class="px-4 py-3 border-b border-slate-800">
-      <input
-        type="text"
-        placeholder="Search subjects..."
-        bind:value={search}
-        class="px-3 py-2 w-full rounded-lg border bg-slate-800 text-slate-50 border-slate-800 focus:outline-none focus:ring focus:ring-blue-500"
-      />
-    </div>
-    <div class="overflow-y-auto flex-1">
-      {#if loading}
-        <div class="px-6 py-6 text-slate-400">Loading…</div>
-      {:else if error}
-        <div class="px-6 py-6 text-red-400">{error}</div>
-      {:else}
-        {#each activeSubjects.filter(subjectMatches) as subj}
-          <button class="px-6 py-3 w-full text-left font-bold text-base hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-blue-500' : ''}"
-            onclick={() => selectSubject(subj)}>
-            {subj.title}
-          </button>
-        {/each}
-        <div class="my-2 border-t border-slate-800"></div>
-        {#each otherFolders.filter(folderMatches) as folder}
-          <div>
-            <button class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all cursor-pointer hover:bg-slate-800 hover:border-blue-500"
-              onclick={() => toggleFolder(folder.code)}>
-              <span class="text-base font-bold">{folder.code}</span>
-              <svg class="ml-2 w-4 h-4 transition-transform duration-200 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate({expandedFolders[folder.code] ? 90 : 0}deg)">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-          </button>
-          {#if expandedFolders[folder.code]}
-            {#each folder.subjects.filter(subjectMatches) as subj}
-              <button class="pl-10 pr-6 py-2 font-medium text-sm hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-blue-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-blue-500' : ''}"
-                onclick={() => selectSubject(subj)}>
-                {subj.title}
-              </button>
-            {/each}
-          {/if}
-          </div>
-        {/each}
-      {/if}
-    </div>
-  </aside>
-  <div class="flex-1 p-8 bg-black">
+  <!-- Subject Selection Sidebar -->
+  <SubjectSidebar
+    bind:search
+    {loading}
+    {error}
+    {activeSubjects}
+    {otherFolders}
+    {selectedSubject}
+    {expandedFolders}
+    {subjectMatches}
+    {folderMatches}
+    on:selectSubject={handleSelectSubject}
+    on:toggleFolder={handleToggleFolder}
+  />
+
+  <!-- Course Content Area -->
+  <div class="flex flex-1 h-full">
     {#if selectedSubject}
-      <div class="p-8 mx-auto max-w-xl rounded-xl shadow-lg bg-slate-900">
-        <h2 class="mb-2 text-2xl font-bold">{selectedSubject.title}</h2>
-        <div class="mb-4 text-slate-400">{selectedSubject.description}</div>
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div><span class="font-semibold">Code:</span> {selectedSubject.code}</div>
-          <div><span class="font-semibold">Class Unit:</span> {selectedSubject.classunit}</div>
-          <div><span class="font-semibold">Programme:</span> {selectedSubject.programme}</div>
-          <div><span class="font-semibold">Metaclass:</span> {selectedSubject.metaclass}</div>
-          <div><span class="font-semibold">Marksbook Type:</span> {selectedSubject.marksbook_type}</div>
+      {#if loadingCourse}
+        <div class="flex justify-center items-center w-full">
+          <div class="text-slate-400 text-lg">Loading course content...</div>
         </div>
+      {:else if courseError}
+        <div class="flex justify-center items-center w-full">
+          <div class="text-red-400 text-lg">Error loading course: {courseError}</div>
+        </div>
+      {:else if coursePayload}
+        <!-- Schedule Navigation -->
+        <ScheduleSidebar
+          schedule={coursePayload.d}
+          {selectedLesson}
+          on:selectLesson={handleSelectLesson}
+        />
+
+        <!-- Main Content -->
+        <CourseContent
+          {coursePayload}
+          {parsedDocument}
+          {selectedLessonContent}
+        />
+      {:else}
+        <div class="flex justify-center items-center w-full">
+          <div class="text-slate-400 text-lg">No course content available</div>
+        </div>
+      {/if}
+    {:else}
+      <div class="flex justify-center items-center w-full">
+        <div class="text-slate-400 text-lg">Select a subject to view course content</div>
       </div>
     {/if}
   </div>
-</div> 
+</div>
+
+<style>
+  :global(.course-content) {
+    @apply w-full h-full;
+  }
+  
+  /* Style the course content to match the screenshot */
+  :global(.course-content h1) {
+    @apply text-3xl font-bold text-white bg-blue-500 p-6 rounded-t-xl m-4 mb-0;
+  }
+  
+  :global(.course-content h2) {
+    @apply text-xl font-bold text-white bg-blue-500 p-4 rounded-xl m-4 mb-2;
+  }
+  
+  :global(.course-content p) {
+    @apply text-slate-300 px-4 py-2;
+  }
+  
+  :global(.course-content .section) {
+    @apply m-4 bg-slate-900 rounded-xl overflow-hidden;
+  }
+  
+  :global(.course-content a) {
+    @apply text-blue-400 hover:text-blue-300 transition-colors;
+  }
+  
+  :global(.course-content img) {
+    @apply max-w-full h-auto rounded-lg;
+  }
+  
+  /* File/document styling */
+  :global(.course-content .file-item) {
+    @apply bg-slate-800 rounded-lg p-4 m-2 hover:bg-slate-700 transition-colors cursor-pointer;
+  }
+  
+  :global(.course-content .file-grid) {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4;
+  }
+  
+  /* Make embedded content responsive */
+  :global(.course-content iframe) {
+    @apply w-full rounded-lg;
+  }
+  
+  :global(.course-content video) {
+    @apply w-full rounded-lg;
+  }
+</style> 
