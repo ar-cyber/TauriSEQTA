@@ -45,12 +45,16 @@ Clone the repo:
 ```bash
 git clone --branch develop https://github.com/betterseqta/desqta 
 ```
+Run the program:
+```bash
+npm run start
+```
+
+# Optionally run both commands manually:
 Install modules
 ```bash
 npm i # or your preferred like pnpm or yarn
 ```
-
-### Running Development
 Run the script
 ```
 npm run tauri dev
