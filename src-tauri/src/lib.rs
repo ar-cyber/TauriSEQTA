@@ -25,11 +25,14 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+        .plugin(tauri_plugin_deep_link::init());
+
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             println!("[Desqta] Single instance event: {:?}", argv);
             
             // Handle deep link in single instance
@@ -66,8 +69,8 @@ pub fn run() {
                                     },
                                     _ => {
                                         println!("[Desqta] Unknown parameter: {}", key);
-                        }
-                    }
+                                    }
+                                }
                             } else {
                                 println!("[Desqta] Invalid parameter format: {}", param);
                             }
@@ -93,7 +96,10 @@ pub fn run() {
                     }
                 }
             }
-        }))
+        }));
+    }
+
+    builder
         .setup(|app| {
             println!("[Desqta] Running setup, registering deep link handler...");
 
