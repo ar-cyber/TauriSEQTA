@@ -100,18 +100,6 @@ pub fn run() {
     }
 
     builder
-        .setup(|app| {
-            println!("[Desqta] Running setup, registering deep link handler...");
-
-            // Register all deep links unconditionally
-            {
-                use tauri_plugin_deep_link::DeepLinkExt;
-                let _ = app.deep_link().register_all();
-                println!("[Desqta] Registered all pre-defined deep links (unconditionally)");
-            }
-
-            Ok(())
-        })
         .invoke_handler(tauri::generate_handler![
             greet,
             netgrab::get_api_data,
