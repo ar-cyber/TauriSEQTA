@@ -4,6 +4,10 @@
 
 :root {
 	--primary-color: #3b82f6;
+	--accent-color: #3b82f6;
+	--accent-color-hover: #2563eb;
+	--accent-color-light: #93c5fd;
+	--accent-color-dark: #1e40af;
 	//--background: #121212;
 	//--surface: #18191c;
 	//--surface-alt: #232428;
@@ -41,4 +45,37 @@ body {
 /* Make calendar icon in date inputs white on dark backgrounds */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
+}
+
+/* Dynamic accent color classes */
+.accent-bg {
+  background-color: var(--accent-color);
+}
+
+.accent-bg-hover:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.accent-text {
+  color: var(--accent-color);
+}
+
+.accent-border {
+  border-color: var(--accent-color);
+}
+
+.accent-ring {
+  --tw-ring-color: var(--accent-color);
+}
+
+.accent-shadow {
+  box-shadow: 0 0 15px var(--accent-color);
+}
+
+/* Update accent color variables when the store changes */
+:root[data-accent-color] {
+  --accent-color: var(--accent-color-value);
+  --accent-color-hover: color-mix(in srgb, var(--accent-color-value) 90%, black);
+  --accent-color-light: color-mix(in srgb, var(--accent-color-value) 20%, white);
+  --accent-color-dark: color-mix(in srgb, var(--accent-color-value) 90%, black);
 } 

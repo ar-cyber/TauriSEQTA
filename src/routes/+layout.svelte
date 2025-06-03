@@ -6,6 +6,7 @@
 
 	import { onMount } from 'svelte';
 	import '../app.css';
+	import { accentColor, loadAccentColor } from '../lib/stores/theme';
 	import {
 		Icon,
 		Home,
@@ -255,18 +256,22 @@
 	}
 
 	onMount(async () => {
-		await loadWeatherSettings();
+		await Promise.all([
+			checkSession(),
+			loadWeatherSettings(),
+			loadAccentColor()
+		]);
 		if (weatherEnabled) {
 			if (forceUseLocation) fetchWeather();
 			else fetchWeatherWithIP();
-		} 
+		}
 	});
 
 	$effect(() => {
-		if (weatherEnabled) {
-			if (forceUseLocation) fetchWeather();
-			else fetchWeatherWithIP();
-		} 	});
+		// Update the root element's data attribute with the current accent color
+		document.documentElement.setAttribute('data-accent-color', '');
+		document.documentElement.style.setProperty('--accent-color-value', $accentColor);
+	});
 
 	onMount(() => {
 		const checkMobile = () => {

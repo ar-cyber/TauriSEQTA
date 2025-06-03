@@ -305,19 +305,19 @@
 		<h1 class="text-2xl font-bold text-white">Assessments</h1>
 		<div class="flex gap-2">
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'list' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'list' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'list'}
 			>
 				List View
 			</button>
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'board' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'board' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'board'}
 			>
 				Board View
 			</button>
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'calendar' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'calendar' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'calendar'}
 			>
 				Calendar View
@@ -453,7 +453,7 @@
 											</div>
 											<a 
 												href="/assessments/{assessment.id}/{assessment.metaclass}" 
-												class="px-3 py-1 text-sm font-medium rounded-lg bg-blue-600 text-white transition-all duration-200 hover:bg-blue-500 hover:scale-105"
+												class="px-3 py-1 text-sm font-medium rounded-lg accent-bg text-white transition-all duration-200 hover:accent-bg-hover hover:scale-105"
 											>
 												View Details
 											</a>

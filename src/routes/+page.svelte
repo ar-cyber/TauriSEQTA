@@ -448,13 +448,13 @@
         <div class="flex gap-3">
           <button
             onclick={prevDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:bg-indigo-500/20 text-slate-400 hover:text-indigo-300 border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_10px_rgba(99,102,241,0.2)]"
+            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:accent-bg-hover text-slate-400 hover:text-white border border-slate-700/50 hover:accent-border hover:accent-shadow"
           >
             <Icon src={ChevronLeft} class="w-5 h-5" />
           </button>
           <button
             onclick={nextDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:bg-indigo-500/20 text-slate-400 hover:text-indigo-300 border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_10px_rgba(99,102,241,0.2)]"
+            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:accent-bg-hover text-slate-400 hover:text-white border border-slate-700/50 hover:accent-border hover:accent-shadow"
           >
             <Icon src={ChevronRight} class="w-5 h-5" />
           </button>
@@ -529,7 +529,7 @@
                 {#if lesson.programmeID !== 0}
                   <div class="flex gap-3">
                     <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:bg-indigo-500/30 text-slate-300 hover:text-white border-slate-700/50 hover:border-indigo-500/50"
+                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:accent-bg-hover text-slate-300 hover:text-white border-slate-700/50 hover:accent-border"
                       aria-label="View Assessment"
                       onclick={() =>
                         (location.href = `/assessments?code=${lesson.code}&date=${lesson.date}`)}
@@ -537,7 +537,7 @@
                       <Icon src={DocumentText} class="w-5 h-5" />
                     </button>
                     <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:bg-indigo-500/30 text-slate-300 hover:text-white border-slate-700/50 hover:border-indigo-500/50"
+                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:accent-bg-hover text-slate-300 hover:text-white border-slate-700/50 hover:accent-border"
                       aria-label="View Course"
                       onclick={() =>
                         (location.href = `/courses?code=${lesson.code}&date=${lesson.date}`)}
@@ -563,7 +563,7 @@
         <h3 class="text-xl font-semibold text-white">Notices</h3>
         <a
           href="/notices"
-          class="px-3 py-1.5 text-nowrap text-sm text-indigo-200 rounded-lg transition-all duration-300 hover:bg-indigo-500/20 hover:text-white"
+          class="px-3 py-1.5 text-nowrap text-sm accent-text rounded-lg transition-all duration-300 hover:accent-bg-hover hover:text-white"
         >
           View all
           <Icon src={ArrowTopRightOnSquare} class="inline ml-1 w-4 h-4" />

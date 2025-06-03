@@ -2,6 +2,7 @@
 import { onMount } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
 import { notify } from '../../utils/notify';
+import { accentColor, loadAccentColor, updateAccentColor } from '../../lib/stores/theme';
 
 interface Shortcut {
   name: string;
@@ -23,13 +24,14 @@ let remindersEnabled = true;
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean}>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean, accent_color: string}>('get_settings');
     shortcuts = settings.shortcuts || [];
     weatherEnabled = settings.weather_enabled ?? false;
     forceUseLocation = settings.force_use_location ?? false;
     weatherCity = settings.weather_city ?? '';
     weatherCountry = settings.weather_country ?? '';
     remindersEnabled = settings.reminders_enabled ?? true;
+    accentColor.set(settings.accent_color ?? '#3b82f6');
 
     console.log('Loading settings', {
     shortcuts,
@@ -46,6 +48,7 @@ async function loadSettings() {
     weatherCity = '';
     weatherCountry = '';
     remindersEnabled = true;
+    accentColor.set('#3b82f6');
   }
   loading = false;
 }
@@ -63,7 +66,17 @@ async function saveSettings() {
     forceUseLocation
   });
   try {
-    await invoke('save_settings', { newSettings: { shortcuts, weather_enabled: weatherEnabled, weather_city: weatherCity, weather_country: weatherCountry, reminders_enabled: remindersEnabled, force_use_location: forceUseLocation} });
+    await invoke('save_settings', { 
+      newSettings: { 
+        shortcuts, 
+        weather_enabled: weatherEnabled, 
+        weather_city: weatherCity, 
+        weather_country: weatherCountry, 
+        reminders_enabled: remindersEnabled, 
+        force_use_location: forceUseLocation,
+        accent_color: $accentColor
+      }
+    });
     saveSuccess = true;
     setTimeout(() => location.reload(), 1500)
   } catch (e) {
@@ -151,7 +164,7 @@ onMount(loadSettings);
                   <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeShortcut(idx)} title="Remove">✕</button>
                 </div>
               {/each}
-              <button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addShortcut}>Add Shortcut</button>
+              <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addShortcut}>Add Shortcut</button>
             </div>
           </div>
           <!-- Widget Settings -->
@@ -193,8 +206,25 @@ onMount(loadSettings);
           <div>
             <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Theme</h3>
             <p class="mb-4 text-xs sm:text-sm text-slate-400">Choose your preferred color scheme and theme settings.</p>
-            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
-              <p class="text-xs sm:text-sm text-slate-400">Theme settings coming soon...</p>
+            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in space-y-4">
+              <div class="flex flex-col gap-2">
+                <label for="accent-color" class="text-sm text-slate-200">Accent Color</label>
+                <div class="flex gap-2 items-center">
+                  <input 
+                    type="color" 
+                    id="accent-color" 
+                    bind:value={$accentColor}
+                    class="w-12 h-12 rounded-lg cursor-pointer bg-transparent accent-border border"
+                  />
+                  <input 
+                    type="text" 
+                    bind:value={$accentColor}
+                    class="flex-1 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    placeholder="#3b82f6"
+                  />
+                </div>
+                <p class="text-xs text-slate-400">This color will be used throughout the app for buttons, links, and other interactive elements.</p>
+              </div>
             </div>
           </div>
           <!-- Layout Settings -->
@@ -220,7 +250,7 @@ onMount(loadSettings);
               <input id="reminders-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={remindersEnabled} />
               <label for="reminders-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Enable assessment reminder notifications</label>
             </div>
-            <button class="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={sendTestNotification}>
+            <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={sendTestNotification}>
               Send Test Notification
             </button>
           </div>
@@ -236,7 +266,7 @@ onMount(loadSettings);
         <div class="p-4 sm:p-6">
           <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
             <p class="text-xs sm:text-sm text-slate-400 mb-4">Install additional features and customizations from our plugin store.</p>
-            <a href="/settings/plugins" class="inline-block w-full sm:w-auto text-center px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow">
+            <a href="/settings/plugins" class="inline-block w-full sm:w-auto text-center px-6 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow">
               Open Plugin Store
             </a>
           </div>
