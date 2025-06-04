@@ -156,7 +156,7 @@ pub struct FeedResponse {
     items: Vec<FeedItem>,
 }
 #[tauri::command]
-pub async fn get_rss_feed(feed: &str) -> Result<Vec<FeedItem>, String> {
+pub async fn get_rss_feed(feed: &str) -> Result<FeedResponse, String> {
     let client = Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
         .build()
