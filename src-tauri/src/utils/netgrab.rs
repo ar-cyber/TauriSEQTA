@@ -2,6 +2,8 @@ use reqwest;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+use std::error::Error;
+use rss::Channel;
 
 #[path = "../utils/session.rs"]
 mod session;
