@@ -100,7 +100,7 @@
         messages = rss.map((msg: any) => ({
           id: msg.title,
           folder: 'RSS Feeds',
-          sender: msg.title,
+          sender: rss.title,
           to: 'You',
           subject: msg.title,
           preview: msg.title + (false ? ' (Attachment)' : ''),

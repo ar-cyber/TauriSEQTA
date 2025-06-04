@@ -150,7 +150,11 @@ pub struct FeedItem {
     description: Option<String>,
     pub_date: Option<String>,
 }
-
+#[derive(Serialize)]
+pub struct FeedResponse {
+    title: String,
+    items: Vec<FeedItem>,
+}
 #[tauri::command]
 pub async fn get_rss_feed(feed: &str) -> Result<Vec<FeedItem>, String> {
     let client = Client::builder()
@@ -180,6 +184,8 @@ pub async fn get_rss_feed(feed: &str) -> Result<Vec<FeedItem>, String> {
     let channel = Channel::read_from(content.as_bytes())
         .map_err(|e| format!("Failed to parse RSS feed: {}", e))?;
 
+    let feed_title = channel.title().to_string();
+
     let items: Vec<FeedItem> = channel
         .items()
         .iter()
@@ -191,7 +197,10 @@ pub async fn get_rss_feed(feed: &str) -> Result<Vec<FeedItem>, String> {
         })
         .collect();
 
-    Ok(items)
+    Ok(FeedResponse {
+        title: channel.title().to_string(),
+        items,
+    })
 }
 
 
