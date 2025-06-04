@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
-  import { seqtaFetch } from "../utils/seqtaFetch";
+  import { seqtaFetch } from "../utils/netUtil";
   import { cache } from "../utils/cache";
   import {
     Icon,

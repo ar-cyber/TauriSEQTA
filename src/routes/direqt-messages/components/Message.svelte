@@ -3,7 +3,7 @@
   import { PencilSquare, Trash, Star, ArrowUturnLeft } from "svelte-hero-icons";
   import type { Message } from "../types";
   import DOMPurify from "dompurify";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
 
   let {
     selectedMessage,
@@ -33,13 +33,7 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
-  // Configure DOMPurify to add target="_blank" to all links
-  DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-    if (node.tagName === 'A' && node.getAttribute('href')) {
-      node.setAttribute('target', '_blank');
-      node.setAttribute('rel', 'noopener noreferrer');
-    }
-  });
+
 
   function updateIframeContent() {
     if (!selectedMessage || !iframe || !iframe.contentWindow) return;

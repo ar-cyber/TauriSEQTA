@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { seqtaFetch } from '../../utils/seqtaFetch';
+  import { onMount, onDestroy } from 'svelte';
+  import { seqtaFetch, getRSS } from '../../utils/netUtil';
   import { type Message, type Folder } from './types';
   import { cache } from '../../utils/cache';
 
@@ -10,6 +10,12 @@
   import MessageDetail from './components/Message.svelte';
   import ComposeModal from './components/ComposeModal.svelte';
 
+  // External Libraries
+  import dayjs from 'dayjs';
+
+
+
+	
   let messages = $state<Message[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
@@ -30,6 +36,7 @@
   async function fetchMessages(folderLabel: string = 'inbox') {
     loading = true;
     error = null;
+    console.log(folderLabel)
     try {
       if (folderLabel === 'sent') {
         // Fetch both sent and outbox, then combine
@@ -86,6 +93,20 @@
           unread: !msg.read
         }));
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
+      } else if (folderLabel === "rss"){
+        const rss = await getRSS("https://www.adelaidemetro.com.au/announcements/rss")
+        console.log(rss)
+        
+        messages = rss.map((msg: any) => ({
+          id: msg.title,
+          folder: 'RSS Feeds',
+          sender: msg.title,
+          to: 'You',
+          subject: msg.title,
+          preview: msg.title + (false ? ' (Attachment)' : ''),
+          date: dayjs(msg.pub_date).format('YYYY-MM-DD HH:mm:ss'),
+          body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
+        }));
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
@@ -103,9 +124,11 @@
             }
           }
         );
+        
         const data = typeof response === 'string' ? JSON.parse(response) : response;
         if (data?.payload?.messages) {
-          messages = data.payload.messages.map((msg: any) => ({
+          messages = data.payload.messages.map((msg: any) => (
+            {
             id: msg.id,
             folder: folderLabel.charAt(0).toUpperCase() + folderLabel.slice(1),
             sender: msg.sender,
@@ -165,6 +188,8 @@
         msg.body = data.payload.contents;
         // Cache the message content for 24 hours
         cache.set(cacheKey, msg.body, 1440); // 24 hours TTL
+      } else if (selectedFolder === 'RSS Feeds') {
+        msg.body = msg.body
       } else {
         msg.body = '<em>No content.</em>';
       }
@@ -187,6 +212,7 @@
     else if (folder === 'Sent') fetchMessages('sent');
     else if (folder === 'Starred') fetchMessages('starred');
     else if (folder === 'Trash') fetchMessages('trash');
+    else if (folder === 'RSS Feeds') fetchMessages('rss');
   }
 
   function openCompose() {

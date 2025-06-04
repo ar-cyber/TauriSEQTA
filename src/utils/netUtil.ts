@@ -24,3 +24,17 @@ export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promis
         throw new Error(error instanceof Error ? error.message : 'Unknown fetch error');
     }
 }
+
+export async function getRSS(url: string): Promise<any> {
+    try {
+        const response = await invoke('get_rss_feed', {
+            feed: url
+        })
+        return response;
+    }
+    catch (error) {
+        console.error('getRSS error:', error);
+        throw new Error(error instanceof Error ? error.message : 'Unknown fetch error');
+    }
+}
+

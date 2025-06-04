@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/core';
 	import { emit, listen } from '@tauri-apps/api/event'
-	import { seqtaFetch } from '../utils/seqtaFetch';
+	import { seqtaFetch } from '../utils/netUtil';
 	import { cache } from '../utils/cache';
 
 	import { onMount } from 'svelte';

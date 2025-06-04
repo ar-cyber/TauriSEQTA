@@ -11,11 +11,11 @@ mod netgrab;
 #[path = "utils/settings.rs"]
 mod settings;
 
-use tauri_plugin_notification;
-use tauri_plugin_deep_link::DeepLinkExt;
-use urlencoding::decode;
-use tauri_plugin_single_instance;
 use tauri::Manager;
+use tauri_plugin_deep_link::DeepLinkExt;
+use tauri_plugin_notification;
+use tauri_plugin_single_instance;
+use urlencoding::decode;
 
 /// Boilerplate example command
 #[tauri::command]
@@ -26,6 +26,7 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_deep_link::init());
@@ -103,6 +104,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             netgrab::get_api_data,
+            netgrab::get_rss_feed,
             netgrab::post_api_data,
             netgrab::fetch_api_data,
             login::check_session_exists,

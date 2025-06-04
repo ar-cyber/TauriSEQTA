@@ -14,7 +14,8 @@
     { name: 'Inbox' as Folder, icon: Inbox },
     { name: 'Sent' as Folder, icon: PaperAirplane },
     { name: 'Starred' as Folder, icon: Star },
-    { name: 'Trash' as Folder, icon: Trash }
+    { name: 'Trash' as Folder, icon: Trash },
+    { name: 'RSS Feeds' as Folder, icon: Inbox}
   ];
 </script>
 

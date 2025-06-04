@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import { seqtaFetch } from '../../utils/seqtaFetch';
+import { seqtaFetch } from '../../utils/netUtil';
 import SubjectSidebar from './components/SubjectSidebar.svelte';
 import ScheduleSidebar from './components/ScheduleSidebar.svelte';
 import CourseContent from './components/CourseContent.svelte';

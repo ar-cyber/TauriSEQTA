@@ -11,4 +11,4 @@ export interface Message {
   starred?: boolean;
 }
 
-export type Folder = 'Inbox' | 'Sent' | 'Starred' | 'Trash'; 
+export type Folder = 'Inbox' | 'Sent' | 'Starred' | 'Trash' | 'RSS Feeds'; 
