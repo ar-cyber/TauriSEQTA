@@ -141,7 +141,7 @@ async fn get_feed(feed: &str) -> Result<Channel, Box<dyn Error>> {
         .bytes()
         .await?;
     let channel = Channel::read_from(&content[..])?;
-    println!(channel);
+    println!("{}", channel);
     Ok(channel)
 }
 
