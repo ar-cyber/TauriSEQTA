@@ -132,6 +132,16 @@ pub async fn get_api_data(
 ) -> Result<String, String> {
     fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters)).await
 }
+#[tauri::command]
+async fn get_feed(feed: &str) -> Result<Channel, Box<dyn Error>> {
+    let content = reqwest::get(feed)
+        .await?
+        .bytes()
+        .await?;
+    let channel = Channel::read_from(&content[..])?;
+    println(channel);
+    Ok(channel)
+}
 
 #[tauri::command]
 pub async fn post_api_data(
