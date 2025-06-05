@@ -97,7 +97,7 @@
         const rss = await getRSS("https://www.adelaidemetro.com.au/announcements/rss")
         console.log(rss)
         
-        messages = rss.map((msg: any) => ({
+        messages = rss.items?.map((msg: any) => ({
           id: msg.title,
           folder: 'RSS Feeds',
           sender: rss.title,
