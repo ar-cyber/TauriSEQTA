@@ -7,7 +7,7 @@ use serde_json::{json, Value};
 use std::io::Cursor;
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
-
+use url::Url;
 // opens a file using the default program:
 
 #[path = "../utils/session.rs"]
@@ -260,6 +260,41 @@ pub fn channel_to_json(channel: &Channel) -> Result<Value> {
     }
 
     Ok(root_json)
+}
+
+/// Open a login window and harvest the cookie once the user signs in.
+#[tauri::command]
+pub async fn open_url(app: tauri::AppHandle, url: String) -> Result<(), String>{
+    use tauri::{WebviewUrl, WebviewWindowBuilder};
+
+    let http_url;
+
+    match url.starts_with("https://") {
+        true => http_url = url.clone(),
+        false => {
+            http_url = format!("https://{}", url.clone());
+        }
+    }
+
+    let parsed_url = match Url::parse(&http_url) {
+        Ok(u) => u,
+        Err(e) => return Err(format!("Invalid URL: {}", e))
+    };
+
+    let full_url: Url = match Url::parse(&format!("{}", parsed_url)) {
+        Ok(u) => u,
+        Err(e) => return Err(format!("Invalid URL: {}", e))// Nothing
+
+    };
+
+    // Spawn the login window
+    WebviewWindowBuilder::new(&app, "seqta_login", WebviewUrl::External(full_url.clone()))
+        .title("SEQTA Login")
+        .inner_size(900.0, 700.0)
+        .build()
+        .map_err(|e| format!("Failed to build window: {}", e))?;
+    Ok(())
+
 }
 
 #[tauri::command]

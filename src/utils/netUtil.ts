@@ -38,3 +38,16 @@ export async function getRSS(url: string): Promise<any> {
     }
 }
 
+export async function openURL(url: string): Promise<any> {
+    try {
+        const response = await invoke('open_url', {
+            url: url
+        })
+    }
+    catch (error) {
+        console.error('openURL error:', error);
+        throw new Error(error instanceof Error ? error.message : 'Unknown fetch error');
+    }
+}
+
+

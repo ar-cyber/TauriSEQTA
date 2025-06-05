@@ -2,8 +2,9 @@
   import { Icon } from "svelte-hero-icons";
   import { PencilSquare, Trash, Star, ArrowUturnLeft } from "svelte-hero-icons";
   import type { Message } from "../types";
+  import {openURL} from '../../../utils/netUtil'
   import DOMPurify from "dompurify";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
 
   let {
     selectedMessage,
@@ -33,7 +34,15 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
-
+  onMount(() => {
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        openURL(link.href);
+      });
+    });
+  });
 
   function updateIframeContent() {
     if (!selectedMessage || !iframe || !iframe.contentWindow) return;

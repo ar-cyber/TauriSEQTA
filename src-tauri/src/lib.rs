@@ -104,6 +104,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             netgrab::get_api_data,
+            netgrab::open_url,
             netgrab::get_rss_feed,
             netgrab::post_api_data,
             netgrab::fetch_api_data,
