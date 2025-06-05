@@ -114,7 +114,7 @@
             date: date,
             body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${description}`,
           }
-        }))
+        })).sort((a, b) => b.date.localeCompare(a.date))
         console.log(rssfeeddata)
         messages = rssfeeddata
 
