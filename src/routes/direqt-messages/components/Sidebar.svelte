@@ -3,14 +3,16 @@
   import { Plus, Inbox, PaperAirplane, Trash, Star, Rss } from 'svelte-hero-icons';
   import { getRSS } from '../../../utils/netUtil';
   import {onMount} from 'svelte';
-
+  import {invoke} from '@tauri-apps/api/core'
   let { selectedFolder, openFolder, openCompose } = $props<{
     selectedFolder: any;
     openFolder: (folder: any) => void;
     openCompose: () => void;
   }>();
 
-
+  interface Feed {
+    url: string;
+  }
   async function a() {
     // Folder definitions
     let folders = [
@@ -19,9 +21,14 @@
       { name: 'Starred', icon: Star, id: "starred" },
       { name: 'Trash', icon: Trash, id: "trash" },
     ];
-    for (let item of ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
-      let title = await getRSS(item)
-      folders.push({ name: `RSS: ${title.channel.title}`, icon: Rss, id: `rss-${item}` })
+    const feeds = await invoke<{
+        feeds: Feed[];
+      }>("get_settings");
+    console.log(feeds.feeds)
+    for (let item of feeds.feeds) {
+      console.log(item.url)
+      let title = await getRSS(item.url)
+      folders.push({ name: `RSS: ${title.channel.title}`, icon: Rss, id: `rss-${item.url}` })
     }
     return folders
   }
@@ -44,7 +51,6 @@
     {:then folders}
       <nav class="flex flex-col flex-1 gap-1 px-2 py-4">
         {#each folders as folder}
-        
           <button
             class="w-full flex items-center gap-3 px-4 sm:px-6 py-2.5 text-left text-sm sm:text-base font-medium rounded-lg transition-all duration-200 relative group
               {selectedFolder === folder.name 

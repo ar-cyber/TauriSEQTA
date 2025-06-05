@@ -10,6 +10,11 @@ interface Shortcut {
   url: string;
 }
 
+interface Feed {
+
+  url: string;
+}
+
 let shortcuts: Shortcut[] = [];
 let loading = true;
 let saving = false;
@@ -18,6 +23,7 @@ let saveError = '';
 let weatherEnabled = false;
 let forceUseLocation = false;
 let weatherCity = '';
+let feeds: Feed[] = []; 
 let weatherCountry = '';
 
 let remindersEnabled = true;
@@ -25,8 +31,9 @@ let remindersEnabled = true;
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean, accent_color: string}>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], feeds: any[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean, accent_color: string}>('get_settings');
     shortcuts = settings.shortcuts || [];
+    feeds = settings.feeds || [];
     weatherEnabled = settings.weather_enabled ?? false;
     forceUseLocation = settings.force_use_location ?? false;
     weatherCity = settings.weather_city ?? '';
@@ -44,6 +51,7 @@ async function loadSettings() {
     });
   } catch (e) {
     shortcuts = [];
+    feeds = [];
     weatherEnabled = false;
     forceUseLocation = false;
     weatherCity = '';
@@ -60,6 +68,7 @@ async function saveSettings() {
   saveError = '';
   console.log('Saving settings', {
     shortcuts,
+    feeds,
     weatherEnabled,
     weatherCity,
     weatherCountry,
@@ -69,7 +78,8 @@ async function saveSettings() {
   try {
     await invoke('save_settings', { 
       newSettings: { 
-        shortcuts, 
+        shortcuts,
+        feeds, 
         weather_enabled: weatherEnabled, 
         weather_city: weatherCity, 
         weather_country: weatherCountry, 
@@ -91,10 +101,17 @@ function addShortcut() {
   shortcuts = [...shortcuts, { name: '', icon: '', url: '' }];
 }
 
+function addFeed() {
+  feeds = [...feeds, { url: '' }];
+}
+
 function removeShortcut(idx: number) {
   shortcuts = shortcuts.filter((_, i) => i !== idx);
 }
 
+function removeFeed(idx: number) {
+  feeds = feeds.filter((_, i) => i !== idx);
+}
 async function sendTestNotification() {
   if (!remindersEnabled) {
     alert('Reminders are currently disabled. Enable them to receive notifications.');
@@ -257,7 +274,25 @@ onMount(loadSettings);
           </div>
         </div>
       </section>
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
+          <h2 class="text-base sm:text-lg font-semibold">RSS Feeds</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Add feeds to your DMs!</p>
+        </div>
+          <!-- Shortcuts -->
+          <div class="space-y-3 sm:space-y-4">
+            <div class="space-y-3 sm:space-y-4">
+              {#each feeds as feed, idx}
+                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-slate-800/50 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
 
+                  <input class="w-full sm:flex-1 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={feed.url} />
+                  <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeFeed(idx)} title="Remove">✕</button>
+                </div>
+              {/each}
+              <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addFeed}>Add Feed</button>
+            </div>
+          </div>
+      </section>
       <!-- Plugins Section -->
       <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
         <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
@@ -293,3 +328,14 @@ onMount(loadSettings);
   to { opacity: 1; }
 }
 </style> 
+
+
+<!--
+
+                  <input 
+                    type="text" 
+                    bind:value={$accentColor}
+                    class="flex-1 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    placeholder="#3b82f6"
+                  />
+-->

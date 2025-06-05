@@ -13,6 +13,7 @@
   // External Libraries
   import dayjs from 'dayjs';
 
+    
 
 
 	
@@ -96,8 +97,9 @@
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
       } else if (folderLabel.includes('rss-')){
         let rssfeeddata: any = []
+        console.log()
         let rss = await getRSS(folderLabel.replace('rss-', ""))
-        // console.log(rss)
+        console.log(rss)
         rssfeeddata = (rss.feeds?.map((msg: any) => {
           let date;
           let description;
@@ -219,7 +221,7 @@
   function openFolder(folder: any) {
     selectedFolder = folder.name;
     selectedMessage = null;
-    
+    console.log(folder.id)
     if (folder.id.includes('rss-')) {
       selectedRSS = folder.id
       fetchMessages(folder.id, folder.name)

@@ -19,6 +19,7 @@ fn settings_file() -> PathBuf {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Settings {
     pub shortcuts: Vec<Shortcut>,
+    pub feeds: Vec<Feed>,
     pub weather_enabled: bool,
     pub weather_city: String,
     pub weather_country: String,
@@ -31,6 +32,7 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             shortcuts: Vec::new(),
+            feeds: Vec::new(),
             weather_enabled: false,
             force_use_location: false,
             weather_city: String::new(),
@@ -45,6 +47,12 @@ impl Default for Settings {
 pub struct Shortcut {
     pub name: String,
     pub icon: String,
+    pub url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Feed {
+    
     pub url: String,
 }
 
