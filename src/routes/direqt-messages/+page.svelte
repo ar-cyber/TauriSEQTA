@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { seqtaFetch, getRSS } from '../../utils/netUtil';
-  import { type Message, type Folder } from './types';
+  import { type Message} from './types';
   import { cache } from '../../utils/cache';
 
   // Components
@@ -20,7 +20,8 @@
   let loading = $state(true);
   let error = $state<string | null>(null);
 
-  let selectedFolder = $state<Folder>('Inbox');
+  let selectedFolder = $state('Inbox');
+  let selectedRSS = $state();
   let selectedMessage = $state<Message | null>(null);
   let showComposeModal = $state(false);
   let composeSubject = $state('');
@@ -33,7 +34,7 @@
   let deleting = $state(false);
   let restoring = $state(false);
 
-  async function fetchMessages(folderLabel: string = 'inbox') {
+  async function fetchMessages(folderLabel: string = 'inbox', rssname: string = "") {
     loading = true;
     error = null;
     console.log(folderLabel)
@@ -93,29 +94,30 @@
           unread: !msg.read
         }));
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
-      } else if (folderLabel === "rss"){
-        let rssfeeddata = [];
-        for (let item of ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
-          console.log(item)
-          let rss = await getRSS(item)
-          
-          rssfeeddata.push(rss.items?.map((msg: any) => {
-            let date;
-            if (msg.pubDate === null) {date = dayjs(rss.pubDate).format('YYYY-MM-DD HH:mm:ss')} else {date = msg.pubDate}
-            return {
-              id: msg.title,
-              folder: 'RSS Feeds',
-              sender: rss.title,
-              to: '',
-              subject: msg.title,
-              preview: `${msg.title} from ${rss.title}`, 
-              date: date,
-              body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
-            }
+      } else if (folderLabel.includes('rss-')){
+        let rssfeeddata: any = []
+        let rss = await getRSS(folderLabel.replace('rss-', ""))
+        // console.log(rss)
+        rssfeeddata = (rss.feeds?.map((msg: any) => {
+          let date;
+          let description;
+          if (msg.description === undefined) {description = "No description available"} else {description = msg.description}
+          if (msg.pubDate === null) {date = ""} else {date = dayjs(msg.pubDate).format('YYYY-MM-DD HH:mm:ss')}
+          console.log(date)
+          return {
+            id: Math.floor(Math.random() * 10000000) + 1,
+            folder: rssname,
+            sender: rss.channel.title,
+            to: '',
+            subject: msg.title,
+            preview: `${msg.title} from ${rss.title}`, 
+            date: date,
+            body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${description}`,
           }
-        ))
-        }
-        messages = rssfeeddata.flat().sort((a, b) => b.date.localeCompare(a.date));
+        }))
+        console.log(rssfeeddata)
+        messages = rssfeeddata
+
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
@@ -197,7 +199,7 @@
         msg.body = data.payload.contents;
         // Cache the message content for 24 hours
         cache.set(cacheKey, msg.body, 1440); // 24 hours TTL
-      } else if (selectedFolder === 'RSS Feeds') {
+      } else if (selectedFolder.includes('RSS')) {
         msg.body = msg.body
       } else {
         msg.body = '<em>No content.</em>';
@@ -214,14 +216,14 @@
     }
   }
 
-  function openFolder(folder: Folder) {
-    selectedFolder = folder;
+  function openFolder(folder: any) {
+    selectedFolder = folder.name;
     selectedMessage = null;
-    if (folder === 'Inbox') fetchMessages('inbox');
-    else if (folder === 'Sent') fetchMessages('sent');
-    else if (folder === 'Starred') fetchMessages('starred');
-    else if (folder === 'Trash') fetchMessages('trash');
-    else if (folder === 'RSS Feeds') fetchMessages('rss');
+    
+    if (folder.id.includes('rss-')) {
+      selectedRSS = folder.id
+      fetchMessages(folder.id, folder.name)
+    } else fetchMessages(folder.id)
   }
 
   function openCompose() {

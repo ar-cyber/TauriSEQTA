@@ -19,6 +19,7 @@ let weatherEnabled = false;
 let forceUseLocation = false;
 let weatherCity = '';
 let weatherCountry = '';
+
 let remindersEnabled = true;
 
 async function loadSettings() {

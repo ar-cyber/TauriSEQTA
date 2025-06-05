@@ -187,10 +187,9 @@ pub async fn get_rss_feed(feed: &str) -> Result<Value, String> {
 
     Ok(json)
 }
-
-pub fn channel_to_json(channel: &Channel) -> anyhow::Result<Value> {
+pub fn channel_to_json(channel: &Channel) -> Result<Value> {
     fn xml_to_json(elem: &Element) -> Value {
-        let text = elem.get_text(); // Option<Cow<'_, str>>
+        let text = elem.get_text();
         let has_text = text.as_ref().map(|t| !t.trim().is_empty()).unwrap_or(false);
 
         let has_attrs = !elem.attributes.is_empty();
@@ -227,11 +226,40 @@ pub fn channel_to_json(channel: &Channel) -> anyhow::Result<Value> {
 
         Value::Object(map)
     }
+
     let xml_str = channel.to_string();
     let root = Element::parse(Cursor::new(xml_str))
-        .map_err(|e| anyhow::anyhow!("Failed to parse XML: {}", e))?;
+        .map_err(|e| anyhow!("Failed to parse XML: {}", e))?;
 
-    Ok(xml_to_json(&root))
+    let mut root_json = xml_to_json(&root);
+
+    // Parse item elements into feeds array using flexible xml_to_json
+    let feeds: Vec<Value> = root
+        .get_child("channel")
+        .map(|channel_elem| {
+            channel_elem
+                .children
+                .iter()
+                .filter_map(|node| {
+                    if let XMLNode::Element(child) = node {
+                        if child.name == "item" {
+                            Some(xml_to_json(child))
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    if let Value::Object(ref mut map) = root_json {
+        map.insert("feeds".to_string(), Value::Array(feeds));
+    }
+
+    Ok(root_json)
 }
 
 #[tauri::command]

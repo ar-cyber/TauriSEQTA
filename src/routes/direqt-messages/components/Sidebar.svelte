@@ -1,22 +1,31 @@
 <script lang="ts">
   import { Icon } from 'svelte-hero-icons';
-  import { Plus, Inbox, PaperAirplane, Trash, Star } from 'svelte-hero-icons';
-  import type { Folder } from '../types';
+  import { Plus, Inbox, PaperAirplane, Trash, Star, Rss } from 'svelte-hero-icons';
+  import { getRSS } from '../../../utils/netUtil';
+  import {onMount} from 'svelte';
 
   let { selectedFolder, openFolder, openCompose } = $props<{
-    selectedFolder: Folder;
-    openFolder: (folder: Folder) => void;
+    selectedFolder: any;
+    openFolder: (folder: any) => void;
     openCompose: () => void;
   }>();
 
-  // Folder definitions
-  const folders = [
-    { name: 'Inbox' as Folder, icon: Inbox },
-    { name: 'Sent' as Folder, icon: PaperAirplane },
-    { name: 'Starred' as Folder, icon: Star },
-    { name: 'Trash' as Folder, icon: Trash },
-    { name: 'RSS Feeds' as Folder, icon: Inbox}
-  ];
+
+  async function a() {
+    // Folder definitions
+    let folders = [
+      { name: 'Inbox', icon: Inbox, id: "inbox" },
+      { name: 'Sent', icon: PaperAirplane, id: "sent" },
+      { name: 'Starred', icon: Star, id: "starred" },
+      { name: 'Trash', icon: Trash, id: "trash" },
+    ];
+    for (let item of ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
+      let title = await getRSS(item)
+      folders.push({ name: `RSS: ${title.channel.title}`, icon: Rss, id: `rss-${item}` })
+    }
+    return folders
+  }
+  const rssFeeds = a()
 </script>
 
 <aside class="flex flex-col border-r xl:w-64 border-slate-800/50 bg-slate-900/10 backdrop-blur-sm">
@@ -29,22 +38,31 @@
       <span>Compose</span>
     </button>
   </div>
-  <nav class="flex flex-col flex-1 gap-1 px-2 py-4">
-    {#each folders as folder}
-      <button
-        class="w-full flex items-center gap-3 px-4 sm:px-6 py-2.5 text-left text-sm sm:text-base font-medium rounded-lg transition-all duration-200 relative group
-          {selectedFolder === folder.name 
-            ? 'bg-indigo-500/10 text-indigo-400 border-l-4 border-indigo-500 pl-[1.25rem]' 
-            : 'border-l-4 border-transparent text-slate-300 hover:text-white hover:bg-slate-800/50'}
-          focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        onclick={() => openFolder(folder.name)}
-      >
-        <Icon src={folder.icon} class="w-5 h-5" />
-        <span>{folder.name}</span>
-        {#if selectedFolder === folder.name}
-          <div class="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-        {/if}
-      </button>
-    {/each}
-  </nav>
+  
+    {#await rssFeeds}
+      <p>Loading Data...</p>
+    {:then folders}
+      <nav class="flex flex-col flex-1 gap-1 px-2 py-4">
+        {#each folders as folder}
+        
+          <button
+            class="w-full flex items-center gap-3 px-4 sm:px-6 py-2.5 text-left text-sm sm:text-base font-medium rounded-lg transition-all duration-200 relative group
+              {selectedFolder === folder.name 
+                ? 'bg-indigo-500/10 text-indigo-400 border-l-4 border-indigo-500 pl-[1.25rem]' 
+                : 'border-l-4 border-transparent text-slate-300 hover:text-white hover:bg-slate-800/50'}
+              focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            onclick={() => openFolder(folder)}
+          >
+            <Icon src={folder.icon} class="w-5 h-5" />
+            <span>{folder.name}</span>
+            {#if selectedFolder === folder.name}
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+            {/if}
+          </button>
+        
+        {/each}
+      </nav>
+    {:catch error}
+        <p>Error! {error}</p>
+    {/await}
 </aside> 
