@@ -154,7 +154,7 @@ pub struct FeedResponse {
 }
 
 #[tauri::command]
-pub async fn get_rss_feed_json(feed: &str) -> Result<Value, String> {
+pub async fn get_rss_feed(feed: &str) -> Result<Value, String> {
     let client = Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
         .build()
@@ -190,23 +190,22 @@ pub async fn get_rss_feed_json(feed: &str) -> Result<Value, String> {
 
 pub fn channel_to_json(channel: &Channel) -> anyhow::Result<Value> {
     fn xml_to_json(elem: &Element) -> Value {
+        let text = elem.get_text(); // Option<Cow<'_, str>>
+        let has_text = text.as_ref().map(|t| !t.trim().is_empty()).unwrap_or(false);
+
         let has_attrs = !elem.attributes.is_empty();
         let has_children = elem.children.iter().any(|c| matches!(c, XMLNode::Element(_)));
-        let has_text = elem.text.as_ref().map(|t| !t.trim().is_empty()).unwrap_or(false);
 
-        // Simple case: text-only element
         if !has_attrs && !has_children && has_text {
-            return Value::String(elem.text.clone().unwrap());
+            return Value::String(text.unwrap().to_string());
         }
 
         let mut map = serde_json::Map::new();
 
-        // Include attributes (optional)
         if has_attrs {
             map.insert("@attributes".into(), json!(elem.attributes));
         }
 
-        // Add child elements
         for child in &elem.children {
             if let XMLNode::Element(child_elem) = child {
                 let child_json = xml_to_json(child_elem);
@@ -222,16 +221,16 @@ pub fn channel_to_json(channel: &Channel) -> anyhow::Result<Value> {
             }
         }
 
-        // Add text content if exists (and not the only thing)
         if has_text {
-            map.insert("text".into(), Value::String(elem.text.clone().unwrap()));
+            map.insert("text".into(), Value::String(text.unwrap().to_string()));
         }
 
         Value::Object(map)
     }
-
     let xml_str = channel.to_string();
-    let root = Element::parse(Cursor::new(xml_str))?;
+    let root = Element::parse(Cursor::new(xml_str))
+        .map_err(|e| anyhow::anyhow!("Failed to parse XML: {}", e))?;
+
     Ok(xml_to_json(&root))
 }
 
