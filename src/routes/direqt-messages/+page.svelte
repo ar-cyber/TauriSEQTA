@@ -95,7 +95,7 @@
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
       } else if (folderLabel === "rss"){
         let rssfeeddata = [];
-        for (let item in ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
+        for (let item of ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
           console.log(item)
           let rss = await getRSS(item)
           
@@ -115,7 +115,7 @@
           }
         ))
         }
-        messages = rssfeeddata.sort((a, b) => b.date.localeCompare(a.date));
+        messages = rssfeeddata.flat().sort((a, b) => b.date.localeCompare(a.date));
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
