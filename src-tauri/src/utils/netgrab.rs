@@ -2,14 +2,11 @@ use reqwest;
 use reqwest::Client;
 use rss::Channel;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
-use serde_json::Value;
+use xmltree::{Element, XMLNode};
+use serde_json::{json, Value};
+use std::io::Cursor;
 use std::collections::HashMap;
-use std::error::Error;
-// src-tauri/src/main.rs
-use tauri::{AppHandle, Manager};
-use tauri_plugin_opener::OpenerExt; // Import the trait to use .opener()
-
+use anyhow::{Result, anyhow};
 
 // opens a file using the default program:
 
@@ -155,8 +152,9 @@ pub struct FeedResponse {
     title: String,
     items: Vec<FeedItem>,
 }
+
 #[tauri::command]
-pub async fn get_rss_feed(feed: &str) -> Result<FeedResponse, String> {
+pub async fn get_rss_feed_json(feed: &str) -> Result<Value, String> {
     let client = Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
         .build()
@@ -184,23 +182,57 @@ pub async fn get_rss_feed(feed: &str) -> Result<FeedResponse, String> {
     let channel = Channel::read_from(content.as_bytes())
         .map_err(|e| format!("Failed to parse RSS feed: {}", e))?;
 
-    let feed_title = channel.title().to_string();
+    let json = channel_to_json(&channel)
+        .map_err(|e| format!("Failed to convert to JSON: {}", e))?;
 
-    let items: Vec<FeedItem> = channel
-        .items()
-        .iter()
-        .map(|item| FeedItem {
-            title: item.title().map(|s| s.to_string()),
-            link: item.link().map(|s| s.to_string()),
-            description: item.description().map(|s| s.to_string()),
-            pub_date: item.pub_date().map(|s| s.to_string()),
-        })
-        .collect();
+    Ok(json)
+}
 
-    Ok(FeedResponse {
-        title: feed_title,
-        items,
-    })
+pub fn channel_to_json(channel: &Channel) -> anyhow::Result<Value> {
+    fn xml_to_json(elem: &Element) -> Value {
+        let has_attrs = !elem.attributes.is_empty();
+        let has_children = elem.children.iter().any(|c| matches!(c, XMLNode::Element(_)));
+        let has_text = elem.text.as_ref().map(|t| !t.trim().is_empty()).unwrap_or(false);
+
+        // Simple case: text-only element
+        if !has_attrs && !has_children && has_text {
+            return Value::String(elem.text.clone().unwrap());
+        }
+
+        let mut map = serde_json::Map::new();
+
+        // Include attributes (optional)
+        if has_attrs {
+            map.insert("@attributes".into(), json!(elem.attributes));
+        }
+
+        // Add child elements
+        for child in &elem.children {
+            if let XMLNode::Element(child_elem) = child {
+                let child_json = xml_to_json(child_elem);
+                map.entry(child_elem.name.clone())
+                    .and_modify(|v| {
+                        if let Value::Array(arr) = v {
+                            arr.push(child_json.clone());
+                        } else {
+                            *v = Value::Array(vec![v.take(), child_json.clone()]);
+                        }
+                    })
+                    .or_insert(child_json);
+            }
+        }
+
+        // Add text content if exists (and not the only thing)
+        if has_text {
+            map.insert("text".into(), Value::String(elem.text.clone().unwrap()));
+        }
+
+        Value::Object(map)
+    }
+
+    let xml_str = channel.to_string();
+    let root = Element::parse(Cursor::new(xml_str))?;
+    Ok(xml_to_json(&root))
 }
 
 #[tauri::command]

@@ -98,17 +98,22 @@
         for (let item in ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
           console.log(item)
           let rss = await getRSS(item)
-
-          rssfeeddata.push(rss.items?.map((msg: any) => ({
-            id: msg.title,
-            folder: 'RSS Feeds',
-            sender: rss.title,
-            to: '',
-            subject: msg.title,
-            preview: `${msg.title} from ${rss.title}`, 
-            date: dayjs(msg.pub_date).format('YYYY-MM-DD HH:mm:ss'),
-            body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
-          })))
+          
+          rssfeeddata.push(rss.items?.map((msg: any) => {
+            let date;
+            if (msg.pubDate === null) {date = dayjs(rss.pubDate).format('YYYY-MM-DD HH:mm:ss')} else {date = msg.pubDate}
+            return {
+              id: msg.title,
+              folder: 'RSS Feeds',
+              sender: rss.title,
+              to: '',
+              subject: msg.title,
+              preview: `${msg.title} from ${rss.title}`, 
+              date: date,
+              body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
+            }
+          }
+        ))
         }
         messages = rssfeeddata.sort((a, b) => b.date.localeCompare(a.date));
       } else {
