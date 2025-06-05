@@ -304,7 +304,7 @@ onMount(loadSettings);
       <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-200">
         <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
           <h2 class="text-base sm:text-lg font-semibold">RSS Feeds</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Manage your news and content feeds</p>
+          <p class="text-xs sm:text-sm text-slate-400">Manage your news and content feeds that appear in your DMs</p>
         </div>
         <div class="p-4 sm:p-6 space-y-6">
           <div>
