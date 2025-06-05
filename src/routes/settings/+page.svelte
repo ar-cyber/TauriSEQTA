@@ -3,6 +3,8 @@ import { onMount } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
 import { notify } from '../../utils/notify';
 import { accentColor, loadAccentColor, updateAccentColor } from '../../lib/stores/theme';
+import { Icon } from 'svelte-hero-icons';
+import { Plus, ArrowPath, Trash, Rss } from 'svelte-hero-icons';
 
 interface Shortcut {
   name: string;
@@ -11,7 +13,6 @@ interface Shortcut {
 }
 
 interface Feed {
-
   url: string;
 }
 
@@ -112,6 +113,7 @@ function removeShortcut(idx: number) {
 function removeFeed(idx: number) {
   feeds = feeds.filter((_, i) => i !== idx);
 }
+
 async function sendTestNotification() {
   if (!remindersEnabled) {
     alert('Reminders are currently disabled. Enable them to receive notifications.');
@@ -121,6 +123,29 @@ async function sendTestNotification() {
     title: 'Test Notification',
     body: 'This is a test notification from DesQTA settings.',
   });
+}
+
+async function testFeed(url: string) {
+  if (!url) {
+    notify({
+      title: 'Invalid Feed URL',
+      body: 'Please enter a valid RSS feed URL'
+    });
+    return;
+  }
+
+  try {
+    const result = await invoke('get_rss_feed', { url });
+    notify({
+      title: 'Feed Test Successful',
+      body: 'The RSS feed is valid and can be added'
+    });
+  } catch (error) {
+    notify({
+      title: 'Feed Test Failed',
+      body: 'Could not fetch the RSS feed. Please check the URL and try again.'
+    });
+  }
 }
 
 onMount(loadSettings);
@@ -274,25 +299,76 @@ onMount(loadSettings);
           </div>
         </div>
       </section>
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
+
+      <!-- RSS Feeds Settings -->
+      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-200">
         <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
           <h2 class="text-base sm:text-lg font-semibold">RSS Feeds</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Add feeds to your DMs!</p>
+          <p class="text-xs sm:text-sm text-slate-400">Manage your news and content feeds</p>
         </div>
-          <!-- Shortcuts -->
-          <div class="space-y-3 sm:space-y-4">
-            <div class="space-y-3 sm:space-y-4">
+        <div class="p-4 sm:p-6 space-y-6">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <h3 class="text-sm sm:text-base font-semibold">Feed Sources</h3>
+                <p class="text-xs sm:text-sm text-slate-400">Add RSS feeds to stay updated with your favorite content</p>
+              </div>
+              <button 
+                class="px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow flex items-center gap-2"
+                on:click={addFeed}
+              >
+                <Icon src={Plus} class="w-4 h-4" />
+                Add Feed
+              </button>
+            </div>
+            <div class="space-y-3">
               {#each feeds as feed, idx}
-                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-slate-800/50 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
-
-                  <input class="w-full sm:flex-1 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={feed.url} />
-                  <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeFeed(idx)} title="Remove">✕</button>
+                <div class="group bg-slate-800/50 rounded-lg p-4 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
+                  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-sm font-medium text-slate-200 truncate">
+                          {feed.url ? new URL(feed.url).hostname : 'New Feed'}
+                        </span>
+                      </div>
+                      <input 
+                        class="w-full px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        placeholder="https://example.com/feed.xml"
+                        bind:value={feed.url}
+                      />
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button 
+                        class="p-2 text-slate-400 hover:text-blue-400 transition-colors rounded-lg hover:bg-slate-700/50"
+                        title="Test Feed"
+                        on:click={() => testFeed(feed.url)}
+                      >
+                        <Icon src={ArrowPath} class="w-5 h-5" />
+                      </button>
+                      <button 
+                        class="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-lg hover:bg-slate-700/50"
+                        title="Remove Feed"
+                        on:click={() => removeFeed(idx)}
+                      >
+                        <Icon src={Trash} class="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               {/each}
-              <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addFeed}>Add Feed</button>
+              {#if feeds.length === 0}
+                <div class="text-center py-8 text-slate-400 animate-fade-in">
+                  <Icon src={Rss} class="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p class="text-sm">No feeds added yet</p>
+                  <p class="text-xs mt-1">Add your first RSS feed to get started</p>
+                </div>
+              {/if}
             </div>
           </div>
+        </div>
       </section>
+
       <!-- Plugins Section -->
       <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
         <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
@@ -328,14 +404,3 @@ onMount(loadSettings);
   to { opacity: 1; }
 }
 </style> 
-
-
-<!--
-
-                  <input 
-                    type="text" 
-                    bind:value={$accentColor}
-                    class="flex-1 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    placeholder="#3b82f6"
-                  />
--->
