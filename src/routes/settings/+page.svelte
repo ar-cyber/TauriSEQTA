@@ -135,7 +135,7 @@ async function testFeed(url: string) {
   }
 
   try {
-    const result = await invoke('get_rss_feed', { url });
+    const result = await invoke('get_rss_feed', { feed: url });
     notify({
       title: 'Feed Test Successful',
       body: 'The RSS feed is valid and can be added'
