@@ -96,7 +96,7 @@
       } else if (folderLabel === "rss"){
         let rssfeeddata = [];
         for (let item in ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
-          const rss = await getRSS(item)
+          let rss = await getRSS(item)
 
           rssfeeddata.push(rss.items?.map((msg: any) => ({
             id: msg.title,
