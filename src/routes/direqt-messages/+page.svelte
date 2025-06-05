@@ -110,7 +110,7 @@
             body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
           })))
         }
-        messages = rssfeeddata.sort((a, b) => b.date.localeCompare(a.date));
+        messages = rssfeeddata.flat().sort((a, b) => b.date.localeCompare(a.date));
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
