@@ -94,19 +94,22 @@
         }));
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
       } else if (folderLabel === "rss"){
-        const rss = await getRSS("https://www.adelaidemetro.com.au/announcements/rss")
-        console.log(rss)
-        
-        messages = rss.items?.map((msg: any) => ({
-          id: msg.title,
-          folder: 'RSS Feeds',
-          sender: rss.title,
-          to: 'You',
-          subject: msg.title,
-          preview: msg.title + (false ? ' (Attachment)' : ''),
-          date: dayjs(msg.pub_date).format('YYYY-MM-DD HH:mm:ss'),
-          body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
-        }));
+        let rssfeeddata = [];
+        for (let item in ['https://www.news.com.au/content-feeds/latest-news-national/', 'https://www.adelaidemetro.com.au/announcements/rss']) {
+          const rss = await getRSS(item)
+
+          rssfeeddata.push(rss.items?.map((msg: any) => ({
+            id: msg.title,
+            folder: 'RSS Feeds',
+            sender: rss.title,
+            to: '',
+            subject: msg.title,
+            preview: `${msg.title} from ${rss.title}`, 
+            date: dayjs(msg.pub_date).format('YYYY-MM-DD HH:mm:ss'),
+            body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${msg.description}`,
+          })))
+        }
+        messages = rssfeeddata.sort((a, b) => b.date.localeCompare(a.date));
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
