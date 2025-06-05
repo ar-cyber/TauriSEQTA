@@ -198,12 +198,22 @@ pub async fn get_rss_feed(feed: &str) -> Result<FeedResponse, String> {
         .collect();
 
     Ok(FeedResponse {
-        title: channel.title().to_string(),
+        title: feed_title,
         items,
     })
 }
 
+#[tauri::command]
+pub fn open_url(app: tauri::AppHandle, url: String) {
+    use tauri::{WebviewUrl, WebviewWindowBuilder};
 
+    // Spawn the login window
+    WebviewWindowBuilder::new(&app, "e", WebviewUrl::External(url))
+        .title("RSS Window")
+        .inner_size(900.0, 700.0)
+        .build()
+        .map_err(|e| format!("Failed to build window: {}", e))?;
+}
 
 #[tauri::command]
 pub async fn post_api_data(
