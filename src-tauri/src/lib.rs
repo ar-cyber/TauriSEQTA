@@ -12,7 +12,6 @@ mod netgrab;
 mod settings;
 
 use tauri::Manager;
-use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_notification;
 use tauri_plugin_single_instance;
 use urlencoding::decode;
@@ -33,7 +32,7 @@ pub fn run() {
 
     #[cfg(not(any(target_os = "ios", target_os = "android")))]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             println!("[Desqta] Single instance event: {:?}", argv);
             
             // Handle deep link in single instance

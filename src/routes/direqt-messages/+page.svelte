@@ -116,7 +116,7 @@
             date: date,
             body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${description}`,
           }
-        })).sort((a, b) => b.date.localeCompare(a.date))
+        })).sort((a: any, b: any) => b.date.localeCompare(a.date))
         // console.log(rssfeeddata)
         messages = rssfeeddata
 
@@ -454,15 +454,4 @@
     }
   }
 
-  .animate-fadeIn {
-    animation: fade-in 0.3s ease-out;
-  }
-
-  .animate-slideIn {
-    animation: slide-in 0.3s ease-out;
-  }
-
-  .animate-scaleIn {
-    animation: scale-in 0.3s ease-out;
-  }
 </style> 

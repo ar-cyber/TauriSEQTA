@@ -34,16 +34,12 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
-  onMount(() => {
-    const links = document.querySelectorAll('a');
-    links.forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        openURL(link.href);
-      });
-    });
+  DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+    if (node.tagName === 'A' && node.getAttribute('href')) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
   });
-
   function updateIframeContent() {
     if (!selectedMessage || !iframe || !iframe.contentWindow) return;
 
@@ -265,7 +261,7 @@
             <iframe
               bind:this={iframe}
               class="w-full border-0"
-              sandbox="allow-same-origin allow-scripts"
+              sandbox="allow-same-origin allow-scripts allow-popups"
               title="Message content"
             ></iframe>
           {/if}
