@@ -26,6 +26,7 @@ pub struct Settings {
     pub reminders_enabled: bool,
     pub force_use_location: bool,
     pub accent_color: String,
+    pub theme: String,
 }
 
 impl Default for Settings {
@@ -39,6 +40,7 @@ impl Default for Settings {
             weather_country: String::new(),
             reminders_enabled: true,
             accent_color: "#3b82f6".to_string(), // Default to blue-500
+            theme: "dark".to_string(), // Default to dark theme
         }
     }
 }

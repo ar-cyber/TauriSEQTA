@@ -6,7 +6,7 @@
 
 	import { onMount } from 'svelte';
 	import '../app.css';
-	import { accentColor, loadAccentColor } from '../lib/stores/theme';
+	import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
 	import {
 		Icon,
 		Home,
@@ -255,22 +255,24 @@
 		}
 	}
 
+	$effect(() => {
+		// Update the root element's data attributes with the current accent color and theme
+		document.documentElement.setAttribute('data-accent-color', '');
+		document.documentElement.style.setProperty('--accent-color-value', $accentColor);
+		document.documentElement.setAttribute('data-theme', $theme);
+	});
+
 	onMount(async () => {
 		await Promise.all([
 			checkSession(),
 			loadWeatherSettings(),
-			loadAccentColor()
+			loadAccentColor(),
+			loadTheme()
 		]);
 		if (weatherEnabled) {
 			if (forceUseLocation) fetchWeather();
 			else fetchWeatherWithIP();
 		}
-	});
-
-	$effect(() => {
-		// Update the root element's data attribute with the current accent color
-		document.documentElement.setAttribute('data-accent-color', '');
-		document.documentElement.style.setProperty('--accent-color-value', $accentColor);
 	});
 
 	onMount(() => {
@@ -303,7 +305,7 @@
 	];
 </script>
 
-<div class="flex flex-col md:flex-row pt-2 h-screen bg-slate-900">
+<div class="flex flex-col md:flex-row pt-2 h-screen bg-slate-900" data-theme={$theme}>
 	<!-- Mobile Menu Button -->
 	<button 
 		class="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg bg-slate-800 hover:bg-slate-700"

@@ -2,9 +2,9 @@
 import { onMount } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
 import { notify } from '../../utils/notify';
-import { accentColor, loadAccentColor, updateAccentColor } from '../../lib/stores/theme';
+import { accentColor, loadAccentColor, updateAccentColor, theme, loadTheme, updateTheme } from '../../lib/stores/theme';
 import { Icon } from 'svelte-hero-icons';
-import { Plus, ArrowPath, Trash, Rss } from 'svelte-hero-icons';
+import { Plus, ArrowPath, Trash, Rss, Sun, Moon } from 'svelte-hero-icons';
 
 interface Shortcut {
   name: string;
@@ -32,7 +32,7 @@ let remindersEnabled = true;
 async function loadSettings() {
   loading = true;
   try {
-    const settings = await invoke<{ shortcuts: Shortcut[], feeds: any[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean, accent_color: string}>('get_settings');
+    const settings = await invoke<{ shortcuts: Shortcut[], feeds: any[], weather_enabled: boolean, weather_city: string, weather_country: string, reminders_enabled: boolean, force_use_location: boolean, accent_color: string, theme: 'light' | 'dark'}>('get_settings');
     shortcuts = settings.shortcuts || [];
     feeds = settings.feeds || [];
     weatherEnabled = settings.weather_enabled ?? false;
@@ -41,14 +41,16 @@ async function loadSettings() {
     weatherCountry = settings.weather_country ?? '';
     remindersEnabled = settings.reminders_enabled ?? true;
     accentColor.set(settings.accent_color ?? '#3b82f6');
+    theme.set(settings.theme ?? 'dark');
 
     console.log('Loading settings', {
-    shortcuts,
-    weatherEnabled,
-    weatherCity,
-    weatherCountry,
-    remindersEnabled,
-    forceUseLocation
+      shortcuts,
+      weatherEnabled,
+      weatherCity,
+      weatherCountry,
+      remindersEnabled,
+      forceUseLocation,
+      theme: settings.theme
     });
   } catch (e) {
     shortcuts = [];
@@ -59,6 +61,7 @@ async function loadSettings() {
     weatherCountry = '';
     remindersEnabled = true;
     accentColor.set('#3b82f6');
+    theme.set('dark');
   }
   loading = false;
 }
@@ -74,7 +77,8 @@ async function saveSettings() {
     weatherCity,
     weatherCountry,
     remindersEnabled,
-    forceUseLocation
+    forceUseLocation,
+    theme: $theme
   });
   try {
     await invoke('save_settings', { 
@@ -86,7 +90,8 @@ async function saveSettings() {
         weather_country: weatherCountry, 
         reminders_enabled: remindersEnabled, 
         force_use_location: forceUseLocation,
-        accent_color: $accentColor
+        accent_color: $accentColor,
+        theme: $theme
       }
     });
     saveSuccess = true;
@@ -148,7 +153,9 @@ async function testFeed(url: string) {
   }
 }
 
-onMount(loadSettings);
+onMount(async () => {
+  await Promise.all([loadSettings(), loadTheme()]);
+});
 </script>
 
 <div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
@@ -273,6 +280,27 @@ onMount(loadSettings);
                   </button>
                 </div>
                 <p class="text-xs text-slate-400">This color will be used throughout the app for buttons, links, and other interactive elements.</p>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-sm text-slate-200">Theme</label>
+                <div class="flex gap-2">
+                  <button 
+                    class="flex-1 px-4 py-3 rounded-lg bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'light' ? 'accent-bg' : ''}"
+                    on:click={() => updateTheme('light')}
+                  >
+                    <Icon src={Sun} class="w-5 h-5" />
+                    Light
+                  </button>
+                  <button 
+                    class="flex-1 px-4 py-3 rounded-lg bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'dark' ? 'accent-bg' : ''}"
+                    on:click={() => updateTheme('dark')}
+                  >
+                    <Icon src={Moon} class="w-5 h-5" />
+                    Dark
+                  </button>
+                </div>
+                <p class="text-xs text-slate-400">Choose between light and dark mode for the entire app.</p>
               </div>
             </div>
           </div>
