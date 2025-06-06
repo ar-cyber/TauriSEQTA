@@ -231,7 +231,7 @@ onMount(loadLessons);
       >&#62;</button>
     </div>
     <div class="relative inline-block text-left">
-      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors" onclick={() => showExportMenu = !showExportMenu}>
+      <button class="px-4 py-2 accent-bg text-white rounded-lg hover:opacity-90 transition-colors" onclick={() => showExportMenu = !showExportMenu}>
         Export
       </button>
       {#if showExportMenu}

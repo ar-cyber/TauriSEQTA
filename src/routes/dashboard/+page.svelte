@@ -262,13 +262,12 @@
                         <div class="text-7xl font-bold text-white mb-8 font-mono">
                             {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
                         </div>
-                        <div class="flex gap-4">
-                            <button
+                        <div class="flex justify-center gap-4 mt-6">
+                            <button 
                                 onclick={startTimer}
-                                disabled={isTimerRunning}
-                                class="px-8 py-3 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-6 py-3 rounded-lg text-white font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg accent-bg"
                             >
-                                Start
+                                Start Timer
                             </button>
                             <button
                                 onclick={stopTimer}
