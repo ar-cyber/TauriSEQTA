@@ -345,7 +345,7 @@
 				</a>
 			{/each}
 			{#if weatherEnabled}
-				<div class="my-4 mx-2 rounded-2xl shadow bg-gradient-to-br from-blue-900 to-blue-700 text-white p-4 flex flex-col justify-center animate-fade-in">
+				<div class="my-4 mx-2 rounded-2xl shadow text-white p-4 flex flex-col justify-center animate-fade-in" style="background: linear-gradient(120deg, var(--accent-color-value) 0%, color-mix(in srgb, var(--accent-color-value) 70%, black) 100%);">
 					{#if loadingWeather}
 						<div>Loading weather…</div>
 					{:else if weatherError}
@@ -370,7 +370,7 @@
 				{#if userInfo}
 					<div class="flex gap-3 items-center px-2 py-1 bg-transparent rounded-lg">
 						<!-- Avatar with initials -->
-						<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white bg-blue-600 rounded-full select-none">
+						<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white rounded-full select-none" style="background-color: var(--accent-color-value);">
 							{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
 						</div>
 						<div class="flex flex-col flex-1 min-w-0">
