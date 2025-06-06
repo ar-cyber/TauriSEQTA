@@ -151,13 +151,18 @@
     }
   }
 
+  let clickOutsideHandler: (event: MouseEvent) => void;
+
   onMount(() => {
     fetchNews(selectedSource);
-    document.addEventListener('click', handleClickOutside);
+    clickOutsideHandler = handleClickOutside;
+    document.addEventListener('click', clickOutsideHandler);
   });
 
   onDestroy(() => {
-    document.removeEventListener('click', handleClickOutside);
+    if (clickOutsideHandler) {
+      document.removeEventListener('click', clickOutsideHandler);
+    }
   });
 </script>
 
@@ -226,7 +231,6 @@
           transition:fade
         >
           <div class="relative">
-            <span class="absolute top-3 left-3 z-10 bg-blue-600 text-xs font-bold text-white px-3 py-1 rounded-full shadow-md select-none">NEWS</span>
             {#if article.urlToImage}
               <img
                 src={article.urlToImage}
