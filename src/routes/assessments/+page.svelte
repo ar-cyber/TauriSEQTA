@@ -403,7 +403,11 @@
 							</div>
 							<div class="space-y-4">
 								{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+									<a 
+										href="/assessments/{assessment.id}/{assessment.metaclass}"
+										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										style="border-color: {assessment.colour};"
+									>
 										<div class="flex items-center gap-2">
 											<div class="text-sm font-semibold text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -413,7 +417,7 @@
 											</span>
 										</div>
 										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
-									</div>
+									</a>
 								{/each}
 							</div>
 						</div>
@@ -427,7 +431,11 @@
 							</div>
 							<div class="space-y-4">
 								{#each assessments as assessment}
-									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+									<a 
+										href="/assessments/{assessment.id}/{assessment.metaclass}"
+										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										style="border-color: {assessment.colour};"
+									>
 										<div class="flex items-center gap-2">
 											<div class="text-sm font-semibold text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -438,7 +446,7 @@
 										</div>
 										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
 										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
-									</div>
+									</a>
 								{/each}
 							</div>
 						</div>
@@ -452,7 +460,11 @@
 							</div>
 							<div class="space-y-4">
 								{#each assessments as assessment}
-									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+									<a 
+										href="/assessments/{assessment.id}/{assessment.metaclass}"
+										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										style="border-color: {assessment.colour};"
+									>
 										<div class="flex items-center gap-2">
 											<div class="text-sm font-semibold text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -460,7 +472,7 @@
 										</div>
 										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
 										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
-									</div>
+									</a>
 								{/each}
 							</div>
 						</div>
@@ -566,31 +578,21 @@
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-								<div class="p-4 rounded-xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10" data-assessment-id={assessment.id}>
-									<div class="flex items-start justify-between gap-4">
-										<div class="flex-1 min-w-0">
-											<div class="flex items-center gap-2 mb-1">
-												<div class="w-3 h-3 rounded-full" style="background-color: {assessment.colour}"></div>
-												<span class="text-sm font-medium text-slate-400">{assessment.code}</span>
-											</div>
-											<h3 class="text-lg font-semibold mb-2">{assessment.title}</h3>
-											<div class="text-sm text-slate-400">
-												Due: {new Date(assessment.due).toLocaleDateString()}
-											</div>
+								<a 
+									href="/assessments/{assessment.id}/{assessment.metaclass}"
+									class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+									style="border-color: {assessment.colour};"
+								>
+									<div class="flex items-center gap-2">
+										<div class="text-sm font-semibold text-slate-400">
+											{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 										</div>
-										<div class="flex flex-col items-end gap-2">
-											<div class="px-2 py-1 text-xs font-medium rounded-full {getStatusBadge(assessment.status, assessment.due).color}">
-												{getStatusBadge(assessment.status, assessment.due).text}
-											</div>
-											<a 
-												href="/assessments/{assessment.id}/{assessment.metaclass}" 
-												class="px-3 py-1 text-sm font-medium rounded-lg accent-bg text-white transition-all duration-200 hover:accent-bg-hover hover:scale-105"
-											>
-												View Details
-											</a>
-										</div>
+										<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
+											{getStatusBadge(assessment.status, assessment.due).text}
+										</span>
 									</div>
-								</div>
+									<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+								</a>
 							{/each}
 						</div>
 					</div>
