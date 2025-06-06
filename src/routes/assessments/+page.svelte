@@ -13,6 +13,7 @@
 	let selectedTab = $state<'list' | 'board' | 'calendar'>('list');
 	let subjectFilters: Record<string, boolean> = {};
 	let remindersEnabled = true;
+	let groupBy = $state<'subject' | 'month' | 'status'>('subject');
 
 	const filteredAssessments = $derived(upcomingAssessments.filter((a: any) => subjectFilters[a.code]));
   
@@ -182,8 +183,8 @@
 		return new Date(year, month, 1).getDay();
 	}
 
-	function getMonthName(month: number) {
-		return new Date(2000, month, 1).toLocaleString('default', { month: 'long' });
+	function getMonthName(date: Date) {
+		return date.toLocaleString('default', { month: 'long', year: 'numeric' });
 	}
 
 	let currentDate = $state(new Date());
@@ -293,6 +294,38 @@
 		}
 	}
 
+	function getAssessmentsByMonth() {
+		const grouped = new Map<string, any[]>();
+		filteredAssessments.forEach(assessment => {
+			const date = new Date(assessment.due);
+			const monthKey = getMonthName(date);
+			if (!grouped.has(monthKey)) {
+				grouped.set(monthKey, []);
+			}
+			grouped.get(monthKey)?.push(assessment);
+		});
+		return Array.from(grouped.entries()).sort((a, b) => {
+			const dateA = new Date(a[0]);
+			const dateB = new Date(b[0]);
+			return dateA.getTime() - dateB.getTime();
+		});
+	}
+
+	function getAssessmentsByStatus() {
+		const grouped = new Map<string, any[]>();
+		filteredAssessments.forEach(assessment => {
+			const status = getStatusBadge(assessment.status, assessment.due).text;
+			if (!grouped.has(status)) {
+				grouped.set(status, []);
+			}
+			grouped.get(status)?.push(assessment);
+		});
+		return Array.from(grouped.entries()).sort((a, b) => {
+			const order = ['Overdue', 'Due Soon', 'Upcoming', 'Marked'];
+			return order.indexOf(a[0]) - order.indexOf(b[0]);
+		});
+	}
+
 	const originalOnMount = onMount;
 	onMount(async () => {
 		await loadAssessments();
@@ -337,6 +370,104 @@
 			</div>
 			<p class="mt-4 text-lg sm:text-xl text-slate-300">No upcoming assessments!</p>
 		</div>
+	{:else if selectedTab === 'board'}
+		<div class="space-y-6">
+			<div class="flex justify-end gap-2">
+				<button 
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'subject' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					onclick={() => groupBy = 'subject'}
+				>
+					Group by Subject
+				</button>
+				<button 
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'month' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					onclick={() => groupBy = 'month'}
+				>
+					Group by Month
+				</button>
+				<button 
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'status' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					onclick={() => groupBy = 'status'}
+				>
+					Group by Status
+				</button>
+			</div>
+
+			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10">
+				{#if groupBy === 'subject'}
+					{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
+						<div class="flex-shrink-0 w-72 sm:w-80">
+							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {subject.colour || '#8e8e8e'};">
+								<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
+								<p class="text-sm text-slate-400">{subject.code}</p>
+							</div>
+							<div class="space-y-4">
+								{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
+									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+										<div class="flex items-center gap-2">
+											<div class="text-sm font-semibold text-slate-400">
+												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+											</div>
+											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
+												{getStatusBadge(assessment.status, assessment.due).text}
+											</span>
+										</div>
+										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				{:else if groupBy === 'month'}
+					{#each getAssessmentsByMonth() as [month, assessments]}
+						<div class="flex-shrink-0 w-72 sm:w-80">
+							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50">
+								<h3 class="font-bold text-base sm:text-lg text-white">{month}</h3>
+								<p class="text-sm text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
+							</div>
+							<div class="space-y-4">
+								{#each assessments as assessment}
+									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+										<div class="flex items-center gap-2">
+											<div class="text-sm font-semibold text-slate-400">
+												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+											</div>
+											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
+												{getStatusBadge(assessment.status, assessment.due).text}
+											</span>
+										</div>
+										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				{:else if groupBy === 'status'}
+					{#each getAssessmentsByStatus() as [status, assessments]}
+						<div class="flex-shrink-0 w-72 sm:w-80">
+							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {getStatusBadge(assessments[0].status, assessments[0].due).color};">
+								<h3 class="font-bold text-base sm:text-lg text-white">{status}</h3>
+								<p class="text-sm text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
+							</div>
+							<div class="space-y-4">
+								{#each assessments as assessment}
+									<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
+										<div class="flex items-center gap-2">
+											<div class="text-sm font-semibold text-slate-400">
+												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+											</div>
+										</div>
+										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				{/if}
+			</div>
+		</div>
 	{:else if selectedTab === 'calendar'}
 		<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-slate-700/50">
 			<div class="flex justify-between items-center mb-6">
@@ -347,7 +478,7 @@
 					←
 				</button>
 				<h2 class="text-lg sm:text-xl font-bold text-white">
-					{getMonthName(currentMonth)} {currentYear}
+					{getMonthName(currentDate)}
 				</h2>
 				<button 
 					class="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 text-slate-300 hover:text-white"
@@ -364,12 +495,12 @@
 					</div>
 				{/each}
 				
-				{#each Array(getFirstDayOfMonth(currentYear, currentMonth)) as _, i}
+				{#each Array(getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth())) as _, i}
 					<div class="aspect-square"></div>
 				{/each}
 				
-				{#each Array(getDaysInMonth(currentYear, currentMonth)) as _, i}
-					{@const date = new Date(currentYear, currentMonth, i + 1)}
+				{#each Array(getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth())) as _, i}
+					{@const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1)}
 					{@const assessments = getAssessmentsForDate(date)}
 					{@const isToday = date.toDateString() === new Date().toDateString()}
 					<div class="aspect-square p-1">
@@ -401,7 +532,7 @@
 				{/each}
 			</div>
 		</div>
-	{:else if selectedTab === 'list'}
+	{:else}
 		<div class="flex flex-col lg:flex-row gap-6">
 			<!-- Quick Navigation Sidebar -->
 			<div class="lg:w-48 flex-shrink-0">
@@ -465,32 +596,6 @@
 					</div>
 				{/each}
 			</div>
-		</div>
-	{:else}
-		<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10">
-			{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
-				<div class="flex-shrink-0 w-72 sm:w-80">
-					<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {subject.colour || '#8e8e8e'};">
-						<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
-						<p class="text-sm text-slate-400">{subject.code}</p>
-					</div>
-					<div class="space-y-4">
-						{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
-							<div class="bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" style="border-color: {assessment.colour};">
-								<div class="flex items-center gap-2">
-									<div class="text-sm font-semibold text-slate-400">
-										{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-									</div>
-									<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
-										{getStatusBadge(assessment.status, assessment.due).text}
-									</span>
-								</div>
-								<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
-							</div>
-						{/each}
-					</div>
-				</div>
-			{/each}
 		</div>
 	{/if}
 </div>
