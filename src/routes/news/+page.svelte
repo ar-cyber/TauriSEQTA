@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import Parser from "rss-parser";
   import { fade } from 'svelte/transition';
   import { cache } from '../../utils/cache';
+  import { getRSS } from '../../utils/netUtil';
 
   interface NewsArticle {
     title: string;
@@ -90,7 +90,6 @@
         const response = await fetchAustraliaNews(url);
         news = response.articles || [];
       } else {
-        const parser = new Parser();
         let feeds: string[];
 
         if (rssFeedsByCountry[source.toLowerCase()]) {
@@ -103,14 +102,15 @@
 
         const articlesPromises = feeds.map(async (feedUrl) => {
           try {
-            const response = await fetch(feedUrl);
-            const feedString = await response.text();
-            const feed = await parser.parseString(feedString);
-
+            const feed = await getRSS(feedUrl);
+            if (!feed || !feed.items || !Array.isArray(feed.items)) {
+              console.warn(`Invalid feed format from ${feedUrl}`);
+              return [];
+            }
             return feed.items.map((item: any) => ({
-              title: item.title || "",
-              description: item.contentSnippet || "",
-              url: item.link || "",
+              title: item.title || "No Title",
+              description: item.description || item.contentSnippet || "No description available",
+              url: item.link || feedUrl,
               urlToImage: null,
             }));
           } catch (error) {
@@ -120,11 +120,15 @@
         });
 
         const articlesArray = await Promise.all(articlesPromises);
-        news = articlesArray.flat();
+        news = articlesArray.flat().filter(article => article.title !== "No Title");
+
+        if (news.length === 0) {
+          error = "No articles could be loaded from the selected sources.";
+        }
       }
 
       // Cache the results for 30 minutes
-      cache.set(cacheKey, news, 30);
+      cache.set(cacheKey, news, 30 * 60 * 1000);
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to fetch news';
       news = [];
