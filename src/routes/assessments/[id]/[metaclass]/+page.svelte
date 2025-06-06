@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { seqtaFetch } from '../../../../utils/seqtaFetch';
+	import { seqtaFetch } from '../../../../utils/netUtil';
 	import { Icon, ArrowLeft, DocumentText, VideoCamera, PresentationChartLine, Photo } from 'svelte-hero-icons';
 
 	let assessmentData: any = $state(null);

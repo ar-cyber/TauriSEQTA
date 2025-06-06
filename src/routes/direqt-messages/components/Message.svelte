@@ -2,6 +2,7 @@
   import { Icon } from "svelte-hero-icons";
   import { PencilSquare, Trash, Star, ArrowUturnLeft } from "svelte-hero-icons";
   import type { Message } from "../types";
+  import {openURL} from '../../../utils/netUtil'
   import DOMPurify from "dompurify";
   import { onMount } from "svelte";
 
@@ -33,14 +34,12 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
-  // Configure DOMPurify to add target="_blank" to all links
   DOMPurify.addHook('afterSanitizeAttributes', function(node) {
     if (node.tagName === 'A' && node.getAttribute('href')) {
       node.setAttribute('target', '_blank');
       node.setAttribute('rel', 'noopener noreferrer');
     }
   });
-
   function updateIframeContent() {
     if (!selectedMessage || !iframe || !iframe.contentWindow) return;
 
@@ -262,7 +261,7 @@
             <iframe
               bind:this={iframe}
               class="w-full border-0"
-              sandbox="allow-same-origin allow-scripts"
+              sandbox="allow-same-origin allow-scripts allow-popups"
               title="Message content"
             ></iframe>
           {/if}

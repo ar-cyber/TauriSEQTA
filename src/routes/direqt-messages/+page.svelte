@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { seqtaFetch } from '../../utils/seqtaFetch';
-  import { type Message, type Folder } from './types';
+  import { onMount, onDestroy } from 'svelte';
+  import { seqtaFetch, getRSS } from '../../utils/netUtil';
+  import { type Message} from './types';
   import { cache } from '../../utils/cache';
 
   // Components
@@ -10,11 +10,19 @@
   import MessageDetail from './components/Message.svelte';
   import ComposeModal from './components/ComposeModal.svelte';
 
+  // External Libraries
+  import dayjs from 'dayjs';
+
+    
+
+
+	
   let messages = $state<Message[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
 
-  let selectedFolder = $state<Folder>('Inbox');
+  let selectedFolder = $state('Inbox');
+  let selectedRSS = $state();
   let selectedMessage = $state<Message | null>(null);
   let showComposeModal = $state(false);
   let composeSubject = $state('');
@@ -27,9 +35,10 @@
   let deleting = $state(false);
   let restoring = $state(false);
 
-  async function fetchMessages(folderLabel: string = 'inbox') {
+  async function fetchMessages(folderLabel: string = 'inbox', rssname: string = "") {
     loading = true;
     error = null;
+    console.log(folderLabel)
     try {
       if (folderLabel === 'sent') {
         // Fetch both sent and outbox, then combine
@@ -86,6 +95,31 @@
           unread: !msg.read
         }));
         messages = [...sentMsgs, ...outboxMsgs].sort((a, b) => b.date.localeCompare(a.date));
+      } else if (folderLabel.includes('rss-')){
+        let rssfeeddata: any = []
+        console.log()
+        let rss = await getRSS(folderLabel.replace('rss-', ""))
+        console.log(rss)
+        rssfeeddata = (rss.feeds?.map((msg: any) => {
+          let date;
+          let description;
+          if (msg.description === undefined) {description = "No description available"} else {description = msg.description}
+          if (msg.pubDate === null) {date = ""} else {date = dayjs(msg.pubDate).format('YYYY-MM-DD HH:mm:ss')}
+          console.log(date)
+          return {
+            id: Math.floor(Math.random() * 10000000) + 1,
+            folder: rssname,
+            sender: rss.channel.title,
+            to: '',
+            subject: msg.title,
+            preview: `${msg.title} from ${rss.title}`, 
+            date: date,
+            body: `<a href="${msg.link}">View the RSS feed link.</a> <br> ${description}`,
+          }
+        })).sort((a: any, b: any) => b.date.localeCompare(a.date))
+        // console.log(rssfeeddata)
+        messages = rssfeeddata
+
       } else {
         const response = await seqtaFetch(
           '/seqta/student/load/message?',
@@ -103,9 +137,11 @@
             }
           }
         );
+        
         const data = typeof response === 'string' ? JSON.parse(response) : response;
         if (data?.payload?.messages) {
-          messages = data.payload.messages.map((msg: any) => ({
+          messages = data.payload.messages.map((msg: any) => (
+            {
             id: msg.id,
             folder: folderLabel.charAt(0).toUpperCase() + folderLabel.slice(1),
             sender: msg.sender,
@@ -165,6 +201,8 @@
         msg.body = data.payload.contents;
         // Cache the message content for 24 hours
         cache.set(cacheKey, msg.body, 1440); // 24 hours TTL
+      } else if (selectedFolder.includes('RSS')) {
+        msg.body = msg.body
       } else {
         msg.body = '<em>No content.</em>';
       }
@@ -180,13 +218,14 @@
     }
   }
 
-  function openFolder(folder: Folder) {
-    selectedFolder = folder;
+  function openFolder(folder: any) {
+    selectedFolder = folder.name;
     selectedMessage = null;
-    if (folder === 'Inbox') fetchMessages('inbox');
-    else if (folder === 'Sent') fetchMessages('sent');
-    else if (folder === 'Starred') fetchMessages('starred');
-    else if (folder === 'Trash') fetchMessages('trash');
+    console.log(folder.id)
+    if (folder.id.includes('rss-')) {
+      selectedRSS = folder.id
+      fetchMessages(folder.id, folder.name)
+    } else fetchMessages(folder.id)
   }
 
   function openCompose() {
@@ -415,15 +454,4 @@
     }
   }
 
-  .animate-fadeIn {
-    animation: fade-in 0.3s ease-out;
-  }
-
-  .animate-slideIn {
-    animation: slide-in 0.3s ease-out;
-  }
-
-  .animate-scaleIn {
-    animation: scale-in 0.3s ease-out;
-  }
 </style> 

@@ -3,7 +3,7 @@
   import { XMark } from "svelte-hero-icons";
   import Editor from "../../../components/Editor/Editor.svelte";
   import { onMount } from "svelte";
-  import { seqtaFetch } from "../../../utils/seqtaFetch";
+  import { seqtaFetch } from "../../../utils/netUtil";
 
   type Student = {
     campus: string;

@@ -10,5 +10,3 @@ export interface Message {
   unread: boolean;
   starred?: boolean;
 }
-
-export type Folder = 'Inbox' | 'Sent' | 'Starred' | 'Trash'; 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { seqtaFetch } from '../../utils/seqtaFetch';
+	import { seqtaFetch } from '../../utils/netUtil';
 
 	let portalUrl = $state<string>('');
 	let loading = $state<boolean>(true);

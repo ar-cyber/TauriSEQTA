@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import { seqtaFetch } from '../../utils/seqtaFetch';
+import { seqtaFetch } from '../../utils/netUtil';
 import { cache } from '../../utils/cache';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';

@@ -11,11 +11,10 @@ mod netgrab;
 #[path = "utils/settings.rs"]
 mod settings;
 
-use tauri_plugin_notification;
-use tauri_plugin_deep_link::DeepLinkExt;
-use urlencoding::decode;
-use tauri_plugin_single_instance;
 use tauri::Manager;
+use tauri_plugin_notification;
+use tauri_plugin_single_instance;
+use urlencoding::decode;
 
 /// Boilerplate example command
 #[tauri::command]
@@ -32,7 +31,7 @@ pub fn run() {
 
     #[cfg(not(any(target_os = "ios", target_os = "android")))]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             println!("[Desqta] Single instance event: {:?}", argv);
             
             // Handle deep link in single instance
@@ -103,6 +102,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             netgrab::get_api_data,
+            netgrab::open_url,
+            netgrab::get_rss_feed,
             netgrab::post_api_data,
             netgrab::fetch_api_data,
             login::check_session_exists,
