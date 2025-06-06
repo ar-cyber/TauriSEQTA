@@ -5,6 +5,11 @@ import { cache } from '../../utils/cache';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument } from 'pdfjs-dist';
+
+// Set the worker source for PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 const studentId = 69;
 
@@ -15,6 +20,9 @@ let loadingLessons = $state<boolean>(true);
 let error = $state<string | null>(null);
 let showExportMenu = $state(false);
 let selectedDay = $state<number>(new Date().getDay() === 0 ? 1 : new Date().getDay());
+let showPdfViewer = $state(false);
+let pdfUrl = $state<string | null>(null);
+let pdfLoading = $state(false);
 
 const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -179,7 +187,8 @@ function exportTimetableCSV() {
   saveAs(blob, 'timetable.csv');
 }
 
-function exportTimetablePDF() {
+async function exportTimetablePDF() {
+  pdfLoading = true;
   const doc = new jsPDF();
   const header = ['Day', 'Subject', 'Code', 'From', 'Until', 'Room', 'Teacher'];
   const sortedLessons = [...lessons].sort((a, b) => a.dayIdx - b.dayIdx || a.from.localeCompare(b.from));
@@ -201,7 +210,13 @@ function exportTimetablePDF() {
     headStyles: { fillColor: [59, 130, 246] }, // blue
     alternateRowStyles: { fillColor: [240, 240, 240] }
   });
-  doc.save('timetable.pdf');
+  
+  // Instead of saving, convert to blob and create URL
+  const pdfBlob = doc.output('blob');
+  const url = URL.createObjectURL(pdfBlob);
+  pdfUrl = url;
+  showPdfViewer = true;
+  pdfLoading = false;
 }
 
 function prevDay() {
@@ -331,6 +346,53 @@ onMount(loadLessons);
       {/if}
     </div>
   </div>
+
+  {#if showPdfViewer}
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-slate-800">
+          <h2 class="text-xl font-bold text-white">Timetable PDF</h2>
+          <div class="flex gap-2">
+            <button 
+              class="px-4 py-2 accent-bg text-white rounded-lg hover:opacity-90 transition-colors"
+              onclick={() => {
+                if (pdfUrl) {
+                  saveAs(pdfUrl, 'timetable.pdf');
+                }
+              }}
+            >
+              Download
+            </button>
+            <button 
+              class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+              onclick={() => {
+                showPdfViewer = false;
+                if (pdfUrl) {
+                  URL.revokeObjectURL(pdfUrl);
+                  pdfUrl = null;
+                }
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-hidden">
+          {#if pdfLoading}
+            <div class="flex items-center justify-center h-full">
+              <div class="w-16 h-16 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin"></div>
+            </div>
+          {:else if pdfUrl}
+            <iframe 
+              src={pdfUrl} 
+              class="w-full h-full"
+              title="Timetable PDF"
+            ></iframe>
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
