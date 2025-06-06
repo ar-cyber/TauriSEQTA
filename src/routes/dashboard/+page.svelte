@@ -36,6 +36,8 @@
     let timerSeconds = $state(0);
     let isTimerRunning = $state(false);
     let timerInterval: ReturnType<typeof setInterval> | null = null;
+    let customMinutes = $state('');
+    let customSeconds = $state('');
 
     async function fetchHomeworkData() {
         try {
@@ -105,7 +107,7 @@
                 } else {
                     stopTimer();
                     // Play notification sound
-                    new Audio('/notification.mp3').play().catch(() => {});
+                    new Audio('/timer.mp3').play().catch(() => {});
                 }
             }, 1000);
         }
@@ -123,6 +125,17 @@
         stopTimer();
         timerMinutes = 25;
         timerSeconds = 0;
+    }
+
+    function setCustomTime() {
+        const minutes = parseInt(customMinutes) || 0;
+        const seconds = parseInt(customSeconds) || 0;
+        if (minutes >= 0 && seconds >= 0 && seconds < 60) {
+            timerMinutes = minutes;
+            timerSeconds = seconds;
+            customMinutes = '';
+            customSeconds = '';
+        }
     }
 
     onMount(() => {
@@ -157,13 +170,13 @@
                     {:else if homeworkData}
                         <div class="flex flex-col gap-6">
                             {#each homeworkData.payload as homework}
-                                <div class="bg-slate-800 rounded-xl shadow-lg border-l-8" style="border-color: #1a73e8;">
+                                <div class="bg-slate-800 rounded-xl shadow-lg border-l-8" style="border-color: var(--accent);">
                                     <div class="px-6 pt-5 pb-3">
                                         <h3 class="text-lg font-bold mb-2 text-white">{homework.title}</h3>
                                         <div class="flex flex-col gap-3">
                                             {#each homework.items as item}
                                                 <div class="flex gap-2 items-start bg-slate-700 rounded-lg px-4 py-3 border border-slate-600">
-                                                    <span class="text-xl text-blue-500 mt-1">•</span>
+                                                    <span class="text-xl accent-text mt-1">•</span>
                                                     <span class="text-slate-50">{item}</span>
                                                 </div>
                                             {/each}
@@ -288,6 +301,32 @@
                             class="px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
                         >
                             60m
+                        </button>
+                    </div>
+                    <div class="mt-6 flex flex-col items-center gap-4">
+                        <div class="flex gap-4 items-center">
+                            <input
+                                type="number"
+                                bind:value={customMinutes}
+                                placeholder="Minutes"
+                                min="0"
+                                class="w-24 px-4 py-2 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <span class="text-white text-xl">:</span>
+                            <input
+                                type="number"
+                                bind:value={customSeconds}
+                                placeholder="Seconds"
+                                min="0"
+                                max="59"
+                                class="w-24 px-4 py-2 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <button
+                            onclick={setCustomTime}
+                            class="px-6 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+                        >
+                            Set Custom Time
                         </button>
                     </div>
                 </div>
