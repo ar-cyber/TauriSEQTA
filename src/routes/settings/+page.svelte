@@ -265,6 +265,12 @@ onMount(loadSettings);
                     class="flex-1 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     placeholder="#3b82f6"
                   />
+                  <button 
+                    class="px-3 py-2 rounded bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition"
+                    on:click={() => accentColor.set('#3b82f6')}
+                  >
+                    Reset
+                  </button>
                 </div>
                 <p class="text-xs text-slate-400">This color will be used throughout the app for buttons, links, and other interactive elements.</p>
               </div>
