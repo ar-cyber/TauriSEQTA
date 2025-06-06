@@ -35,7 +35,7 @@ const dispatch = createEventDispatcher<{
     {:else}
       {#each activeSubjects.filter(subjectMatches) as subj}
         <button 
-          class="px-6 py-3 w-full text-left font-bold text-base hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-indigo-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-indigo-500' : ''}"
+          class="px-6 py-3 w-full text-left font-bold text-base hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 accent-border' : ''}"
           on:click={() => dispatch('selectSubject', subj)}>
           {subj.title}
         </button>
@@ -44,7 +44,7 @@ const dispatch = createEventDispatcher<{
       {#each otherFolders.filter(folderMatches) as folder}
         <div>
           <button 
-            class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all cursor-pointer hover:bg-slate-800 hover:border-indigo-500"
+            class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all cursor-pointer hover:bg-slate-800 hover:accent-border"
             on:click={() => dispatch('toggleFolder', folder.code)}>
             <span class="text-base font-bold">{folder.code}</span>
             <svg 
@@ -60,7 +60,7 @@ const dispatch = createEventDispatcher<{
           {#if expandedFolders[folder.code]}
             {#each folder.subjects.filter(subjectMatches) as subj}
               <button 
-                class="pl-10 pr-6 py-2 font-medium text-sm hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:border-indigo-500 transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 border-indigo-500' : ''}"
+                class="pl-10 pr-6 py-2 font-medium text-sm hover:bg-slate-800 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-slate-800 accent-border' : ''}"
                 on:click={() => dispatch('selectSubject', subj)}>
                 {subj.title}
               </button>

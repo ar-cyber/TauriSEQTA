@@ -148,7 +148,7 @@ function getJumpButtonText(target: any) {
   </div>
   <div class="overflow-y-auto flex-1">
     <button 
-      class="w-full px-4 py-3 text-left hover:bg-slate-800 border-l-2 border-transparent hover:border-indigo-500 transition-all {showingOverview ? 'bg-slate-800 border-indigo-500' : ''}"
+      class="w-full px-4 py-3 text-left hover:bg-slate-800 border-l-2 border-transparent hover:accent-border transition-all {showingOverview ? 'bg-slate-800 accent-border' : ''}"
       onclick={onSelectOverview}>
       <div class="font-medium text-white text-sm">📚 Course Overview</div>
       <div class="text-xs text-slate-400 mt-1">
@@ -176,7 +176,7 @@ function getJumpButtonText(target: any) {
         {#each termSchedule.l as lesson, lessonIndex}
           {@const currentLessonContent = coursePayload?.w?.[termSchedule.n]?.[lessonIndex]}
           <button
-            class="w-full px-4 py-2 text-left text-sm hover:bg-slate-800/50 border-l-2 border-transparent hover:border-indigo-500/50 transition-all {selectedLesson === lesson && !showingOverview ? 'bg-slate-800/50 border-indigo-500/50' : ''}"
+            class="w-full px-4 py-2 text-left text-sm hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all {selectedLesson === lesson && !showingOverview ? 'bg-slate-800/50 accent-border' : ''}"
             onclick={() => onSelectLesson({ termSchedule, lesson, lessonIndex })}>
             <div class="font-medium text-white text-sm">{lesson.p} {formatLessonDate(lesson.d)}</div>
             <div class="text-xs text-slate-400 mt-1">
