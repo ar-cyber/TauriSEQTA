@@ -71,8 +71,8 @@ onMount(loadReports);
           class="group bg-[#232428] border border-[#333] rounded-2xl p-0 overflow-hidden shadow-md transition-all duration-200 hover:scale-[1.03] hover:shadow-lg focus:outline-none"
         >
           <div class="flex justify-between items-center px-6 pt-6">
-            <div class="rounded-full bg-blue-600 text-white text-lg font-bold px-6 py-2 tracking-widest transition-colors duration-300 group-hover:bg-blue-500 animate-gradient">{report.year}</div>
-            <div class="rounded-full bg-blue-600 text-white text-sm font-bold px-6 py-2 tracking-widest transition-colors duration-300 group-hover:bg-blue-500 animate-gradient">{report.terms}</div>
+            <div class="rounded-full accent-bg text-white text-lg font-bold px-6 py-2 tracking-widest transition-colors duration-300 group-hover:opacity-90 animate-gradient">{report.year}</div>
+            <div class="rounded-full accent-bg text-white text-sm font-bold px-6 py-2 tracking-widest transition-colors duration-300 group-hover:opacity-90 animate-gradient">{report.terms}</div>
           </div>
           <div class="flex flex-col items-center justify-center flex-1 py-12">
             <div class="text-2xl font-extrabold text-white mb-2 text-center animate-fade-in">{report.types}</div>
