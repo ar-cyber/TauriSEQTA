@@ -241,120 +241,144 @@
                     </div>
                     <div class="p-6">
                         <form onsubmit={(e) => { e.preventDefault(); addTodo(); }} class="mb-6">
-                            <div class="flex flex-col gap-4">
-                                <div class="flex gap-4">
+                            <div class="flex flex-col gap-6 p-4 bg-slate-800/40 rounded-lg border border-slate-700">
+                                <!-- Main Task -->
+                                <div class="flex flex-col sm:flex-row gap-4 items-stretch">
                                     <input
                                         type="text"
                                         bind:value={newTodoText}
                                         placeholder="Add a new task..."
-                                        class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
+                                        class="flex-1 px-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent shadow-sm"
                                     />
                                     <input
                                         type="date"
                                         bind:value={newTodoDueDate}
-                                        class="px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
+                                        class="px-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent shadow-sm"
                                     />
                                 </div>
-                                <div class="flex gap-4">
-                                    <select bind:value={newTodoPriority} class="px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700">
-                                        <option value="low">Low Priority</option>
-                                        <option value="medium">Medium Priority</option>
-                                        <option value="high">High Priority</option>
-                                    </select>
-                                    <input
-                                        type="text"
-                                        bind:value={newTodoTags}
-                                        placeholder="Tags (comma separated)"
-                                        class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700"
-                                    />
-                                    <select bind:value={newTodoRecurring} class="px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700">
-                                        <option value="none">No Repeat</option>
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>
+                                <!-- Details -->
+                                <div class="flex flex-col sm:flex-row gap-4 items-stretch">
+                                    <div class="relative flex items-center flex-1">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2">
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" class="{newTodoPriority === 'high' ? 'text-red-500' : newTodoPriority === 'medium' ? 'text-yellow-400' : 'text-green-500'}"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>
+                                        </span>
+                                        <select bind:value={newTodoPriority} class="pl-8 pr-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700 w-full">
+                                            <option value="low">Low Priority</option>
+                                            <option value="medium">Medium Priority</option>
+                                            <option value="high">High Priority</option>
+                                        </select>
+                                    </div>
+                                    <div class="relative flex items-center flex-1">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2">
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" class="text-blue-400"><rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/><rect x="11" y="4" width="2" height="16" rx="1" fill="currentColor"/></svg>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            bind:value={newTodoTags}
+                                            placeholder="Tags (comma separated, e.g. school,math)"
+                                            class="pl-8 pr-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700 w-full"
+                                        />
+                                    </div>
+                                    <div class="relative flex items-center flex-1">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2">
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" class="text-purple-400"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                        </span>
+                                        <select bind:value={newTodoRecurring} class="pl-8 pr-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700 w-full">
+                                            <option value="none">No Repeat</option>
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="flex gap-2 mb-2">
+                                <!-- Subtasks -->
+                                <div class="bg-slate-900/40 rounded-lg p-3">
+                                    <div class="flex gap-2 mb-2 items-center">
+                                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" class="text-slate-400"><rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/></svg>
                                         <input
                                             type="text"
                                             bind:value={newSubtaskText}
-                                            placeholder="Add subtask..."
-                                            class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700"
+                                            placeholder="Add subtask (e.g. Read chapter 1)"
+                                            class="flex-1 px-4 py-2 rounded-lg bg-slate-900/60 text-white border border-slate-700"
                                         />
-                                        <button type="button" onclick={addSubtask} class="px-4 py-2 rounded-lg bg-accent text-white">Add Subtask</button>
+                                        <button type="button" onclick={addSubtask} class="px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors shadow">Add Subtask</button>
                                     </div>
                                     <div class="flex flex-wrap gap-2">
                                         {#each newSubtasks as st (st.id)}
-                                            <span class="bg-slate-700 text-white px-3 py-1 rounded-lg flex items-center gap-2">
+                                            <span class="bg-slate-700 text-white px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm">
                                                 {st.text}
-                                                <button type="button" onclick={() => removeSubtask(st.id)} class="text-red-400 ml-2">×</button>
+                                                <button type="button" onclick={() => removeSubtask(st.id)} class="text-red-400 ml-2 hover:text-red-600">×</button>
                                             </span>
                                         {/each}
                                     </div>
                                 </div>
-                                <button
-                                    type="submit"
-                                    class="px-6 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors self-end"
-                                >
-                                    Add
-                                </button>
+                                <div class="flex justify-end">
+                                    <button
+                                        type="submit"
+                                        class="px-8 py-2 rounded-lg bg-accent text-white font-semibold hover:bg-accent/90 transition-colors shadow-lg"
+                                    >
+                                        Add Task
+                                    </button>
+                                </div>
                             </div>
                         </form>
 
-                        <div class="space-y-3">
+                        <div class="space-y-4">
                             {#each todos as todo (todo.id)}
-                                <div class="flex flex-col gap-2 p-4 bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700">
+                                <div class="flex flex-col gap-2 p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-700 hover:shadow-lg transition-shadow group">
                                     <div class="flex items-center gap-3">
                                         <input
                                             type="checkbox"
                                             checked={todo.completed}
                                             onchange={() => toggleTodo(todo.id)}
-                                            class="w-5 h-5 rounded border-slate-600 text-accent focus:ring-accent"
+                                            class="w-5 h-5 rounded border-slate-600 text-accent focus:ring-accent accent-bg"
                                         />
                                         <div class="flex-1">
-                                            <p class="text-white {todo.completed ? 'line-through text-slate-400' : ''}">
-                                                {todo.text}
-                                            </p>
+                                            <div class="flex items-center gap-2">
+                                                <p class="text-white {todo.completed ? 'line-through text-slate-400' : ''} font-semibold">
+                                                    {todo.text}
+                                                </p>
+                                                {#if todo.priority}
+                                                    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold {todo.priority === 'high' ? 'bg-red-600' : todo.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-600'} text-white">
+                                                        {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+                                                    </span>
+                                                {/if}
+                                                {#if todo.tags && todo.tags.length}
+                                                    <span class="flex gap-1 ml-2">
+                                                        {#each todo.tags as tag}
+                                                            <span class="bg-blue-700/80 text-blue-100 px-2 py-0.5 rounded-full text-xs">#{tag}</span>
+                                                        {/each}
+                                                    </span>
+                                                {/if}
+                                                {#if todo.recurring && todo.recurring !== 'none'}
+                                                    <span class="inline-block ml-2 text-xs text-purple-300">
+                                                        {todo.recurring.charAt(0).toUpperCase() + todo.recurring.slice(1)}
+                                                    </span>
+                                                {/if}
+                                            </div>
                                             {#if todo.dueDate}
                                                 <p class="text-sm text-slate-400 mt-1">
                                                     Due: {new Date(todo.dueDate).toLocaleDateString()}
                                                 </p>
                                             {/if}
-                                            {#if todo.priority}
-                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 {todo.priority === 'high' ? 'bg-red-600' : todo.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-600'} text-white">
-                                                    {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)} Priority
-                                                </span>
-                                            {/if}
-                                            {#if todo.tags && todo.tags.length}
-                                                <span class="inline-block ml-2 text-xs text-blue-300">
-                                                    {#each todo.tags as tag, i}
-                                                        #{tag}{i < todo.tags.length - 1 ? ', ' : ''}
-                                                    {/each}
-                                                </span>
-                                            {/if}
-                                            {#if todo.recurring && todo.recurring !== 'none'}
-                                                <span class="inline-block ml-2 text-xs text-purple-300">
-                                                    {todo.recurring.charAt(0).toUpperCase() + todo.recurring.slice(1)}
-                                                </span>
-                                            {/if}
                                         </div>
                                         <button
                                             onclick={() => deleteTodo(todo.id)}
-                                            class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                            class="p-2 text-slate-400 hover:text-red-500 transition-colors hover:scale-125 focus:outline-none"
+                                            title="Delete task"
                                         >
-                                            ×
+                                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                                         </button>
                                     </div>
                                     {#if todo.subtasks && todo.subtasks.length}
-                                        <div class="ml-8 flex flex-col gap-1 mt-2">
+                                        <div class="ml-8 flex flex-col gap-1 mt-2 bg-slate-900/40 rounded-lg p-2">
                                             {#each todo.subtasks as st (st.id)}
                                                 <div class="flex items-center gap-2">
                                                     <input
                                                         type="checkbox"
                                                         checked={st.completed}
                                                         onchange={() => toggleSubtask(todo.id, st.id)}
-                                                        class="w-4 h-4 rounded border-slate-600 text-accent"
+                                                        class="w-4 h-4 rounded border-slate-600 text-accent accent-bg"
                                                     />
                                                     <span class="text-sm text-white {st.completed ? 'line-through text-slate-400' : ''}">{st.text}</span>
                                                 </div>
@@ -455,5 +479,8 @@
 <style>
     :global(body) {
         background: var(--background);
+    }
+    .accent-bg {
+        background: var(--accent, #3b82f6);
     }
 </style> 
