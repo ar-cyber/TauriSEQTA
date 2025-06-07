@@ -20,6 +20,10 @@
         text: string;
         completed: boolean;
         dueDate?: string;
+        subtasks?: { id: number; text: string; completed: boolean }[];
+        priority?: 'low' | 'medium' | 'high';
+        tags?: string[];
+        recurring?: 'none' | 'daily' | 'weekly' | 'monthly';
     }
 
     let homeworkData = $state<HomeworkResponse | null>(null);
@@ -30,6 +34,11 @@
     let todos = $state<TodoItem[]>([]);
     let newTodoText = $state('');
     let newTodoDueDate = $state('');
+    let newTodoPriority = $state<'low' | 'medium' | 'high'>('medium');
+    let newTodoTags = $state(''); // comma-separated
+    let newTodoRecurring = $state<'none' | 'daily' | 'weekly' | 'monthly'>('none');
+    let newSubtasks = $state<{ id: number; text: string }[]>([]);
+    let newSubtaskText = $state('');
 
     // Timer state
     let timerMinutes = $state(25);
@@ -58,16 +67,35 @@
         }
     }
 
+    function addSubtask() {
+        if (newSubtaskText.trim()) {
+            newSubtasks = [...newSubtasks, { id: Date.now(), text: newSubtaskText.trim() }];
+            newSubtaskText = '';
+        }
+    }
+
+    function removeSubtask(id: number) {
+        newSubtasks = newSubtasks.filter(st => st.id !== id);
+    }
+
     function addTodo() {
         if (newTodoText.trim()) {
             todos = [...todos, {
                 id: Date.now(),
                 text: newTodoText.trim(),
                 completed: false,
-                dueDate: newTodoDueDate || undefined
+                dueDate: newTodoDueDate || undefined,
+                subtasks: newSubtasks.map(st => ({ ...st, completed: false })),
+                priority: newTodoPriority,
+                tags: newTodoTags.split(',').map(t => t.trim()).filter(Boolean),
+                recurring: newTodoRecurring
             }];
             newTodoText = '';
             newTodoDueDate = '';
+            newTodoPriority = 'medium';
+            newTodoTags = '';
+            newTodoRecurring = 'none';
+            newSubtasks = [];
             saveTodos();
         }
     }
@@ -75,6 +103,20 @@
     function toggleTodo(id: number) {
         todos = todos.map(todo => 
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        saveTodos();
+    }
+
+    function toggleSubtask(todoId: number, subtaskId: number) {
+        todos = todos.map(todo =>
+            todo.id === todoId
+                ? {
+                    ...todo,
+                    subtasks: todo.subtasks?.map(st =>
+                        st.id === subtaskId ? { ...st, completed: !st.completed } : st
+                    )
+                }
+                : todo
         );
         saveTodos();
     }
@@ -199,21 +241,61 @@
                     </div>
                     <div class="p-6">
                         <form onsubmit={(e) => { e.preventDefault(); addTodo(); }} class="mb-6">
-                            <div class="flex gap-4">
-                                <input
-                                    type="text"
-                                    bind:value={newTodoText}
-                                    placeholder="Add a new task..."
-                                    class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
-                                />
-                                <input
-                                    type="date"
-                                    bind:value={newTodoDueDate}
-                                    class="px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
-                                />
+                            <div class="flex flex-col gap-4">
+                                <div class="flex gap-4">
+                                    <input
+                                        type="text"
+                                        bind:value={newTodoText}
+                                        placeholder="Add a new task..."
+                                        class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
+                                    />
+                                    <input
+                                        type="date"
+                                        bind:value={newTodoDueDate}
+                                        class="px-4 py-2 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent"
+                                    />
+                                </div>
+                                <div class="flex gap-4">
+                                    <select bind:value={newTodoPriority} class="px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700">
+                                        <option value="low">Low Priority</option>
+                                        <option value="medium">Medium Priority</option>
+                                        <option value="high">High Priority</option>
+                                    </select>
+                                    <input
+                                        type="text"
+                                        bind:value={newTodoTags}
+                                        placeholder="Tags (comma separated)"
+                                        class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700"
+                                    />
+                                    <select bind:value={newTodoRecurring} class="px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700">
+                                        <option value="none">No Repeat</option>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="flex gap-2 mb-2">
+                                        <input
+                                            type="text"
+                                            bind:value={newSubtaskText}
+                                            placeholder="Add subtask..."
+                                            class="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white border border-slate-700"
+                                        />
+                                        <button type="button" onclick={addSubtask} class="px-4 py-2 rounded-lg bg-accent text-white">Add Subtask</button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        {#each newSubtasks as st (st.id)}
+                                            <span class="bg-slate-700 text-white px-3 py-1 rounded-lg flex items-center gap-2">
+                                                {st.text}
+                                                <button type="button" onclick={() => removeSubtask(st.id)} class="text-red-400 ml-2">×</button>
+                                            </span>
+                                        {/each}
+                                    </div>
+                                </div>
                                 <button
                                     type="submit"
-                                    class="px-6 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors"
+                                    class="px-6 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors self-end"
                                 >
                                     Add
                                 </button>
@@ -222,29 +304,63 @@
 
                         <div class="space-y-3">
                             {#each todos as todo (todo.id)}
-                                <div class="flex items-center gap-3 p-4 bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700">
-                                    <input
-                                        type="checkbox"
-                                        checked={todo.completed}
-                                        onchange={() => toggleTodo(todo.id)}
-                                        class="w-5 h-5 rounded border-slate-600 text-accent focus:ring-accent"
-                                    />
-                                    <div class="flex-1">
-                                        <p class="text-white {todo.completed ? 'line-through text-slate-400' : ''}">
-                                            {todo.text}
-                                        </p>
-                                        {#if todo.dueDate}
-                                            <p class="text-sm text-slate-400 mt-1">
-                                                Due: {new Date(todo.dueDate).toLocaleDateString()}
+                                <div class="flex flex-col gap-2 p-4 bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700">
+                                    <div class="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={todo.completed}
+                                            onchange={() => toggleTodo(todo.id)}
+                                            class="w-5 h-5 rounded border-slate-600 text-accent focus:ring-accent"
+                                        />
+                                        <div class="flex-1">
+                                            <p class="text-white {todo.completed ? 'line-through text-slate-400' : ''}">
+                                                {todo.text}
                                             </p>
-                                        {/if}
+                                            {#if todo.dueDate}
+                                                <p class="text-sm text-slate-400 mt-1">
+                                                    Due: {new Date(todo.dueDate).toLocaleDateString()}
+                                                </p>
+                                            {/if}
+                                            {#if todo.priority}
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 {todo.priority === 'high' ? 'bg-red-600' : todo.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-600'} text-white">
+                                                    {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)} Priority
+                                                </span>
+                                            {/if}
+                                            {#if todo.tags && todo.tags.length}
+                                                <span class="inline-block ml-2 text-xs text-blue-300">
+                                                    {#each todo.tags as tag, i}
+                                                        #{tag}{i < todo.tags.length - 1 ? ', ' : ''}
+                                                    {/each}
+                                                </span>
+                                            {/if}
+                                            {#if todo.recurring && todo.recurring !== 'none'}
+                                                <span class="inline-block ml-2 text-xs text-purple-300">
+                                                    {todo.recurring.charAt(0).toUpperCase() + todo.recurring.slice(1)}
+                                                </span>
+                                            {/if}
+                                        </div>
+                                        <button
+                                            onclick={() => deleteTodo(todo.id)}
+                                            class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                        >
+                                            ×
+                                        </button>
                                     </div>
-                                    <button
-                                        onclick={() => deleteTodo(todo.id)}
-                                        class="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                                    >
-                                        ×
-                                    </button>
+                                    {#if todo.subtasks && todo.subtasks.length}
+                                        <div class="ml-8 flex flex-col gap-1 mt-2">
+                                            {#each todo.subtasks as st (st.id)}
+                                                <div class="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={st.completed}
+                                                        onchange={() => toggleSubtask(todo.id, st.id)}
+                                                        class="w-4 h-4 rounded border-slate-600 text-accent"
+                                                    />
+                                                    <span class="text-sm text-white {st.completed ? 'line-through text-slate-400' : ''}">{st.text}</span>
+                                                </div>
+                                            {/each}
+                                        </div>
+                                    {/if}
                                 </div>
                             {/each}
                         </div>
