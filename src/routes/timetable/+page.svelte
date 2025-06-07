@@ -19,7 +19,9 @@ let lessonColours = $state<any[]>([]);
 let loadingLessons = $state<boolean>(true);
 let error = $state<string | null>(null);
 let showExportMenu = $state(false);
-let selectedDay = $state<number>(new Date().getDay() === 0 ? 1 : new Date().getDay());
+let selectedDay = $state<number>(
+  Math.min(5, Math.max(1, new Date().getDay() === 0 ? 1 : new Date().getDay()))
+);
 let showPdfViewer = $state(false);
 let pdfUrl = $state<string | null>(null);
 let pdfLoading = $state(false);
