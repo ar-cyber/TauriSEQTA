@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { notify } from '../../utils/notify';
 import { accentColor, loadAccentColor, updateAccentColor, theme, loadTheme, updateTheme } from '../../lib/stores/theme';
 import { Icon } from 'svelte-hero-icons';
-import { Plus, ArrowPath, Trash, Rss, Sun, Moon } from 'svelte-hero-icons';
+import { Plus, ArrowPath, Trash, Rss, Sun, Moon, ComputerDesktop } from 'svelte-hero-icons';
 
 interface Shortcut {
   name: string;
@@ -158,17 +158,17 @@ onMount(async () => {
 });
 </script>
 
-<div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
-    <h1 class="text-xl sm:text-2xl font-bold">Settings</h1>
-    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full sm:w-auto">
+<div class="p-4 mx-auto max-w-4xl sm:p-6 md:p-8">
+  <div class="flex flex-col gap-4 justify-between items-start mb-8 sm:flex-row sm:items-center animate-fade-in-up">
+    <h1 class="text-xl font-bold sm:text-2xl">Settings</h1>
+    <div class="flex flex-col gap-2 items-start w-full sm:flex-row sm:items-center sm:w-auto">
       <button 
-        class="w-full sm:w-auto px-6 py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600 focus:ring-2 focus:ring-green-400 transition-all duration-200 active:scale-95 hover:scale-105 shadow-lg"
-        on:click={saveSettings} 
+        class="px-6 py-2 w-full text-white bg-gradient-to-r from-green-600 to-green-500 rounded-lg shadow-lg transition-all duration-200 sm:w-auto hover:from-green-700 hover:to-green-600 focus:ring-2 focus:ring-green-400 active:scale-95 hover:scale-105"
+        onclick={saveSettings} 
         disabled={saving}
       >
         {#if saving}
-          <div class="flex items-center justify-center gap-2">
+          <div class="flex gap-2 justify-center items-center">
             <div class="w-4 h-4 rounded-full border-2 animate-spin border-white/30 border-t-white"></div>
             <span>Saving...</span>
           </div>
@@ -177,68 +177,68 @@ onMount(async () => {
         {/if}
       </button>
       {#if saveSuccess}
-        <span class="text-green-400 animate-fade-in text-sm sm:text-base">Settings saved successfully!</span>
+        <span class="text-sm text-green-400 animate-fade-in sm:text-base">Settings saved successfully!</span>
       {/if}
       {#if saveError}
-        <span class="text-red-400 animate-fade-in text-sm sm:text-base">{saveError}</span>
+        <span class="text-sm text-red-400 animate-fade-in sm:text-base">{saveError}</span>
       {/if}
     </div>
   </div>
 
   {#if loading}
     <div class="flex justify-center items-center py-12 animate-fade-in">
-      <div class="flex flex-col items-center gap-4">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
-        <p class="text-slate-400 text-sm sm:text-base">Loading settings...</p>
+      <div class="flex flex-col gap-4 items-center">
+        <div class="w-8 h-8 rounded-full border-4 animate-spin sm:w-10 sm:h-10 border-indigo-500/30 border-t-indigo-500"></div>
+        <p class="text-sm text-gray-600 dark:text-slate-400 sm:text-base">Loading settings...</p>
       </div>
     </div>
   {:else}
     <div class="space-y-6 sm:space-y-8">
       <!-- Homepage Settings -->
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
-          <h2 class="text-base sm:text-lg font-semibold">Homepage</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Customize your homepage experience</p>
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-gray-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-gray-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Homepage</h2>
+          <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Customize your homepage experience</p>
         </div>
-        <div class="p-4 sm:p-6 space-y-6">
+        <div class="p-4 space-y-6 sm:p-6">
           <!-- Shortcuts -->
           <div>
-            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Quick Access Shortcuts</h3>
-            <p class="mb-4 text-xs sm:text-sm text-slate-400">Add shortcuts to frequently used websites that will appear at the top of your homepage.</p>
+            <h3 class="mb-3 text-sm font-semibold sm:text-base sm:mb-4">Quick Access Shortcuts</h3>
+            <p class="mb-4 text-xs text-gray-600 sm:text-sm dark:text-slate-400">Add shortcuts to frequently used websites that will appear at the top of your homepage.</p>
             <div class="space-y-3 sm:space-y-4">
               {#each shortcuts as shortcut, idx}
-                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-slate-800/50 rounded-lg p-3 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
-                  <input class="w-full sm:w-24 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Name" bind:value={shortcut.name} />
-                  <input class="w-full sm:w-22 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="Icon emoji" bind:value={shortcut.icon} />
-                  <input class="w-full sm:flex-1 px-2 py-1.5 rounded bg-slate-900/50 focus:ring-2 focus:ring-blue-500 transition" placeholder="URL" bind:value={shortcut.url} />
-                  <button class="text-red-400 hover:text-red-600 px-2 transition-transform duration-200 active:scale-110" on:click={() => removeShortcut(idx)} title="Remove">✕</button>
+                <div class="flex flex-col gap-2 items-start p-3 rounded-lg transition-all duration-200 sm:flex-row sm:items-center bg-gray-100/80 dark:bg-slate-800/50 hover:shadow-lg hover:bg-gray-200/80 dark:hover:bg-slate-700/50 animate-fade-in">
+                  <input class="px-2 py-1.5 w-full bg-white rounded transition sm:w-24 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500" placeholder="Name" bind:value={shortcut.name} />
+                  <input class="px-2 py-1.5 w-full bg-white rounded transition sm:w-22 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500" placeholder="Icon emoji" bind:value={shortcut.icon} />
+                  <input class="px-2 py-1.5 w-full bg-white rounded transition sm:flex-1 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500" placeholder="URL" bind:value={shortcut.url} />
+                  <button class="px-2 text-red-400 transition-transform duration-200 hover:text-red-600 active:scale-110" onclick={() => removeShortcut(idx)} title="Remove">✕</button>
                 </div>
               {/each}
-              <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={addShortcut}>Add Shortcut</button>
+              <button class="px-4 py-2 w-full text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105" onclick={addShortcut}>Add Shortcut</button>
             </div>
           </div>
           <!-- Widget Settings -->
           <div>
-            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Widget Settings</h3>
-            <p class="mb-4 text-xs sm:text-sm text-slate-400">Configure which widgets appear on your in DesQTA.</p>
-            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in space-y-4">
-              <div class="flex items-center gap-4">
-                <input id="weather-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={weatherEnabled} />
-                <label for="weather-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Show Weather Widget</label>
+            <h3 class="mb-3 text-sm font-semibold sm:text-base sm:mb-4">Widget Settings</h3>
+            <p class="mb-4 text-xs text-gray-600 sm:text-sm dark:text-slate-400">Configure which widgets appear on your in DesQTA.</p>
+            <div class="p-4 space-y-4 rounded-lg bg-gray-100/80 dark:bg-slate-800/50 animate-fade-in">
+              <div class="flex gap-4 items-center">
+                <input id="weather-enabled" type="checkbox" class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5" bind:checked={weatherEnabled} />
+                <label for="weather-enabled" class="text-sm font-medium text-gray-800 cursor-pointer sm:text-base dark:text-slate-200">Show Weather Widget</label>
               </div>
-              <div class="flex items-center gap-4">
-                <input id="force-use-location" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={forceUseLocation} />
-                <label for="force-use-location" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Only use Fallback Location for Weather</label>
-                <p class="text-xs sm:text-sm text-slate-400">Useful if you use a VPN or want to choose the location, though the system sometimes does not work.</p>
+              <div class="flex gap-4 items-center">
+                <input id="force-use-location" type="checkbox" class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5" bind:checked={forceUseLocation} />
+                <label for="force-use-location" class="text-sm font-medium text-gray-800 cursor-pointer sm:text-base dark:text-slate-200">Only use Fallback Location for Weather</label>
+                <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Useful if you use a VPN or want to choose the location, though the system sometimes does not work.</p>
               </div>
-              <div class="flex flex-col items-start gap-2 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
-                <label for="weather-city" class="text-xs sm:text-sm text-slate-400">Fallback City:</label>
-                <input id="weather-city" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Perth" bind:value={weatherCity} />
+              <div class="flex flex-col gap-2 items-start pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-city" class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Fallback City:</label>
+                <input id="weather-city" class="px-3 py-2 w-full text-gray-900 bg-white rounded border transition sm:w-64 dark:bg-slate-900/50 dark:text-white border-gray-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Perth" bind:value={weatherCity} />
               </div>
-              <div class="flex flex-col items-start gap-2 pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
-                <label for="weather-country" class="text-xs sm:text-sm text-slate-400">Fallback Country Code</label>
+              <div class="flex flex-col gap-2 items-start pl-1" style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled ? 'auto' : 'none'};">
+                <label for="weather-country" class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Fallback Country Code</label>
                 <a href="https://countrycode.org" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-400 hover:underline">If unsure, visit countrycode.org</a>
-                <input id="weather-country" class="w-full sm:w-64 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="AU" bind:value={weatherCountry} />
+                <input id="weather-country" class="px-3 py-2 w-full text-gray-900 bg-white rounded border transition sm:w-64 dark:bg-slate-900/50 dark:text-white border-gray-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AU" bind:value={weatherCountry} />
               </div>
             </div>
           </div>
@@ -246,88 +246,95 @@ onMount(async () => {
       </section>
 
       <!-- Appearance Settings -->
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-100">
-        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
-          <h2 class="text-base sm:text-lg font-semibold">Appearance</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Customize how DesQTA looks</p>
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-gray-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-gray-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Appearance</h2>
+          <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Customize how DesQTA looks</p>
         </div>
-        <div class="p-4 sm:p-6 space-y-6">
+        <div class="p-4 space-y-6 sm:p-6">
           <!-- Theme Settings -->
           <div>
-            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Theme</h3>
-            <p class="mb-4 text-xs sm:text-sm text-slate-400">Choose your preferred color scheme and theme settings.</p>
-            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in space-y-4">
+            <h3 class="mb-3 text-sm font-semibold sm:text-base sm:mb-4">Theme</h3>
+            <p class="mb-4 text-xs text-gray-600 sm:text-sm dark:text-slate-400">Choose your preferred color scheme and theme settings.</p>
+            <div class="p-4 space-y-4 rounded-lg bg-gray-100/80 dark:bg-slate-800/50 animate-fade-in">
               <div class="flex flex-col gap-2">
-                <label for="accent-color" class="text-sm text-slate-200">Accent Color</label>
+                <label for="accent-color" class="text-sm text-gray-800 dark:text-slate-200">Accent Color</label>
                 <div class="flex gap-2 items-center">
                   <input 
                     type="color" 
                     id="accent-color" 
                     bind:value={$accentColor}
-                    class="w-12 h-12 rounded-lg cursor-pointer bg-transparent accent-border border"
+                    class="w-12 h-12 bg-transparent rounded-lg border cursor-pointer accent-border"
                   />
                   <input 
                     type="text" 
                     bind:value={$accentColor}
-                    class="flex-1 px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    class="flex-1 px-3 py-2 text-gray-900 bg-white rounded border transition dark:bg-slate-900/50 dark:text-white border-gray-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="#3b82f6"
                   />
                   <button 
-                    class="px-3 py-2 rounded bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition"
-                    on:click={() => accentColor.set('#3b82f6')}
+                    class="px-3 py-2 text-gray-800 bg-gray-200 rounded transition dark:bg-slate-700/50 dark:text-white hover:bg-gray-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500"
+                    onclick={() => accentColor.set('#3b82f6')}
                   >
                     Reset
                   </button>
                 </div>
-                <p class="text-xs text-slate-400">This color will be used throughout the app for buttons, links, and other interactive elements.</p>
+                <p class="text-xs text-gray-600 dark:text-slate-400">This color will be used throughout the app for buttons, links, and other interactive elements.</p>
               </div>
 
               <div class="flex flex-col gap-2">
-                <label class="text-sm text-slate-200">Theme</label>
+                <p class="text-sm text-gray-800 dark:text-slate-200">Theme</p>
                 <div class="flex gap-2">
                   <button 
-                    class="flex-1 px-4 py-3 rounded-lg bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'light' ? 'accent-bg' : ''}"
-                    on:click={() => updateTheme('light')}
+                    class="flex-1 px-4 py-3 rounded-lg bg-gray-200 dark:bg-slate-700/50 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'light' ? 'accent-bg' : ''}"
+                    onclick={() => updateTheme('light')}
                   >
                     <Icon src={Sun} class="w-5 h-5" />
                     Light
                   </button>
                   <button 
-                    class="flex-1 px-4 py-3 rounded-lg bg-slate-700/50 text-white hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'dark' ? 'accent-bg' : ''}"
-                    on:click={() => updateTheme('dark')}
+                    class="flex-1 px-4 py-3 rounded-lg bg-gray-200 dark:bg-slate-700/50 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'dark' ? 'accent-bg' : ''}"
+                    onclick={() => updateTheme('dark')}
                   >
                     <Icon src={Moon} class="w-5 h-5" />
                     Dark
                   </button>
+                  <button 
+                    class="flex-1 px-4 py-3 rounded-lg bg-gray-200 dark:bg-slate-700/50 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500 transition flex items-center justify-center gap-2 {$theme === 'system' ? 'accent-bg' : ''}"
+                    onclick={() => updateTheme('system')}
+                  >
+                    <Icon src={ComputerDesktop} class="w-5 h-5" />
+                    System
+                  </button>
                 </div>
-                <p class="text-xs text-slate-400">Choose between light and dark mode for the entire app.</p>
+                <p class="text-xs text-gray-600 dark:text-slate-400">Choose between light mode, dark mode, or follow your system preference.</p>
               </div>
             </div>
           </div>
           <!-- Layout Settings -->
           <div>
-            <h3 class="text-sm sm:text-base font-semibold mb-3 sm:mb-4">Layout</h3>
-            <p class="mb-4 text-xs sm:text-sm text-slate-400">Adjust the layout and sizing of various elements.</p>
-            <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
-              <p class="text-xs sm:text-sm text-slate-400">Layout settings coming soon...</p>
+            <h3 class="mb-3 text-sm font-semibold sm:text-base sm:mb-4">Layout</h3>
+            <p class="mb-4 text-xs text-gray-600 sm:text-sm dark:text-slate-400">Adjust the layout and sizing of various elements.</p>
+            <div class="p-4 rounded-lg bg-gray-100/80 dark:bg-slate-800/50 animate-fade-in">
+              <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Layout settings coming soon...</p>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Notification Settings -->
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-200">
-        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
-          <h2 class="text-base sm:text-lg font-semibold">Notifications</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Manage your notification preferences</p>
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-200 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-gray-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-gray-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Notifications</h2>
+          <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Manage your notification preferences</p>
         </div>
         <div class="p-4 sm:p-6">
-          <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in flex flex-col gap-4">
-            <div class="flex items-center gap-3">
-              <input id="reminders-enabled" type="checkbox" class="accent-blue-600 w-4 h-4 sm:w-5 sm:h-5" bind:checked={remindersEnabled} />
-              <label for="reminders-enabled" class="text-sm sm:text-base text-slate-200 font-medium cursor-pointer">Enable assessment reminder notifications</label>
+          <div class="flex flex-col gap-4 p-4 rounded-lg bg-gray-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <div class="flex gap-3 items-center">
+              <input id="reminders-enabled" type="checkbox" class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5" bind:checked={remindersEnabled} />
+              <label for="reminders-enabled" class="text-sm font-medium text-gray-800 cursor-pointer sm:text-base dark:text-slate-200">Enable assessment reminder notifications</label>
             </div>
-            <button class="w-full sm:w-auto px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow" on:click={sendTestNotification}>
+            <button class="px-4 py-2 w-full text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105" onclick={sendTestNotification}>
               Send Test Notification
             </button>
           </div>
@@ -335,21 +342,21 @@ onMount(async () => {
       </section>
 
       <!-- RSS Feeds Settings -->
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-200">
-        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
-          <h2 class="text-base sm:text-lg font-semibold">RSS Feeds</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Manage your news and content feeds that appear in your DMs</p>
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-200 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-gray-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-gray-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">RSS Feeds</h2>
+          <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Manage your news and content feeds that appear in your DMs</p>
         </div>
-        <div class="p-4 sm:p-6 space-y-6">
+        <div class="p-4 space-y-6 sm:p-6">
           <div>
             <div class="flex justify-between items-center mb-4">
               <div>
-                <h3 class="text-sm sm:text-base font-semibold">Feed Sources</h3>
-                <p class="text-xs sm:text-sm text-slate-400">Add RSS feeds to stay updated with your favorite content</p>
+                <h3 class="text-sm font-semibold sm:text-base">Feed Sources</h3>
+                <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Add RSS feeds to stay updated with your favorite content</p>
               </div>
               <button 
-                class="px-4 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow flex items-center gap-2"
-                on:click={addFeed}
+                class="flex gap-2 items-center px-4 py-2 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105"
+                onclick={addFeed}
               >
                 <Icon src={Plus} class="w-4 h-4" />
                 Add Feed
@@ -357,33 +364,33 @@ onMount(async () => {
             </div>
             <div class="space-y-3">
               {#each feeds as feed, idx}
-                <div class="group bg-slate-800/50 rounded-lg p-4 transition-all duration-200 hover:shadow-lg hover:bg-slate-700/50 animate-fade-in">
-                  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <div class="p-4 rounded-lg transition-all duration-200 group bg-gray-100/80 dark:bg-slate-800/50 hover:shadow-lg hover:bg-gray-200/80 dark:hover:bg-slate-700/50 animate-fade-in">
+                  <div class="flex flex-col gap-3 items-start sm:flex-row sm:items-center">
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2 mb-2">
-                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span class="text-sm font-medium text-slate-200 truncate">
+                      <div class="flex gap-2 items-center mb-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-medium text-gray-800 truncate dark:text-slate-200">
                           {feed.url ? new URL(feed.url).hostname : 'New Feed'}
                         </span>
                       </div>
                       <input 
-                        class="w-full px-3 py-2 rounded bg-slate-900/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        class="px-3 py-2 w-full text-gray-900 bg-white rounded border transition dark:bg-slate-900/50 dark:text-white border-gray-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="https://example.com/feed.xml"
                         bind:value={feed.url}
                       />
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
                       <button 
-                        class="p-2 text-slate-400 hover:text-blue-400 transition-colors rounded-lg hover:bg-slate-700/50"
+                        class="p-2 text-gray-600 rounded-lg transition-colors dark:text-slate-400 hover:text-blue-400 hover:bg-gray-200 dark:hover:bg-slate-700/50"
                         title="Test Feed"
-                        on:click={() => testFeed(feed.url)}
+                        onclick={() => testFeed(feed.url)}
                       >
                         <Icon src={ArrowPath} class="w-5 h-5" />
                       </button>
                       <button 
-                        class="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-lg hover:bg-slate-700/50"
+                        class="p-2 text-gray-600 rounded-lg transition-colors dark:text-slate-400 hover:text-red-400 hover:bg-gray-200 dark:hover:bg-slate-700/50"
                         title="Remove Feed"
-                        on:click={() => removeFeed(idx)}
+                        onclick={() => removeFeed(idx)}
                       >
                         <Icon src={Trash} class="w-5 h-5" />
                       </button>
@@ -392,10 +399,10 @@ onMount(async () => {
                 </div>
               {/each}
               {#if feeds.length === 0}
-                <div class="text-center py-8 text-slate-400 animate-fade-in">
-                  <Icon src={Rss} class="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <div class="py-8 text-center text-gray-600 dark:text-slate-400 animate-fade-in">
+                  <Icon src={Rss} class="mx-auto mb-3 w-12 h-12 opacity-50" />
                   <p class="text-sm">No feeds added yet</p>
-                  <p class="text-xs mt-1">Add your first RSS feed to get started</p>
+                  <p class="mt-1 text-xs">Add your first RSS feed to get started</p>
                 </div>
               {/if}
             </div>
@@ -404,15 +411,15 @@ onMount(async () => {
       </section>
 
       <!-- Plugins Section -->
-      <section class="bg-slate-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up delay-300">
-        <div class="px-4 sm:px-6 py-4 border-b border-slate-800/50">
-          <h2 class="text-base sm:text-lg font-semibold">Plugins</h2>
-          <p class="text-xs sm:text-sm text-slate-400">Enhance your DesQTA experience with plugins</p>
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-gray-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-gray-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Plugins</h2>
+          <p class="text-xs text-gray-600 sm:text-sm dark:text-slate-400">Enhance your DesQTA experience with plugins</p>
         </div>
         <div class="p-4 sm:p-6">
-          <div class="p-4 bg-slate-800/50 rounded-lg animate-fade-in">
-            <p class="text-xs sm:text-sm text-slate-400 mb-4">Install additional features and customizations from our plugin store.</p>
-            <a href="/settings/plugins" class="inline-block w-full sm:w-auto text-center px-6 py-2 rounded-lg accent-bg text-white hover:accent-bg-hover focus:ring-2 accent-ring transition-all duration-200 active:scale-95 hover:scale-105 shadow">
+          <div class="p-4 rounded-lg bg-gray-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <p class="mb-4 text-xs text-gray-600 sm:text-sm dark:text-slate-400">Install additional features and customizations from our plugin store.</p>
+            <a href="/settings/plugins" class="inline-block px-6 py-2 w-full text-center text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105">
               Open Plugin Store
             </a>
           </div>

@@ -340,7 +340,7 @@
 </script>
 
 <div class="flex h-full">
-  <div class="flex h-full w-full max-xl:flex-col">
+  <div class="flex w-full h-full max-xl:flex-col">
     <Sidebar 
       selectedFolder={selectedFolder}
       openFolder={openFolder}
@@ -357,7 +357,7 @@
     />
     
     <!-- Message detail view - full screen on mobile -->
-    <div class="hidden xl:block flex-1">
+    <div class="hidden flex-1 xl:block">
       <MessageDetail
         selectedMessage={selectedMessage}
         selectedFolder={selectedFolder}
@@ -377,11 +377,11 @@
 
   <!-- Mobile message detail view -->
   {#if selectedMessage}
-    <div class="xl:hidden fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-sm">
-      <div class="h-full flex flex-col">
-        <div class="flex items-center justify-between p-4 border-b border-slate-800/50">
+    <div class="fixed inset-0 z-50 backdrop-blur-sm xl:hidden bg-white/95 dark:bg-slate-900/95">
+      <div class="flex flex-col h-full">
+                  <div class="flex justify-between items-center p-4 border-b border-gray-300/50 dark:border-slate-800/50">
           <button
-            class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+            class="flex gap-2 items-center text-gray-700 transition-colors dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
             onclick={() => selectedMessage = null}
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -389,11 +389,11 @@
             </svg>
             <span class="text-sm font-medium">Back</span>
           </button>
-          <span class="text-sm font-medium text-slate-300">Message</span>
+          <span class="text-sm font-medium text-gray-700 dark:text-slate-300">Message</span>
           <div class="w-8"></div> <!-- Spacer for alignment -->
         </div>
         
-        <div class="flex-1 overflow-y-auto">
+        <div class="overflow-y-auto flex-1">
           <MessageDetail
             selectedMessage={selectedMessage}
             selectedFolder={selectedFolder}

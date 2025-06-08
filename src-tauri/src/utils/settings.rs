@@ -40,7 +40,7 @@ impl Default for Settings {
             weather_country: String::new(),
             reminders_enabled: true,
             accent_color: "#3b82f6".to_string(), // Default to blue-500
-            theme: "dark".to_string(), // Default to dark theme
+            theme: "system".to_string(), // Default to dark theme
         }
     }
 }

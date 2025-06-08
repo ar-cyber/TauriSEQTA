@@ -170,13 +170,13 @@
   });
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="container px-4 py-8 mx-auto">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold text-white">News</h1>
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">News</h1>
     <div class="relative">
       <button
         id="source-button"
-        class="px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-lg hover:bg-slate-700 focus:ring-2 focus:ring-blue-500 transition-colors"
+                  class="px-4 py-2 text-gray-900 bg-white rounded-lg border border-gray-300 transition-colors dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500"
         on:click={() => showSourceSelector = !showSourceSelector}
       >
         {selectedSource.toUpperCase()}
@@ -184,19 +184,19 @@
       {#if showSourceSelector}
         <div
           id="source-dropdown"
-          class="absolute right-0 mt-2 w-48 bg-slate-800 text-white border border-slate-700 rounded-lg shadow-xl z-10"
+          class="absolute right-0 z-10 mt-2 w-48 text-gray-900 bg-white rounded-lg border border-gray-300 shadow-xl dark:bg-slate-800 dark:text-white dark:border-slate-700"
           transition:fade
         >
           {#each Object.keys(rssFeedsByCountry) as country}
             <button
-              class="w-full px-4 py-2 text-left hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg"
+              class="px-4 py-2 w-full text-left transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 first:rounded-t-lg last:rounded-b-lg"
               on:click={() => handleSourceChange(country)}
             >
               {country.toUpperCase()}
             </button>
           {/each}
           <button
-            class="w-full px-4 py-2 text-left hover:bg-slate-700 transition-colors border-t border-slate-700"
+                          class="px-4 py-2 w-full text-left border-t border-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 dark:border-slate-700"
             on:click={() => handleSourceChange('australia')}
           >
             AUSTRALIA
@@ -208,30 +208,30 @@
 
   {#if loading}
     <div class="flex justify-center items-center h-64">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500"></div>
+      <div class="w-12 h-12 rounded-full border-b-4 border-blue-500 animate-spin"></div>
     </div>
   {:else if error}
-    <div class="text-center py-8">
-      <p class="text-red-400 mb-4">{error}</p>
+    <div class="py-8 text-center">
+      <p class="mb-4 text-red-400">{error}</p>
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        class="px-4 py-2 text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700"
         on:click={() => fetchNews(selectedSource)}
       >
         Retry
       </button>
     </div>
   {:else if news.length === 0}
-    <div class="text-center py-8">
+    <div class="py-8 text-center">
       <p class="text-slate-400">No news articles found.</p>
     </div>
   {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {#each news as article (article.url)}
         <a
           href={article.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="group block bg-slate-900 border border-slate-800 rounded-xl shadow-2xl hover:scale-[1.025] hover:shadow-blue-900/30 transition-all duration-200 overflow-hidden focus:ring-2 focus:ring-blue-500"
+          class="group block dark:bg-slate-900 bg-slate-100 border dark:border-slate-800 border-slate-200 rounded-xl shadow-2xl hover:scale-[1.025] hover:shadow-blue-900/30 transition-all duration-200 overflow-hidden focus:ring-2 focus:ring-blue-500"
           transition:fade
         >
           <div class="relative">
@@ -239,15 +239,15 @@
               <img
                 src={article.urlToImage}
                 alt={article.title}
-                class="w-full h-48 object-cover rounded-t-xl"
+                class="object-cover w-full h-48 rounded-t-xl"
               />
             {/if}
           </div>
           <div class="p-5">
-            <h2 class="text-lg font-semibold text-white mb-2 line-clamp-2">
+            <h2 class="mb-2 text-lg font-semibold dark:text-white line-clamp-2">
               {article.title}
             </h2>
-            <p class="text-slate-300 line-clamp-3">
+            <p class="dark:text-slate-300 text-slate-700 line-clamp-3">
               {article.description}
             </p>
           </div>

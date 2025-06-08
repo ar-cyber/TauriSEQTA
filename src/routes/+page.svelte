@@ -411,26 +411,26 @@
 </style>
 
 <div
-  class="p-8 mx-auto max-w-7xl min-h-screen bg-gradient-to-br from-slate-950 to-slate-900"
+  class="p-8 mx-auto max-w-7xl min-h-screen"
 >
   <div class="space-y-8">
     <!-- Shortcuts Section -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4">
       {#each homepageShortcuts as shortcut}
         <a
           href={shortcut.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] overflow-hidden"
+          class="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] bg-gray-200/40 dark:bg-slate-800/40 backdrop-blur-sm border border-gray-300/50 dark:border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] overflow-hidden"
         >
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-purple-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 from-indigo-600/10 to-purple-700/10 group-hover:opacity-100"></div>
           <div
-            class="relative flex justify-center items-center w-12 h-12 sm:w-14 sm:h-14 mb-3 text-2xl sm:text-3xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg animate-gradient"
+            class="flex relative justify-center items-center mb-3 w-12 h-12 text-2xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg sm:w-14 sm:h-14 sm:text-3xl animate-gradient"
           >
             {shortcut.icon}
           </div>
-          <span
-            class="relative text-sm sm:text-base font-medium text-white transition-colors group-hover:text-indigo-200 text-center"
+                      <span
+              class="relative text-sm font-medium text-center text-gray-900 transition-colors sm:text-base dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-200"
             >{shortcut.name}</span
           >
         </a>
@@ -439,22 +439,22 @@
 
     <!-- Today's Lessons Section -->
     <div
-      class="overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
+      class="overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm bg-white/80 dark:bg-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
     >
       <div
-        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-3 sm:px-4 py-3 bg-gradient-to-r border-b border-slate-700/50 from-slate-800/70 to-slate-800/30"
+        class="flex flex-col gap-4 justify-between items-start px-3 py-3 bg-gradient-to-r border-b sm:flex-row sm:items-center sm:px-4 border-gray-300/50 dark:border-slate-700/50 from-gray-100/70 dark:from-slate-800/70 to-gray-100/30 dark:to-slate-800/30"
       >
-        <span class="text-xl font-semibold text-white">{lessonsSubtitle()}</span>
+        <span class="text-xl font-semibold text-gray-900 dark:text-white">{lessonsSubtitle()}</span>
         <div class="flex gap-3">
           <button
             onclick={prevDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:accent-bg-hover text-slate-400 hover:text-white border border-slate-700/50 hover:accent-border hover:accent-shadow"
+            class="flex justify-center items-center w-9 h-9 text-gray-600 rounded-full border transition-all duration-300 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-gray-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow"
           >
             <Icon src={ChevronLeft} class="w-5 h-5" />
           </button>
           <button
             onclick={nextDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full transition-all duration-300 hover:accent-bg-hover text-slate-400 hover:text-white border border-slate-700/50 hover:accent-border hover:accent-shadow"
+            class="flex justify-center items-center w-9 h-9 text-gray-600 rounded-full border transition-all duration-300 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-gray-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow"
           >
             <Icon src={ChevronRight} class="w-5 h-5" />
           </button>
@@ -466,16 +466,16 @@
           <div
             class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"
           ></div>
-          <p class="mt-4 text-slate-400">Loading your schedule...</p>
+          <p class="mt-4 text-gray-600 dark:text-slate-400">Loading your schedule...</p>
         </div>
       {:else if lessons.length === 0}
-        <div class="flex flex-col sm:flex-row gap-6 sm:gap-12 justify-center items-center px-4 sm:px-14 py-12 sm:py-16 w-full">
+        <div class="flex flex-col gap-6 justify-center items-center px-4 py-12 w-full sm:flex-row sm:gap-12 sm:px-14 sm:py-16">
           <div
             class="flex justify-center items-center w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-gradient"
           >
             <span class="text-3xl sm:text-5xl">Q</span>
           </div>
-          <p class="text-xl sm:text-2xl text-slate-300 text-center">
+          <p class="text-xl text-center text-gray-700 sm:text-2xl dark:text-slate-300">
             No lessons available for this day.
           </p>
         </div>
@@ -483,16 +483,16 @@
         <div class="flex overflow-x-scroll">
           {#each lessons as lesson, i}
             <div
-              class="relative flex flex-col max-w-xs w-full group border-t-4"
+              class="flex relative flex-col w-full max-w-xs border-t-4 group"
               style="border-color: {lesson.colour}; box-shadow: inset 0px 10px 10px -10px {lesson.colour};"
             >
               <div
-                class="flex relative flex-col flex-1 gap-2 p-3 sm:p-4 backdrop-blur-sm"
+                class="flex relative flex-col flex-1 gap-2 p-3 backdrop-blur-sm sm:p-4"
               >
                 <div class="flex justify-between items-center">
-                  <span class="text-base sm:text-lg font-bold text-white truncate"
-                    >{lesson.description}</span
-                  >
+                                  <span class="text-base font-bold text-gray-900 truncate sm:text-lg dark:text-white"
+                  >{lesson.description}</span
+                >
                   {#if lesson.active}
                     <span
                       class="px-2.5 py-1 ml-2 text-xs font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-sm animate-gradient"
@@ -500,28 +500,28 @@
                     >
                   {/if}
                 </div>
-                <div class="flex items-center mt-1 text-sm sm:text-base text-slate-300">
+                <div class="flex items-center mt-1 text-sm text-gray-700 sm:text-base dark:text-slate-300">
                   <Icon
                     src={AcademicCap}
-                    class="mr-1.5 w-4 h-4 text-slate-400"
+                    class="mr-1.5 w-4 h-4 text-gray-600 dark:text-slate-400"
                   />
                   <span class="truncate">{lesson.staff}</span>
                 </div>
-                <div class="flex items-center text-sm sm:text-base text-slate-300">
+                <div class="flex items-center text-sm text-gray-700 sm:text-base dark:text-slate-300">
                   <Icon
                     src={BuildingOffice}
-                    class="mr-1.5 w-4 h-4 text-slate-400"
+                    class="mr-1.5 w-4 h-4 text-gray-600 dark:text-slate-400"
                   />
                   <span class="truncate">{lesson.room}</span>
                 </div>
                 <div
-                  class="inline-flex items-center px-3 py-1.5 mt-3 font-mono text-sm rounded-lg bg-slate-800/50 w-fit mb-auto"
+                  class="inline-flex items-center px-3 py-1.5 mt-3 mb-auto font-mono text-sm rounded-lg bg-gray-200/50 dark:bg-slate-800/50 w-fit"
                 >
                   <Icon src={Clock} class="mr-1.5 w-4 h-4 text-indigo-400" />
                   {lesson.from} – {lesson.until}
                 </div>
                 {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                  <div class="text-xs text-slate-400">
+                  <div class="text-xs text-gray-600 dark:text-slate-400">
                     {lesson.attendanceTitle}
                   </div>
                 {/if}
@@ -529,7 +529,7 @@
                 {#if lesson.programmeID !== 0}
                   <div class="flex gap-3">
                     <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:accent-bg-hover text-slate-300 hover:text-white border-slate-700/50 hover:accent-border"
+                      class="flex justify-center items-center w-9 h-9 text-gray-700 rounded-lg border transition-all duration-300 bg-gray-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-gray-300/50 dark:border-slate-700/50 hover:accent-border"
                       aria-label="View Assessment"
                       onclick={() =>
                         (location.href = `/assessments?code=${lesson.code}&date=${lesson.date}`)}
@@ -537,7 +537,7 @@
                       <Icon src={DocumentText} class="w-5 h-5" />
                     </button>
                     <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 bg-slate-800/70 hover:accent-bg-hover text-slate-300 hover:text-white border-slate-700/50 hover:accent-border"
+                      class="flex justify-center items-center w-9 h-9 text-gray-700 rounded-lg border transition-all duration-300 bg-gray-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-gray-300/50 dark:border-slate-700/50 hover:accent-border"
                       aria-label="View Course"
                       onclick={() =>
                         (location.href = `/courses?code=${lesson.code}&date=${lesson.date}`)}
@@ -555,15 +555,15 @@
 
     <!-- Notices Widget -->
     <div
-      class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
+      class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-white/80 dark:bg-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
     >
-      <div
-        class="flex justify-between items-center px-4 py-3 bg-gradient-to-br from-slate-800/70 to-slate-800/30 border-b border-slate-700/50"
-      >
-        <h3 class="text-xl font-semibold text-white">Notices</h3>
+        <div
+          class="flex justify-between items-center px-4 py-3 bg-gradient-to-br border-b from-gray-100/70 dark:from-slate-800/70 to-gray-100/30 dark:to-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
+        >
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Notices</h3>
         <a
           href="/notices"
-          class="px-3 py-1.5 text-nowrap text-sm accent-text rounded-lg transition-all duration-300 hover:accent-bg-hover hover:text-white"
+          class="px-3 py-1.5 text-sm rounded-lg transition-all duration-300 text-nowrap accent-text hover:accent-bg-hover hover:text-white"
         >
           View all
           <Icon src={ArrowTopRightOnSquare} class="inline ml-1 w-4 h-4" />
@@ -577,16 +577,16 @@
             <div
               class="mx-auto w-12 h-12 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"
             ></div>
-            <p class="mt-4 text-slate-400">Loading notices...</p>
+            <p class="mt-4 text-gray-600 dark:text-slate-400">Loading notices...</p>
           </div>
         {:else if homepageNotices.length === 0}
-          <div class="py-10 text-center text-slate-400">
+          <div class="py-10 text-center text-gray-600 dark:text-slate-400">
             No notices available.
           </div>
         {:else}
           {#each homepageNotices as notice}
             <div
-              class="p-4 mb-4 rounded-xl border transition-all duration-300 last:mb-0 bg-slate-800/60 hover:bg-slate-800/80 border-slate-700/50 hover:border-slate-600/50"
+              class="p-4 mb-4 rounded-xl border transition-all duration-300 last:mb-0 bg-gray-100/60 dark:bg-slate-800/60 hover:bg-gray-200/80 dark:hover:bg-slate-800/80 border-gray-300/50 dark:border-slate-700/50 hover:border-gray-400/50 dark:hover:border-slate-600/50"
             >
               <div class="flex gap-2 items-center mb-2">
                 <span
@@ -597,14 +597,14 @@
                 >
                   {getHomepageLabelTitle(notice.label)}
                 </span>
-                <span class="text-xs text-slate-400">{notice.staff}</span>
+                <span class="text-xs text-gray-600 dark:text-slate-400">{notice.staff}</span>
               </div>
-              <div class="mb-2 text-base font-bold text-white">
-                {notice.title}
-              </div>
-              <div class="text-sm text-slate-300 line-clamp-2">
-                {@html notice.contents}
-              </div>
+                              <div class="mb-2 text-base font-bold text-gray-900 dark:text-white">
+                  {notice.title}
+                </div>
+                <div class="text-sm text-gray-700 dark:text-slate-300 line-clamp-2">
+                  {@html notice.contents}
+                </div>
             </div>
           {/each}
         {/if}
@@ -613,24 +613,24 @@
 
     <!-- Upcoming Assessments -->
     <div
-      class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-slate-800/30 border-slate-700/50"
+      class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-white/80 dark:bg-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
     >
-      <div
-        class="flex justify-between items-center px-4 py-3 bg-gradient-to-br from-slate-800/70 to-slate-800/30 border-b border-slate-700/50"
-      >
-        <span class="text-xl font-semibold text-white text-nowrap pr-4"
-          >Upcoming Assessments</span
+              <div
+          class="flex justify-between items-center px-4 py-3 bg-gradient-to-br border-b from-gray-100/70 dark:from-slate-800/70 to-gray-100/30 dark:to-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
         >
-        <div class="flex gap-2 overflow-x-scroll" id="upcoming-filters">
+          <span class="pr-4 text-xl font-semibold text-gray-900 dark:text-white text-nowrap"
+            >Upcoming Assessments</span
+          >
+        <div class="flex overflow-x-scroll gap-2" id="upcoming-filters">
           {#each activeSubjects as subj}
-            <label
-              class="flex items-center px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm rounded-full border transition-all duration-300 cursor-pointer bg-slate-800/70 border-slate-700/50 hover:border-indigo-500/50"
-            >
-              <input
-                type="checkbox"
-                bind:checked={subjectFilters[subj.code]}
-                class="mr-2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500 rounded form-checkbox border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-900"
-              />
+                          <label
+                class="flex items-center px-2.5 py-1.5 text-xs rounded-full border transition-all duration-300 cursor-pointer sm:px-3 sm:text-sm bg-gray-200/70 dark:bg-slate-800/70 border-gray-300/50 dark:border-slate-700/50 hover:border-indigo-500/50"
+              >
+                              <input
+                  type="checkbox"
+                  bind:checked={subjectFilters[subj.code]}
+                  class="mr-2 w-3.5 h-3.5 text-indigo-500 rounded border-gray-300 sm:w-4 sm:h-4 form-checkbox dark:border-slate-700 focus:ring-indigo-500 focus:ring-offset-gray-100 dark:focus:ring-offset-slate-900"
+                />
               <span style="color: {subj.colour}">{subj.code}</span>
             </label>
           {/each}
@@ -640,9 +640,9 @@
       {#if loadingAssessments}
         <div class="flex flex-col justify-center items-center py-12 sm:py-16">
           <div
-            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"
+            class="w-12 h-12 rounded-full border-4 animate-spin sm:w-16 sm:h-16 border-indigo-500/30 border-t-indigo-500"
           ></div>
-          <p class="mt-4 text-sm sm:text-base text-slate-400">Loading assessments...</p>
+                      <p class="mt-4 text-sm text-gray-600 sm:text-base dark:text-slate-400">Loading assessments...</p>
         </div>
       {:else if filteredAssessments.length === 0}
         <div class="flex flex-col justify-center items-center py-12 sm:py-16">
@@ -651,10 +651,10 @@
           >
             🎉
           </div>
-          <p class="mt-4 text-lg sm:text-xl text-slate-300">Nothing coming up!</p>
+          <p class="mt-4 text-lg text-gray-700 sm:text-xl dark:text-slate-300">Nothing coming up!</p>
         </div>
       {:else}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
+        <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 sm:p-6">
           {#each filteredAssessments as a}
             <div
               class="flex flex-col gap-4 p-4 sm:p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] relative group"
@@ -668,9 +668,9 @@
                 style="border: 1px solid {a.colour}30;"
               ></div>
 
-              <div class="relative z-10 flex items-center gap-4">
+              <div class="flex relative z-10 gap-4 items-center">
                 <div
-                  class="flex justify-center items-center h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br rounded-xl shadow-lg animate-gradient"
+                  class="flex justify-center items-center w-12 h-12 bg-gradient-to-br rounded-xl shadow-lg sm:h-14 sm:w-14 animate-gradient"
                   style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);"
                 >
                   <span class="text-xl sm:text-2xl">📄</span>
@@ -678,7 +678,7 @@
 
                 <div class="flex-1 min-w-0">
                   <div class="flex flex-wrap gap-2 items-center">
-                    <div class="text-sm sm:text-base font-bold text-white">
+                    <div class="text-sm font-bold dark:text-white sm:text-base">
                       {new Date(a.due).toLocaleDateString("en-AU", {
                         weekday: "short",
                         month: "short",
@@ -696,10 +696,10 @@
                   </div>
                   <div class="mt-1">
                     <span
-                      class="block text-xs font-semibold uppercase text-slate-400"
+                      class="block text-xs font-semibold text-gray-600 uppercase dark:text-slate-400"
                       >{a.subject}</span
                     >
-                    <span class="block text-sm sm:text-base font-semibold text-white truncate"
+                    <span class="block text-sm font-semibold text-gray-900 truncate dark:text-white sm:text-base"
                       >{a.title}</span
                     >
                   </div>
@@ -707,7 +707,7 @@
               </div>
 
               {#if a.description}
-                <div class="relative z-10 text-sm text-slate-300 line-clamp-2">
+                <div class="relative z-10 text-sm text-gray-700 dark:text-slate-300 line-clamp-2">
                   {a.description}
                 </div>
               {/if}

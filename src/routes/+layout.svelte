@@ -256,10 +256,10 @@
 	}
 
 	$effect(() => {
-		// Update the root element's data attributes with the current accent color and theme
+		// Update the root element's data attributes with the current accent color
 		document.documentElement.setAttribute('data-accent-color', '');
 		document.documentElement.style.setProperty('--accent-color-value', $accentColor);
-		document.documentElement.setAttribute('data-theme', $theme);
+		// Theme application is now handled by the theme store
 	});
 
 	onMount(async () => {
@@ -305,10 +305,10 @@
 	];
 </script>
 
-<div class="flex flex-col pt-2 h-screen md:flex-row bg-slate-900" data-theme={$theme}>
+<div class="flex flex-col pt-2 h-screen md:flex-row">
 	<!-- Mobile Menu Button -->
-	<button 
-		class="fixed top-4 right-4 z-50 p-2 rounded-lg md:hidden bg-slate-800 hover:bg-slate-700"
+	<button
+		class="fixed top-4 right-4 z-50 p-2 bg-white rounded-lg md:hidden hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
 		onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
 	>
 		<Icon src={Bars3} class="w-6 h-6" />
@@ -321,14 +321,14 @@
 		class:-translate-x-full={!isMobileMenuOpen && isMobile}
 	>
 		<div class="flex overflow-y-scroll flex-col gap-2 h-full">
-			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-slate-900">
+			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-white dark:bg-slate-900">
 				<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
 				<span class="text-lg font-bold tracking-wide">DesQTA</span>
 			</div>
 			{#each menu as item}
 				<a 
 					href={item.path} 
-					class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-slate-800 hover:scale-[1.03] group"
+					class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:scale-[1.03] group"
 					onclick={() => isMobile && (isMobileMenuOpen = false)}
 				>
 					<Icon src={item.icon} class="mr-4 w-6 h-6" />
@@ -379,7 +379,7 @@
 							<div class="flex gap-2 items-center">
 								<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
 							</div>
-							<div class="flex gap-2 items-center min-w-0 text-xs text-slate-400">
+							<div class="flex gap-2 items-center min-w-0 text-xs text-gray-500 dark:text-slate-400">
 								<span class="font-mono">{userInfo.userCode}</span>
 								<span>•</span>
 								<span class="font-mono">{userInfo.meta.governmentID}</span>
@@ -390,7 +390,7 @@
 				{#if !$needsSetup}
 					<button 
 						onclick={handleLogout}
-						class="px-2 py-1 font-semibold rounded-lg transition text-zinc-400 hover:text-zinc-50"
+						class="px-2 py-1 font-semibold text-gray-600 rounded-lg transition hover:text-gray-800 dark:text-zinc-400 dark:hover:text-zinc-50"
 					>
 						<Icon src={ArrowLeftStartOnRectangle} class="size-4" />
 					</button>
@@ -400,7 +400,7 @@
 	</aside>
 
 	<!-- Main Content -->
-	<main class="overflow-y-auto flex-1 rounded-tl-2xl bg-slate-950">
+	<main class="overflow-y-auto flex-1 bg-gray-50 rounded-tl-2xl dark:bg-slate-950">
 		{#if $needsSetup}
 			<style>
 				.auth-header {
@@ -641,7 +641,7 @@
 							{/if}
 							<div style="width:100%;max-width:480px;padding:2.5rem;">
 								<div class="auth-label">Web Authentication</div>
-								<p class="mb-4 text-base">
+								<p class="mb-4 text-base text-gray-600 dark:text-slate-300">
 									Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
 								</p>
 								<div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
@@ -651,7 +651,7 @@
 											type="text"
 											bind:value={seqtaUrl}
 											placeholder="https://schoolname.seqta.com"
-											class="flex-1 px-3 py-2 rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
+											class="flex-1 px-3 py-2 text-gray-900 bg-white rounded-lg border border-gray-300 outline-none dark:bg-slate-800/40 dark:text-white dark:border-slate-800 focus:ring"
 										/>
 									</div>
 									<button
@@ -679,7 +679,7 @@
 <!-- Mobile Menu Overlay -->
 {#if isMobile && isMobileMenuOpen}
 	<div 
-		class="fixed inset-0 z-30 bg-black bg-opacity-50"
+		class="fixed inset-0 z-30 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-50"
 		onclick={() => isMobileMenuOpen = false}
 		role="button"
 		tabindex="0"

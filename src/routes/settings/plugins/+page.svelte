@@ -131,13 +131,13 @@ onMount(loadPlugins);
 
   {#if loading}
     <div class="flex justify-center items-center py-12 animate-fade-in">
-      <p class="text-slate-400">Loading plugins...</p>
+      <p class="text-gray-600 dark:text-slate-400">Loading plugins...</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {#each plugins as plugin}
         <div 
-          class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up cursor-pointer"
+          class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-300 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up cursor-pointer"
           on:click={() => openPluginDetails(plugin)}
         >
           <div class="relative h-32 overflow-hidden">
@@ -152,9 +152,9 @@ onMount(loadPlugins);
             <div class="flex items-start gap-4">
               <div class="text-4xl">{plugin.icon}</div>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold">{plugin.name}</h3>
-                <p class="text-sm text-slate-400 mt-1">{plugin.description}</p>
-                <div class="flex items-center gap-2 mt-2 text-sm text-slate-500">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{plugin.name}</h3>
+                <p class="text-sm text-gray-600 dark:text-slate-400 mt-1">{plugin.description}</p>
+                <div class="flex items-center gap-2 mt-2 text-sm text-gray-500 dark:text-slate-500">
                   <span>v{plugin.version}</span>
                   <span>•</span>
                   <span>by {plugin.author}</span>
@@ -163,7 +163,7 @@ onMount(loadPlugins);
                 </div>
                 <div class="flex flex-wrap gap-2 mt-2">
                   {#each plugin.tags as tag}
-                    <span class="px-2 py-1 text-xs rounded-full bg-blue-900 text-blue-200">
+                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {tag}
                     </span>
                   {/each}

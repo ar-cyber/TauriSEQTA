@@ -64,20 +64,20 @@
 	onMount(loadAssessmentDetails);
 </script>
 
-<div class="min-h-screen bg-slate-950">
+<div class="min-h-screen dark:bg-slate-950 bg-slate-100">
 	<!-- Header -->
-	<div class="sticky top-0 z-10 flex items-center gap-4 px-6 py-4 bg-slate-900 border-b border-slate-800 backdrop-blur-sm bg-opacity-80">
-		<a href="/assessments" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200">
+	<div class="flex sticky top-0 z-10 gap-4 items-center px-6 py-4 bg-opacity-80 border-b backdrop-blur-sm dark:bg-slate-900 bg-slate-100 dark:border-slate-800 border-slate-200">
+		<a href="/assessments" class="flex gap-2 items-center transition-colors duration-200 text-slate-400 hover:text-slate-600 dark:hover:text-white">
 			<Icon src={ArrowLeft} class="w-5 h-5" />
 			<span>Back to Assessments</span>
 		</a>
 	</div>
 
 	<!-- Tabs -->
-	<div class="container mx-auto px-6 pt-6">
-		<div class="flex gap-2 border-b border-slate-800">
-			<button class="px-4 py-2 font-semibold uppercase tracking-wide text-xs focus:outline-none transition-all duration-200 border-b-2 hover:scale-105"
-				on:click={() => tab = 'overview'}
+	<div class="container px-6 pt-6 mx-auto">
+		<div class="flex gap-2 border-b dark:border-slate-800 border-slate-200">
+			<button class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
+				onclick={() => tab = 'overview'}
 				class:border-blue-500={tab === 'overview'}
 				class:text-blue-400={tab === 'overview'}
 				class:text-slate-400={tab !== 'overview'}
@@ -85,8 +85,8 @@
 			>
 				Overview
 			</button>
-			<button class="px-4 py-2 font-semibold uppercase tracking-wide text-xs focus:outline-none transition-all duration-200 border-b-2 hover:scale-105"
-				on:click={() => tab = 'details'}
+			<button class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
+				onclick={() => tab = 'details'}
 				class:border-blue-500={tab === 'details'}
 				class:text-blue-400={tab === 'details'}
 				class:text-slate-400={tab !== 'details'}
@@ -95,8 +95,8 @@
 				Details
 			</button>
 			{#if allSubmissions.length}
-				<button class="px-4 py-2 font-semibold uppercase tracking-wide text-xs focus:outline-none transition-all duration-200 border-b-2 hover:scale-105"
-					on:click={() => tab = 'submissions'}
+				<button class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
+					onclick={() => tab = 'submissions'}
 					class:border-blue-500={tab === 'submissions'}
 					class:text-blue-400={tab === 'submissions'}
 					class:text-slate-400={tab !== 'submissions'}
@@ -109,10 +109,10 @@
 	</div>
 
 	<!-- Content -->
-	<div class="container mx-auto px-6 py-8">
+	<div class="container px-6 py-8 mx-auto">
 		{#if loading}
 			<div class="flex justify-center items-center h-64">
-				<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+				<div class="w-12 h-12 rounded-full border-t-2 border-b-2 border-blue-500 animate-spin"></div>
 			</div>
 		{:else if error}
 			<div class="flex justify-center items-center h-64">
@@ -122,18 +122,18 @@
 			{#if tab === 'overview'}
 				<!-- Overview Tab: Description and Resources -->
 				<div class="grid gap-8 animate-fade-in">
-					<div class="grid gap-6 p-6 rounded-2xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
-						<h1 class="text-2xl font-bold mb-2">Assessment Overview</h1>
-						<div class="prose prose-invert max-w-none">
-							<div class="text-slate-300 whitespace-pre-line">{@html assessmentData.description}</div>
+					<div class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+						<h1 class="mb-2 text-2xl font-bold">Assessment Overview</h1>
+						<div class="max-w-none prose prose-invert">
+							<div class="whitespace-pre-line text-slate-300">{@html assessmentData.description}</div>
 						</div>
 					</div>
 					{#if assessmentData.resources?.length}
-						<div class="grid gap-6 p-6 rounded-2xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+						<div class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
 							<h2 class="text-xl font-bold">Resources</h2>
 							<div class="grid gap-4">
 								{#each assessmentData.resources as resource}
-									<div class="flex items-center gap-4 p-4 rounded-xl bg-slate-800 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
+									<div class="flex items-center gap-4 p-4 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
 										<Icon src={getFileIcon(resource.userfile.mimetype)} class="w-6 h-6 text-blue-400" />
 										<div class="flex-1 min-w-0">
 											<div class="text-sm font-medium truncate">{resource.name}</div>
@@ -141,7 +141,7 @@
 										</div>
 										<button
 											disabled
-											class="px-3 py-1 text-sm font-medium rounded-lg bg-gray-600 text-gray-300 cursor-not-allowed transition-all duration-200 hover:bg-gray-500"
+											class="px-3 py-1 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-gray-500"
 										>
 											Download
 										</button>
@@ -154,14 +154,14 @@
 			{:else if tab === 'details'}
 				<!-- Details Tab: Grade, Feedback, Teacher Files -->
 				<div class="grid gap-8 animate-fade-in">
-					<div class="p-6 rounded-2xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+					<div class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
 						<!-- Grade Bar -->
 						{#if assessmentData.marked && firstCriterion}
 							<div class="mb-4">
-								<div class="text-2xl font-bold mb-2">Grade</div>
-								<div class="relative w-full h-16 rounded-xl bg-slate-800 overflow-hidden border border-slate-700 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
-									<div class="absolute top-0 left-0 h-full transition-all duration-500 bg-blue-600" style="width: {firstCriterion.results.percentage}%"></div>
-									<div class="relative z-10 flex items-center justify-center h-full">
+								<div class="mb-2 text-2xl font-bold">Grade</div>
+								<div class="overflow-hidden relative w-full h-16 rounded-xl border transition-all duration-300 dark:bg-slate-800 bg-slate-200 dark:border-slate-700 border-slate-200 hover:shadow-lg hover:shadow-blue-500/10">
+									<div class="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-500" style="width: {firstCriterion.results.percentage}%"></div>
+									<div class="flex relative z-10 justify-center items-center h-full">
 										<span class="text-3xl font-extrabold tracking-wide text-white drop-shadow animate-fade-in" style="text-shadow: 0 2px 8px #000a">
 										{firstCriterion.results.grade || firstCriterion.results.percentage.toFixed(2) + '%'}
 										</span>
@@ -170,24 +170,24 @@
 							</div>
 						{/if}
 						<!-- End Grade Bar -->
-						<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+						<div class="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
 							<h1 class="text-2xl font-bold">Teacher marking and feedback</h1>
 						</div>
 						{#if assessmentData.marked && assessmentData.criteria?.length}
 							<div class="mb-2 font-semibold">Achievement</div>
 						{/if}
 						{#if assessmentData.marked && assessmentData.engagement?.feedbackComment}
-							<div class="mb-4 p-4 rounded-xl bg-slate-800 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5">
-								<div class="font-semibold mb-1">Teacher feedback</div>
-								<div class="text-slate-300">{assessmentData.engagement.feedbackComment}</div>
+							<div class="p-4 mb-4 rounded-xl transition-all duration-300 dark:bg-slate-800 bg-slate-200 hover:shadow-lg hover:shadow-blue-500/5">
+								<div class="mb-1 font-semibold">Teacher feedback</div>
+								<div class="dark:text-slate-300 text-slate-700">{assessmentData.engagement.feedbackComment}</div>
 							</div>
 						{/if}
 						{#if assessmentData.resources?.length}
 							<div class="mt-6">
-								<div class="font-semibold mb-2">Teacher files</div>
+								<div class="mb-2 font-semibold">Teacher files</div>
 								<div class="grid gap-2">
 									{#each teacherFiles as file}
-										<div class="flex items-center gap-4 p-3 rounded-xl bg-slate-800 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
+										<div class="flex items-center gap-4 p-3 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
 											<Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-blue-400" />
 											<div class="flex-1 min-w-0">
 												<div class="text-sm font-medium truncate">{file.filename}</div>
@@ -195,7 +195,7 @@
 											</div>
 											<button
 												disabled
-												class="px-3 py-1 text-sm font-medium rounded-lg bg-gray-600 text-gray-300 cursor-not-allowed transition-all duration-200 hover:bg-gray-500"
+												class="px-3 py-1 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-gray-500"
 											>
 												Download
 											</button>
@@ -209,20 +209,20 @@
 			{:else if tab === 'submissions'}
 				<!-- Submissions Tab -->
 				<div class="grid gap-8 animate-fade-in">
-					<div class="p-6 rounded-2xl bg-slate-900 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
-						<h1 class="text-2xl font-bold mb-4">Submissions</h1>
+					<div class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+						<h1 class="mb-4 text-2xl font-bold">Submissions</h1>
 						{#if allSubmissions.filter(f => !f.staff).length === 0}
 							<div class="text-slate-400">No submissions found.</div>
 						{:else}
 							<div class="grid gap-3">
 								{#each allSubmissions.filter(f => !f.staff) as file}
 									<div 
-										class="flex items-center gap-4 p-3 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg {file.created_by === 69 ? 'bg-slate-900 border-blue-600 hover:shadow-blue-500/10' : 'border-slate-700 hover:shadow-slate-500/5'}"
+										class="flex items-center gap-4 p-3 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg bg-slate-200/50 dark:bg-slate-800"
 									>
 										<Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-blue-400" />
 										<div class="flex-1 min-w-0">
 											<div class="text-sm font-medium truncate">{file.filename}</div>
-											<div class="text-xs text-slate-400 flex gap-2 items-center">
+											<div class="flex gap-2 items-center text-xs text-slate-400">
 												<span>{formatFileSize(file.size)}</span>
 												<span>•</span>
 												<span>Student</span>
@@ -232,7 +232,7 @@
 										</div>
 										<button
 											disabled
-											class="px-3 py-1 text-sm font-medium rounded-lg bg-gray-600 text-gray-300 cursor-not-allowed transition-all duration-200 hover:bg-gray-500"
+											class="px-3 py-1 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-gray-500"
 										>
 											Download
 										</button>

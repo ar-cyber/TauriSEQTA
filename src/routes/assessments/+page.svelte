@@ -335,22 +335,22 @@
 
 <div class="p-4 sm:p-6 space-y-6">
 	<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-		<h1 class="text-2xl font-bold text-white">Assessments</h1>
+		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Assessments</h1>
 		<div class="flex gap-2">
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'list' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'list' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'list'}
 			>
 				List View
 			</button>
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'board' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'board' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'board'}
 			>
 				Board View
 			</button>
 			<button 
-				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'calendar' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+				class="px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base {selectedTab === 'calendar' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 				onclick={() => selectedTab = 'calendar'}
 			>
 				Calendar View
@@ -361,62 +361,62 @@
 	{#if loadingAssessments}
 		<div class="flex flex-col justify-center items-center py-12 sm:py-16">
 			<div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
-			<p class="mt-4 text-sm sm:text-base text-slate-400">Loading assessments...</p>
+			<p class="mt-4 text-sm sm:text-base text-gray-600 dark:text-slate-400">Loading assessments...</p>
 		</div>
 	{:else if filteredAssessments.length === 0}
 		<div class="flex flex-col justify-center items-center py-12 sm:py-16">
 			<div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
 				🎉
 			</div>
-			<p class="mt-4 text-lg sm:text-xl text-slate-300">No upcoming assessments!</p>
+			<p class="mt-4 text-lg sm:text-xl text-gray-700 dark:text-slate-300">No upcoming assessments!</p>
 		</div>
 	{:else if selectedTab === 'board'}
 		<div class="space-y-6">
 			<div class="flex justify-end gap-2">
 				<button 
-					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'subject' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'subject' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 					onclick={() => groupBy = 'subject'}
 				>
 					Group by Subject
 				</button>
 				<button 
-					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'month' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'month' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 					onclick={() => groupBy = 'month'}
 				>
 					Group by Month
 				</button>
 				<button 
-					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'status' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'}"
+					class="px-4 py-2 rounded-lg transition-all duration-300 text-sm {groupBy === 'status' ? 'accent-bg text-white shadow-lg accent-shadow' : 'bg-gray-200/80 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-300/80 dark:hover:bg-slate-700/50'}"
 					onclick={() => groupBy = 'status'}
 				>
 					Group by Status
 				</button>
 			</div>
 
-			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10">
+			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-gray-300/20 dark:scrollbar-track-slate-800/10">
 				{#if groupBy === 'subject'}
 					{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
 						<div class="flex-shrink-0 w-72 sm:w-80">
-							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {subject.colour || '#8e8e8e'};">
-								<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
-								<p class="text-sm text-slate-400">{subject.code}</p>
+							<div class="bg-gray-100/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-gray-300/50 dark:border-slate-700/50" style="border-color: {subject.colour || '#8e8e8e'};">
+								<h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{subject.title}</h3>
+								<p class="text-sm text-gray-600 dark:text-slate-400">{subject.code}</p>
 							</div>
 							<div class="space-y-4">
 								{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
 									<a 
 										href="/assessments/{assessment.id}/{assessment.metaclass}"
-										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										class="block bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-gray-300/50 dark:border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
 										style="border-color: {assessment.colour};"
 									>
 										<div class="flex items-center gap-2">
-											<div class="text-sm font-semibold text-slate-400">
+											<div class="text-sm font-semibold text-gray-600 dark:text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 											</div>
 											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
 												{getStatusBadge(assessment.status, assessment.due).text}
 											</span>
 										</div>
-										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+										<h4 class="font-bold mt-1 text-gray-900 dark:text-white truncate">{assessment.title}</h4>
 									</a>
 								{/each}
 							</div>
@@ -426,26 +426,26 @@
 					{#each getAssessmentsByMonth() as [month, assessments]}
 						<div class="flex-shrink-0 w-72 sm:w-80">
 							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50">
-								<h3 class="font-bold text-base sm:text-lg text-white">{month}</h3>
-								<p class="text-sm text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
+								<h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{month}</h3>
+								<p class="text-sm text-gray-600 dark:text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
 							</div>
 							<div class="space-y-4">
 								{#each assessments as assessment}
 									<a 
 										href="/assessments/{assessment.id}/{assessment.metaclass}"
-										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										class="block bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-gray-300/50 dark:border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
 										style="border-color: {assessment.colour};"
 									>
 										<div class="flex items-center gap-2">
-											<div class="text-sm font-semibold text-slate-400">
+											<div class="text-sm font-semibold text-gray-600 dark:text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 											</div>
 											<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
 												{getStatusBadge(assessment.status, assessment.due).text}
 											</span>
 										</div>
-										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
-										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
+										<h4 class="font-bold mt-1 text-gray-900 dark:text-white truncate">{assessment.title}</h4>
+										<p class="text-sm text-gray-600 dark:text-slate-400 mt-1">{assessment.code}</p>
 									</a>
 								{/each}
 							</div>
@@ -455,23 +455,23 @@
 					{#each getAssessmentsByStatus() as [status, assessments]}
 						<div class="flex-shrink-0 w-72 sm:w-80">
 							<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 mb-4 border-l-8 border border-slate-700/50" style="border-color: {getStatusBadge(assessments[0].status, assessments[0].due).color};">
-								<h3 class="font-bold text-base sm:text-lg text-white">{status}</h3>
-								<p class="text-sm text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
+								<h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{status}</h3>
+								<p class="text-sm text-gray-600 dark:text-slate-400">{assessments.length} assessment{assessments.length === 1 ? '' : 's'}</p>
 							</div>
 							<div class="space-y-4">
 								{#each assessments as assessment}
 									<a 
 										href="/assessments/{assessment.id}/{assessment.metaclass}"
-										class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										class="block bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-gray-300/50 dark:border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
 										style="border-color: {assessment.colour};"
 									>
 										<div class="flex items-center gap-2">
-											<div class="text-sm font-semibold text-slate-400">
+											<div class="text-sm font-semibold text-gray-600 dark:text-slate-400">
 												{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 											</div>
 										</div>
-										<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
-										<p class="text-sm text-slate-400 mt-1">{assessment.code}</p>
+										<h4 class="font-bold mt-1 text-gray-900 dark:text-white truncate">{assessment.title}</h4>
+										<p class="text-sm text-gray-600 dark:text-slate-400 mt-1">{assessment.code}</p>
 									</a>
 								{/each}
 							</div>
@@ -481,19 +481,19 @@
 			</div>
 		</div>
 	{:else if selectedTab === 'calendar'}
-		<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-slate-700/50">
+		<div class="bg-gray-100/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-300/50 dark:border-slate-700/50">
 			<div class="flex justify-between items-center mb-6">
 				<button 
-					class="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 text-slate-300 hover:text-white"
+					class="p-2 rounded-lg hover:bg-gray-200/80 dark:hover:bg-slate-700/50 transition-all duration-300 text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
 					onclick={prevMonth}
 				>
 					←
 				</button>
-				<h2 class="text-lg sm:text-xl font-bold text-white">
+				<h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
 					{getMonthName(currentDate)}
 				</h2>
 				<button 
-					class="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 text-slate-300 hover:text-white"
+					class="p-2 rounded-lg hover:bg-gray-200/80 dark:hover:bg-slate-700/50 transition-all duration-300 text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
 					onclick={nextMonth}
 				>
 					→
@@ -502,7 +502,7 @@
 			
 			<div class="grid grid-cols-7 gap-2">
 				{#each ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as day}
-					<div class="text-center py-2 text-xs sm:text-sm font-semibold text-slate-400">
+					<div class="text-center py-2 text-xs sm:text-sm font-semibold text-gray-600 dark:text-slate-400">
 						{day}
 					</div>
 				{/each}
@@ -516,9 +516,9 @@
 					{@const assessments = getAssessmentsForDate(date)}
 					{@const isToday = date.toDateString() === new Date().toDateString()}
 					<div class="aspect-square p-1">
-						<div class="h-full rounded-lg border p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-slate-800/30'} {isToday ? 'border-indigo-500 ring-4 ring-indigo-500/30 animate-pulse-today' : 'border-slate-700/50'}"
+						<div class="h-full rounded-lg border p-2 transition-all duration-300 hover:scale-105 {assessments.length > 0 ? '' : 'bg-gray-200/60 dark:bg-slate-800/30'} {isToday ? 'border-indigo-500 ring-4 ring-indigo-500/30 animate-pulse-today' : 'border-gray-300/50 dark:border-slate-700/50'}"
 							style={assessments.length > 0 && assessments[0].colour ? `background: ${assessments[0].colour}20;` : ''}>
-							<div class="text-sm sm:text-base mb-1 {isToday ? 'font-bold text-indigo-400 scale-110' : 'text-slate-300'}">{i + 1}</div>
+							<div class="text-sm sm:text-base mb-1 {isToday ? 'font-bold text-indigo-400 scale-110' : 'text-gray-700 dark:text-slate-300'}">{i + 1}</div>
 							{#if assessments.length > 0}
 								<div class="space-y-1">
 									{#each assessments.slice(0, 2) as assessment}
@@ -533,7 +533,7 @@
 										</div>
 									{/each}
 									{#if assessments.length > 2}
-										<div class="text-xs text-center text-slate-400">
+										<div class="text-xs text-center text-gray-600 dark:text-slate-400">
 											+{assessments.length - 2} more
 										</div>
 									{/if}
@@ -548,13 +548,13 @@
 		<div class="flex flex-col lg:flex-row gap-6">
 			<!-- Quick Navigation Sidebar -->
 			<div class="lg:w-48 flex-shrink-0">
-				<div class="sticky top-6 bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50">
-					<h3 class="text-sm font-semibold mb-3 text-slate-400">Quick Jump</h3>
+				<div class="sticky top-6 bg-gray-100/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-300/50 dark:border-slate-700/50">
+					<h3 class="text-sm font-semibold mb-3 text-gray-600 dark:text-slate-400">Quick Jump</h3>
 					<div class="space-y-2">
 						{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
 							<a 
 								href="#subject-{subject.code}"
-								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-700/50 transition-all duration-300 cursor-pointer text-slate-300 hover:text-white"
+								class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-200/80 dark:hover:bg-slate-700/50 transition-all duration-300 cursor-pointer text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
 								onclick={(e) => scrollToSubject(e, subject.code)}
 							>
 								<div class="w-2 h-2 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
@@ -568,30 +568,30 @@
 			<!-- Main Content -->
 			<div class="flex-1 space-y-6">
 				{#each activeSubjects.filter(s => subjectFilters[s.code]) as subject}
-					<div id="subject-{subject.code}" class="bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-slate-700/50">
-						<div class="px-4 sm:px-6 py-4 border-b border-slate-700/50">
+					<div id="subject-{subject.code}" class="bg-gray-100/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-300/50 dark:border-slate-700/50">
+						<div class="px-4 sm:px-6 py-4 border-b border-gray-300/50 dark:border-slate-700/50">
 							<div class="flex items-center gap-3">
 								<div class="w-3 h-3 rounded-full" style="background-color: {subject.colour || '#8e8e8e'}"></div>
-								<h3 class="font-bold text-base sm:text-lg text-white">{subject.title}</h3>
-								<span class="text-sm text-slate-400">({subject.code})</span>
+								<h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white">{subject.title}</h3>
+								<span class="text-sm text-gray-600 dark:text-slate-400">({subject.code})</span>
 							</div>
 						</div>
 						<div class="p-4 space-y-4">
 							{#each filteredAssessments.filter(a => a.code === subject.code) as assessment}
 								<a 
 									href="/assessments/{assessment.id}/{assessment.metaclass}"
-									class="block bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+									class="block bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 shadow-lg border-l-8 border border-gray-300/50 dark:border-slate-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
 									style="border-color: {assessment.colour};"
 								>
 									<div class="flex items-center gap-2">
-										<div class="text-sm font-semibold text-slate-400">
+										<div class="text-sm font-semibold text-gray-600 dark:text-slate-400">
 											{new Date(assessment.due).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
 										</div>
 										<span class="px-2 py-0.5 rounded text-xs text-white {getStatusBadge(assessment.status, assessment.due).color}">
 											{getStatusBadge(assessment.status, assessment.due).text}
 										</span>
 									</div>
-									<h4 class="font-bold mt-1 text-white truncate">{assessment.title}</h4>
+									<h4 class="font-bold mt-1 text-gray-900 dark:text-white truncate">{assessment.title}</h4>
 								</a>
 							{/each}
 						</div>

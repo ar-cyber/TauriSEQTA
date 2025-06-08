@@ -99,7 +99,7 @@
   <div class="absolute top-0 w-full h-screen" onkeydown={() => {}} onclick={closeSlashMenu} role="menu" tabindex="-1"></div>
   <div
    transition:fly={{ y: 10, duration: 300 }}
-    class="overflow-auto absolute w-80 max-w-full max-h-80 rounded-xl border shadow-xl backdrop-blur-lg bg-slate-900/70 border-slate-700/20"
+    class="overflow-auto absolute w-80 max-w-full max-h-80 rounded-xl border shadow-xl backdrop-blur-lg dark:bg-slate-900/70 bg-slate-100/70 dark:border-slate-700/20 border-slate-200"
     style="left: {$slashLocation.x}px; top: {$slashLocation.y + $slashLocation.height + 320 >
     height
       ? $slashLocation.y - $slashLocation.height - 320
@@ -107,7 +107,7 @@
     <div class="p-2 text-sm text-slate-500">Basic Blocks</div>
     {#each $slashItems as { title, subtitle, command }, i}
       <div
-        class="p-2 flex gap-3 cursor-pointer {i == $selectedIndex && 'bg-slate-950/50'} hover:bg-slate-950/30 rounded-lg mx-2"
+        class="p-2 flex gap-3 cursor-pointer {i == $selectedIndex && 'dark:bg-slate-950/50 bg-slate-300/50'} dark:hover:bg-slate-950/30 hover:bg-slate-300/20 rounded-lg mx-2"
         onclick={() => handleItemClick({ command })}
         onkeydown={() => {}}
         role="menuitem"
@@ -118,7 +118,7 @@
           {@html getCommandIcon(title)}
         </div>
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-medium text-white truncate">{title}</div>
+          <div class="text-sm font-medium truncate dark:text-white">{title}</div>
           <p class="text-xs truncate text-slate-400">{subtitle ? subtitle : ''}</p>
         </div>
       </div>

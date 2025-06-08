@@ -232,29 +232,29 @@ function nextDay() {
 onMount(loadLessons);
 </script>
 
-<div class="flex flex-col w-full h-full text-slate-50">
-  <div class="flex justify-between items-center px-4 py-2 shadow bg-slate-800">
+<div class="flex flex-col w-full h-full text-gray-900 dark:text-slate-50">
+  <div class="flex justify-between items-center px-4 py-2 shadow bg-gray-100 dark:bg-slate-800">
     <div class="flex gap-2 items-center">
       <button 
-        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
         onclick={prevWeek}
         disabled={loadingLessons}
       >&#60;</button>
       <span class="text-lg font-bold">{weekRangeLabel()}</span>
       <button 
-        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
         onclick={nextWeek}
         disabled={loadingLessons}
       >&#62;</button>
     </div>
     <div class="relative inline-block text-left">
-      <button class="px-4 py-2 accent-bg text-white rounded-lg hover:opacity-90 transition-colors" onclick={() => showExportMenu = !showExportMenu}>
+              <button class="px-4 py-2 accent-bg text-white rounded-lg hover:opacity-90 transition-colors" onclick={() => showExportMenu = !showExportMenu}>
         Export
       </button>
       {#if showExportMenu}
-        <div class="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-10">
-          <button class="block w-full text-left px-4 py-2 hover:bg-slate-700 text-white" onclick={exportTimetableCSV}>Export as CSV</button>
-          <button class="block w-full text-left px-4 py-2 hover:bg-slate-700 text-white" onclick={exportTimetablePDF}>Export as PDF</button>
+        <div class="absolute right-0 mt-2 w-32 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg z-10">
+          <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white" onclick={exportTimetableCSV}>Export as CSV</button>
+          <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white" onclick={exportTimetablePDF}>Export as PDF</button>
         </div>
       {/if}
     </div>
@@ -263,23 +263,23 @@ onMount(loadLessons);
   <div class="flex overflow-hidden flex-1 items-stretch">
     <div class="flex flex-col flex-1 w-full h-full justify-stretch">
       <!-- Header Row -->
-      <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full border-b-2 border-slate-800">
-        <div class="w-14 bg-slate-800"></div>
+      <div class="grid grid-cols-[60px_repeat(5,1fr)] w-full border-b-2 border-gray-300 dark:border-slate-800">
+        <div class="w-14 bg-gray-100 dark:bg-slate-800"></div>
         {#each dayLabels as day, index}
-          <div class="py-1 px-2 text-center font-bold bg-slate-800 border-l border-slate-900 text-sm {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''} hidden sm:block">{day.toUpperCase()}</div>
+          <div class="py-1 px-2 text-center font-bold bg-gray-100 dark:bg-slate-800 border-l border-gray-300 dark:border-slate-900 text-sm text-gray-900 dark:text-white {new Date().getDay() === (index + 1) % 7 ? 'bg-blue-500 text-white' : ''} hidden sm:block">{day.toUpperCase()}</div>
         {/each}
       </div>
 
       <!-- Mobile Day Navigation -->
-      <div class="sm:hidden flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-800">
+      <div class="sm:hidden flex items-center justify-between px-4 py-2 bg-gray-100/50 dark:bg-slate-800/50 border-b border-gray-300 dark:border-slate-800">
         <button 
-          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
           onclick={prevDay}
           disabled={loadingLessons}
         >&#60;</button>
         <span class="text-base font-bold">{dayLabels[selectedDay - 1].toUpperCase()}</span>
         <button 
-          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed" 
           onclick={nextDay}
           disabled={loadingLessons}
         >&#62;</button>
@@ -300,25 +300,25 @@ onMount(loadLessons);
       {:else if loadingLessons}
         <div class="flex flex-col justify-center items-center py-16">
           <div class="w-16 h-16 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin"></div>
-          <p class="mt-4 text-slate-400">Loading timetable...</p>
+          <p class="mt-4 text-gray-600 dark:text-slate-400">Loading timetable...</p>
         </div>
       {:else if lessons.length}
         <div class="relative flex-1 w-full h-full" style="height: {GRID_HEIGHT}px;">
           <!-- Time labels -->
           <div class="absolute top-0 left-0 z-10 w-14 h-full pointer-events-none">
             {#each getUniqueTimes() as time}
-              <div class="absolute left-0 w-full border-t border-slate-800" style="top: {timeToY(timeToMinutes(time), timeBounds().min, timeBounds().max)}px;">
-                <span class="text-xs text-slate-400">{time}</span>
+              <div class="absolute left-0 w-full border-t border-gray-300 dark:border-slate-800" style="top: {timeToY(timeToMinutes(time), timeBounds().min, timeBounds().max)}px;">
+                <span class="text-xs text-gray-600 dark:text-slate-400">{time}</span>
               </div>
             {/each}
           </div>
           <!-- Day columns -->
           <div class="grid absolute top-0 right-0 left-14 grid-cols-1 sm:grid-cols-5 h-full">
             {#each Array(5) as _, dayIdx}
-              <div class="relative h-full border-l border-slate-800 {dayIdx + 1 !== selectedDay ? 'hidden sm:block' : ''}">
+              <div class="relative h-full border-l border-gray-300 dark:border-slate-800 {dayIdx + 1 !== selectedDay ? 'hidden sm:block' : ''}">
                 {#each getLessonsFor(dayIdx) as lesson}
                   <div
-                    class="flex absolute right-1 left-1 flex-col justify-center p-2 rounded-lg border-l-4 shadow-sm bg-slate-800"
+                    class="flex absolute right-1 left-1 flex-col justify-center p-2 rounded-lg border-l-4 shadow-sm bg-white dark:bg-slate-800"
                     style="
                       top: {timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
                       height: {timeToY(timeToMinutes(lesson.until), timeBounds().min, timeBounds().max) - timeToY(timeToMinutes(lesson.from), timeBounds().min, timeBounds().max)}px;
@@ -326,10 +326,10 @@ onMount(loadLessons);
                     "
                   >
                     <span class="text-sm font-bold truncate">{lesson.description}</span>
-                    <span class="text-xs truncate text-slate-400">{lesson.staff}</span>
-                    <span class="text-xs truncate text-slate-400">{lesson.room}</span>
+                                    <span class="text-xs truncate text-gray-600 dark:text-slate-400">{lesson.staff}</span>
+                <span class="text-xs truncate text-gray-600 dark:text-slate-400">{lesson.room}</span>
                     {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                      <span class="text-xs italic truncate text-slate-400">{lesson.attendanceTitle}</span>
+                      <span class="text-xs italic truncate text-gray-600 dark:text-slate-400">{lesson.attendanceTitle}</span>
                     {/if}
                     <span class="mt-1 font-mono text-xs">{lesson.from} – {lesson.until}</span>
                   </div>
@@ -343,7 +343,7 @@ onMount(loadLessons);
           <div class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
             📚
           </div>
-          <p class="mt-4 text-xl text-slate-300">No lessons available for this week.</p>
+          <p class="mt-4 text-xl text-gray-700 dark:text-slate-300">No lessons available for this week.</p>
         </div>
       {/if}
     </div>
@@ -351,9 +351,9 @@ onMount(loadLessons);
 
   {#if showPdfViewer}
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
-        <div class="flex justify-between items-center p-4 border-b border-slate-800">
-          <h2 class="text-xl font-bold text-white">Timetable PDF</h2>
+      <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-300 dark:border-slate-800">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Timetable PDF</h2>
           <div class="flex gap-2">
             <button 
               class="px-4 py-2 accent-bg text-white rounded-lg hover:opacity-90 transition-colors"
@@ -366,7 +366,7 @@ onMount(loadLessons);
               Download
             </button>
             <button 
-              class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+              class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-slate-600 transition-colors"
               onclick={() => {
                 showPdfViewer = false;
                 if (pdfUrl) {

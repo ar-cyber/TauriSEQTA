@@ -145,20 +145,20 @@
   {#if selectedMessage}
     <div class="mx-auto w-full max-w-4xl animate-fadeIn">
       <div
-        class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-slate-800/50 bg-slate-900/40"
+        class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-gray-300/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40"
       >
-        <div class="p-4 sm:p-6 pb-3 border-b border-slate-800/50">
+                  <div class="p-4 sm:p-6 pb-3 border-b border-gray-300/50 dark:border-slate-800/50">
           <div class="mb-4 text-xl sm:text-2xl font-bold text-indigo-400">
             {selectedMessage.subject}
           </div>
           
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div class="space-y-1">
-              <div class="text-sm sm:text-base text-slate-200">
+              <div class="text-sm sm:text-base text-gray-700 dark:text-slate-200">
                 <span class="font-medium">{selectedMessage.sender}</span>
               </div>
-              <div class="text-xs sm:text-sm text-slate-400">
-                To: <span class="font-medium text-slate-300">{selectedMessage.to}</span>
+              <div class="text-xs sm:text-sm text-gray-600 dark:text-slate-400">
+                To: <span class="font-medium text-gray-700 dark:text-slate-300">{selectedMessage.to}</span>
               </div>
             </div>
             
@@ -269,7 +269,7 @@
       </div>
     </div>
   {:else}
-    <div class="flex flex-col justify-center items-center h-full text-center text-slate-400">
+    <div class="flex flex-col justify-center items-center h-full text-center text-gray-600 dark:text-slate-400">
       <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />

@@ -121,22 +121,22 @@
 <div class="p-6">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold">Notices</h1>
-    <div class="flex items-center gap-4">
+    <div class="flex gap-4 items-center">
       <input
         type="date"
         value={formatDate(selectedDate)}
-        on:change={updateDate}
-        class="px-4 py-2 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onchange={updateDate}
+        class="px-4 py-2 text-gray-900 bg-white rounded-lg border border-gray-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
   </div>
 
   <!-- Label filter bar -->
   {#if labels.length > 0}
-    <div class="flex flex-wrap gap-2 mb-6 bg-white/5 rounded-lg p-2">
+    <div class="flex flex-wrap gap-2 p-2 mb-6 rounded-lg bg-white/5">
       <button
         class="px-4 py-1.5 rounded-lg font-semibold text-sm border border-[var(--surface-alt)] bg-[var(--surface)] hover:bg-[var(--surface-alt)] transition-all duration-200 transform hover:scale-105 active:scale-95 focus:ring-2 focus:ring-blue-400"
-        on:click={() => selectedLabel = null}
+        onclick={() => selectedLabel = null}
         class:selected={!selectedLabel}
       >
         All
@@ -145,7 +145,7 @@
         <button
           class="px-4 py-1.5 rounded-lg font-semibold text-sm border border-[var(--surface-alt)] transition-all duration-200 transform hover:scale-105 active:scale-95 focus:ring-2 focus:ring-blue-400"
           style={`color: ${label.color}; border-color: ${label.color}; background: ${selectedLabel === label.id ? label.color + '22' : 'var(--surface)'}`}
-          on:click={() => selectedLabel = label.id}
+          onclick={() => selectedLabel = label.id}
         >
           {label.title}
         </button>
@@ -158,16 +158,16 @@
   {:else if error}
     <div class="p-8 text-center text-red-500">{error}</div>
   {:else}
-    <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {#each notices.filter(n => !selectedLabel || n.labelId === selectedLabel) as notice}
         <div class="rounded-xl shadow-lg bg-white/10 text-[var(--text)] border-t-8 flex flex-col h-96" style={`border-top-color: ${getLabelColor(notice.labelId)}; border-top-width: 8px;`}> 
-          <div class="p-5 flex-1 flex flex-col overflow-y-auto">
-            <h2 class="text-2xl font-bold mb-1">{notice.title}</h2>
-            <div class="font-semibold text-sm mb-1" style={`color: ${getLabelColor(notice.labelId)}`}
+          <div class="flex overflow-y-auto flex-col flex-1 p-5">
+            <h2 class="mb-1 text-2xl font-bold">{notice.title}</h2>
+            <div class="mb-1 text-sm font-semibold" style={`color: ${getLabelColor(notice.labelId)}`}
               class:text-white={isColorDark(getLabelColor(notice.labelId))}
             >{getLabelTitle(notice.labelId)}</div>
             <div class="text-xs text-[var(--text-muted)] mb-2 uppercase tracking-wide">{notice.author}</div>
-            <div class="text-base flex-1">{@html notice.content}</div>
+            <div class="flex-1 text-base">{@html notice.content}</div>
           </div>
         </div>
       {/each}
