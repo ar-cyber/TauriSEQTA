@@ -235,6 +235,8 @@
   <div
     class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-60 animate-fade-in"
     onkeydown={handleEscapeKey}
+    role="dialog"
+    tabindex="0"
   >
     <div
       class="bg-slate-900 rounded-xl w-[80%] h-[85vh] max-w-6xl shadow-2xl flex flex-col border border-slate-800 overflow-hidden"
@@ -281,11 +283,7 @@
 
           <!-- Editor -->
           <div class="overflow-y-auto flex-1 p-4 bg-slate-900">
-            <div
-              class="flex flex-col p-4 h-full rounded-lg border bg-slate-800 border-slate-700"
-            >
-              <Editor bind:htmlContent={composeBody} />
-            </div>
+            <Editor bind:content={composeBody} />
           </div>
         </div>
 

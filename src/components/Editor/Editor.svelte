@@ -17,11 +17,15 @@
   import { slashVisible } from './Plugins/Commands/stores';
   import { get } from 'svelte/store';
 
+  import EditorStyles from './EditorOverrideStyles.css?raw';
+
   import { onMount, onDestroy } from 'svelte';
   import './EditorStyles.css';
+  import './EditorOverrideStyles.css';
+  import './userHTML.css'
 
   // Make htmlContent bindable from parent components
-  let { htmlContent = $bindable('') } = $props();
+  let { content = $bindable('') } = $props<{ content: string }>();
   
   let commandListInstance = $state<any>(null);
 
@@ -35,12 +39,12 @@
         element: element!,
         editorProps: {
           attributes: {
-            class: 'focus:outline-none flex flex-col items-center px-3 md:px-0'
+            class: 'focus:outline-none px-3 md:px-0'
           },
           handleKeyDown: (view, event) => {
             // Handle keyboard events when slash menu is visible
             if (get(slashVisible) && commandListInstance) {
-              if (event.key === 'Enter') {
+              if (event.key === 'Enter' || event.key === 'ArrowUp' || event.key === 'ArrowDown') {
                 const handled = commandListInstance.handleKeydown(event, editor);
                 if (handled) {
                   return true; // Prevent TipTap from handling this event
@@ -80,8 +84,9 @@
           editor = editor;
         },
         onUpdate: ({ editor }: { editor: Editor }) => {
-          // Update the htmlContent with the editor's HTML
-          htmlContent = editor.getHTML();
+          // Update the htmlContent with the editor's HTML plus CSS
+          const editorHTML = editor.getHTML();
+          content = `<${''}style>${EditorStyles}</${''}style><div class="editor-prose">${editorHTML}</div>`;
         }
       });
     }
@@ -95,15 +100,17 @@
   
   function handleKeydownCapture(event: KeyboardEvent) {
     if (commandListInstance && editor && get(slashVisible)) {
-      if (commandListInstance.handleKeydown(event, editor)) {
-        event.preventDefault();
-        event.stopPropagation();
+      if (event.key === 'Escape') {
+        if (commandListInstance.handleKeydown(event, editor)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
       }
     }
   }
 </script>
 
-<div class="h-full prose prose-slate prose-invert" bind:clientWidth={w}>
+<div class="h-full editor-prose" bind:clientWidth={w}>
   <div 
     class="w-full" 
     bind:this={element} 

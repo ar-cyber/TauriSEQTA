@@ -6,7 +6,6 @@ type SlashItems = SlashItem[];
 type SlashItem = {
   title: string;
   subtitle: string;
-  image: any;
   command: ({ editor, range }: EditorProps) => void;
 };
 
@@ -38,4 +37,3 @@ export const desktopMenu: Writable<boolean> = writable(true);
 export const components: Writable<Components> = writable([]);
 export const editorWidth: Writable<number> = writable(0);
 export const selectedIndex: Writable<number> = writable(0);
-export const scrollIntoView: Writable<boolean> = writable(false);

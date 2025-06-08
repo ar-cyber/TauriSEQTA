@@ -1,4 +1,4 @@
-import { slashVisible, slashItems, slashLocation, slashProps } from './stores';
+import { slashVisible, slashItems, slashLocation, slashProps, selectedIndex } from './stores';
 
 export default {
   items: ({ query }: any) => {
@@ -6,18 +6,13 @@ export default {
       {
         title: 'To Dos',
         subtitle: 'Create a to do list with checkboxes',
-        image: '/images/editor/commands/todos.png',
         command: ({ editor, range }: any) => {
-          editor.commands.deleteRange(range);
-          editor.commands.insertContent(
-            '<ul data-type="taskList"><li data-checked="false"><li>&#8203</li></ul>'
-          );
+          editor.chain().focus().deleteRange(range).toggleTaskList().run();
         }
       },
       {
         title: 'Heading 1',
         subtitle: 'BIG heading',
-        image: '/images/editor/commands/heading.png',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
         }
@@ -25,7 +20,6 @@ export default {
       {
         title: 'Heading 2',
         subtitle: 'Less Big heading',
-        image: '/images/editor/commands/heading2.png',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
         }
@@ -33,7 +27,6 @@ export default {
       {
         title: 'Heading 3',
         subtitle: 'Medium big heading',
-        image: '/images/editor/commands/heading3.png',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
         }
@@ -41,7 +34,6 @@ export default {
       {
         title: 'Bullet List',
         subtitle: 'Pew pew pew',
-        image: '/images/editor/commands/bulletlist.png',
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleBulletList();
@@ -50,11 +42,71 @@ export default {
       {
         title: 'Numbered List',
         subtitle: '1, 2, 3, 4...',
-        image: '/images/editor/commands/numberedlist.png',
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
-
           editor.commands.toggleOrderedList();
+        }
+      },
+      {
+        title: 'Text',
+        subtitle: 'Just plain text paragraph',
+        command: ({ editor, range }: any) => {
+          editor.chain().focus().deleteRange(range).setNode('paragraph').run();
+        }
+      },
+      {
+        title: 'Quote',
+        subtitle: 'Capture important quotes',
+        command: ({ editor, range }: any) => {
+          editor.chain().focus().deleteRange(range).toggleBlockquote().run();
+        }
+      },
+      {
+        title: 'Code Block',
+        subtitle: 'Formatted code snippet',
+        command: ({ editor, range }: any) => {
+          editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
+        }
+      },
+      {
+        title: 'Divider',
+        subtitle: 'Add a horizontal line',
+        command: ({ editor, range }: any) => {
+          editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+        }
+      },
+      {
+        title: 'Bold Text',
+        subtitle: 'Make text bold',
+        command: ({ editor, range }: any) => {
+          editor.commands.deleteRange(range);
+          editor.commands.toggleBold();
+        }
+      },
+      {
+        title: 'Italic Text',
+        subtitle: 'Make text italic',
+        command: ({ editor, range }: any) => {
+          editor.commands.deleteRange(range);
+          editor.commands.toggleItalic();
+        }
+      },
+      {
+        title: 'Link',
+        subtitle: 'Add a web link',
+        command: ({ editor, range }: any) => {
+          const url = prompt('Enter the URL:');
+          if (url) {
+            editor.chain().focus().deleteRange(range).setLink({ href: url }).insertContent('Link text').run();
+          }
+        }
+      },
+      {
+        title: 'Inline Code',
+        subtitle: 'Inline code snippet',
+        command: ({ editor, range }: any) => {
+          editor.commands.deleteRange(range);
+          editor.commands.toggleCode();
         }
       }
     ]
@@ -72,6 +124,7 @@ export default {
         slashVisible.set(true);
         slashLocation.set({ x: location.x, y: location.y, height: location.height });
         slashItems.set(props.items);
+        selectedIndex.set(0);
       },
 
       onUpdate(props: any) {
@@ -87,6 +140,7 @@ export default {
 
       onExit() {
         slashVisible.set(false);
+        selectedIndex.set(0);
       }
     };
   }

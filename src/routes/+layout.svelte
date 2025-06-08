@@ -305,10 +305,10 @@
 	];
 </script>
 
-<div class="flex flex-col md:flex-row pt-2 h-screen bg-slate-900" data-theme={$theme}>
+<div class="flex flex-col pt-2 h-screen md:flex-row bg-slate-900" data-theme={$theme}>
 	<!-- Mobile Menu Button -->
 	<button 
-		class="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg bg-slate-800 hover:bg-slate-700"
+		class="fixed top-4 right-4 z-50 p-2 rounded-lg md:hidden bg-slate-800 hover:bg-slate-700"
 		onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
 	>
 		<Icon src={Bars3} class="w-6 h-6" />
@@ -316,7 +316,7 @@
 
 	<!-- Sidebar -->
 	<aside
-		class="flex flex-col justify-between px-2 pb-2 space-y-2 w-full md:w-64 h-full fixed md:relative transform transition-transform duration-300 ease-in-out z-40 bg-slate-900"
+		class="flex fixed z-40 flex-col justify-between px-2 pb-2 space-y-2 w-full h-full transition-transform duration-300 ease-in-out transform md:w-64 md:relative"
 		class:translate-x-0={isMobileMenuOpen || !isMobile}
 		class:-translate-x-full={!isMobileMenuOpen && isMobile}
 	>
@@ -347,17 +347,17 @@
 				</a>
 			{/each}
 			{#if weatherEnabled}
-				<div class="my-4 mx-2 rounded-2xl shadow text-white p-4 flex flex-col justify-center animate-fade-in" style="background: linear-gradient(120deg, var(--accent-color-value) 0%, color-mix(in srgb, var(--accent-color-value) 70%, black) 100%);">
+				<div class="flex flex-col justify-center p-4 mx-2 my-4 text-white rounded-2xl shadow animate-fade-in" style="background: linear-gradient(120deg, var(--accent-color-value) 0%, color-mix(in srgb, var(--accent-color-value) 70%, black) 100%);">
 					{#if loadingWeather}
 						<div>Loading weather…</div>
 					{:else if weatherError}
 						<div class="text-red-400">{weatherError}</div>
 					{:else if weatherData}
 						<div class="flex flex-col gap-1">
-							<div class="text-base font-bold flex items-center gap-2">
+							<div class="flex gap-2 items-center text-base font-bold">
 								<span>Weather in {weatherData.location}, {weatherData.country}</span>
 							</div>
-							<div class="flex items-center gap-2 mt-2">
+							<div class="flex gap-2 items-center mt-2">
 								<span class="text-2xl font-bold">{Math.round(weatherData.temperature)}°C</span>
 								<span class="text-lg">{weatherData.weathercode === 0 ? '☀️' : weatherData.weathercode < 4 ? '🌤️' : weatherData.weathercode < 45 ? '☁️' : '🌧️'}</span>
 								<span class="text-xs">{weatherData.windspeed} km/h wind</span>
@@ -400,7 +400,7 @@
 	</aside>
 
 	<!-- Main Content -->
-	<main class="flex-1 overflow-y-auto bg-slate-950 rounded-tl-2xl">
+	<main class="overflow-y-auto flex-1 rounded-tl-2xl bg-slate-950">
 		{#if $needsSetup}
 			<style>
 				.auth-header {
@@ -594,20 +594,20 @@
 								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
 							{/if}
 							<div class="auth-label">Extension Authentication</div>
-							<div class="space-y-4 text-slate-100 mt-4">
+							<div class="mt-4 space-y-4 text-slate-100">
 								<p class="text-base">
 									For the best experience, use our browser extension for seamless authentication and extra features.
 								</p>
 								<div>
-									<h3 class="font-semibold mb-2">Supported Browsers:</h3>
-									<ul class="list-disc list-inside space-y-2 text-base">
+									<h3 class="mb-2 font-semibold">Supported Browsers:</h3>
+									<ul class="space-y-2 text-base list-disc list-inside">
 										<li>Google Chrome</li>
 										<li>Mozilla Firefox</li>
 									</ul>
 								</div>
 								<div>
-									<h3 class="font-semibold mb-2">Features:</h3>
-									<ul class="list-disc list-inside space-y-2 text-base">
+									<h3 class="mb-2 font-semibold">Features:</h3>
+									<ul class="space-y-2 text-base list-disc list-inside">
 										<li>Automatic session management</li>
 										<li>Secure cookie handling</li>
 										<li>Enhanced performance</li>
@@ -641,17 +641,17 @@
 							{/if}
 							<div style="width:100%;max-width:480px;padding:2.5rem;">
 								<div class="auth-label">Web Authentication</div>
-								<p class="text-base mb-4">
+								<p class="mb-4 text-base">
 									Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
 								</p>
 								<div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
-									<div class="flex items-center w-full mb-2">
+									<div class="flex items-center mb-2 w-full">
 										<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
 										<input
 											type="text"
 											bind:value={seqtaUrl}
 											placeholder="https://schoolname.seqta.com"
-											class="px-3 py-2 flex-1 rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
+											class="flex-1 px-3 py-2 rounded-lg border outline-none focus:ring border-slate-800 bg-slate-800/40"
 										/>
 									</div>
 									<button
@@ -679,7 +679,7 @@
 <!-- Mobile Menu Overlay -->
 {#if isMobile && isMobileMenuOpen}
 	<div 
-		class="fixed inset-0 bg-black bg-opacity-50 z-30"
+		class="fixed inset-0 z-30 bg-black bg-opacity-50"
 		onclick={() => isMobileMenuOpen = false}
 		role="button"
 		tabindex="0"

@@ -1,46 +1,60 @@
-h1, h2, h3, h4, h5, h6, p, ul, ol {
-  width: 100%;
-  min-width: 2px !important;
+/* Editor-specific styles (animations, transitions, editor-only features) */
+
+/* Nested content styling with animated borders */
+.editor-prose li > *:not(:first-child) {
+  position: relative;
+  margin-left: -0.5rem;
 }
 
-.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
-  margin-bottom: 0.5rem;
+.editor-prose li:not(:has(> label)) > *:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: -0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background-color: #e5e7eb7e;
+  transform-origin: top;
+  animation: expandDown 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.ProseMirror p::before, .ProseMirror h1::before, .ProseMirror h2::before, .ProseMirror h3::before, .ProseMirror h4::before, .ProseMirror h5::before, .ProseMirror h6::before {
+.dark .editor-prose li > *:not(:first-child)::before {
+  background-color: #4b55637b;
+}
+
+/* Special handling for nested lists to extend the line properly */
+.editor-prose li > ul,
+.editor-prose li > ol {
+  margin-left: -0.5rem;
+}
+
+.editor-prose li > ul::before,
+.editor-prose li > ol::before {
+  bottom: -0.25rem; /* Extend slightly below for better visual connection */
+}
+
+@keyframes expandDown {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+
+/* Placeholders for editor-only */
+.editor-prose p::before, .editor-prose h1::before, .editor-prose h2::before, .editor-prose h3::before, .editor-prose h4::before, .editor-prose h5::before, .editor-prose h6::before {
   content: attr(data-placeholder);
-  color: #adb5bd;
+  color: #9ca3af;
   float: left;
   height: 0;
 }
 
-.ProseMirror p {
-  margin: 0.5rem 0;
-  line-height: 1.5;
-}
-
-ul[data-type="taskList"] {
-	list-style: none;
-	padding: 0;
-}
-
-ul[data-type="taskList"] p {
-	margin: 0;
-}
-
-ul[data-type="taskList"] li {
-	display: flex;
-}
-
-ul[data-type="taskList"] li > label {
-	flex: 0 0 auto;
-	margin-right: 0.5rem;
-	user-select: none;
-}
-
-ul[data-type="taskList"] li > div {
-	flex: 1 1 auto;
-  margin: 3px 0;
+.dark .editor-prose p::before, .dark .editor-prose h1::before, .dark .editor-prose h2::before, .dark .editor-prose h3::before, .dark .editor-prose h4::before, .dark .editor-prose h5::before, .dark .editor-prose h6::before {
+  color: #6b7280;
 }
 
 
@@ -112,4 +126,50 @@ Tippy popups that are appended to document.body directly
 .dragPreview {
   position: absolute;
   top: -1000px;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animate headers only */
+.editor-prose h1, .editor-prose h2, .editor-prose h3, .editor-prose h4, .editor-prose h5, .editor-prose h6 {
+  animation: fadeInScale 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-origin: left center;
+}
+
+/* Smooth transitions for all interactive elements */
+.editor-prose {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Bold and italic transitions */
+.editor-prose strong, .editor-prose em {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Selected node styling (Notion-like) */
+.ProseMirror-selectednode {
+  box-shadow: 0 0 0 4px #3b82f6;
+  border-radius: 4px;
+  background-color: rgba(59, 130, 246, 0.05);
+  transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+}
+
+.dark .ProseMirror-selectednode {
+  box-shadow: 0 0 0 2px #3a3e44;
+  background-color: rgba(96, 165, 250, 0.08);
+}
+
+/* Ensure selected nodes have proper spacing */
+.ProseMirror-selectednode {
+  margin: 2px;
 }
