@@ -86,7 +86,7 @@
         onUpdate: ({ editor }: { editor: Editor }) => {
           // Update the htmlContent with the editor's HTML plus CSS
           const editorHTML = editor.getHTML();
-          content = `<${''}style>${EditorStyles}</${''}style><div class="editor-prose">${editorHTML}</div>`;
+          content = `<div class="editor-prose">${editorHTML}<${''}style>${EditorStyles}</${''}style></div>`;
         }
       });
     }
@@ -112,7 +112,7 @@
 
 <div class="h-full editor-prose" bind:clientWidth={w}>
   <div 
-    class="w-full" 
+    class="w-full min-h-full" 
     bind:this={element} 
     onkeydown={handleKeydownCapture}
     role="textbox"
