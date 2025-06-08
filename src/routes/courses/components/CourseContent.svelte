@@ -135,19 +135,19 @@ function sortModules(modules: Module[]): Module[] {
 }
 </script>
 
-<div class="relative flex-1 overflow-y-auto">
+<div class="overflow-y-auto relative flex-1">
   <!-- Mesh Gradient Background -->
-  <div class="absolute inset-0 -z-10 pointer-events-none" style="background: radial-gradient(circle at 20% 30%, #7b8cff 30%, transparent 60%), radial-gradient(circle at 80% 70%, #e66465 30%, transparent 60%), radial-gradient(circle at 60% 20%, #fff 20%, transparent 60%), radial-gradient(circle at 80% 20%, #b993ff 40%, transparent 70%), radial-gradient(circle at 10% 80%, #ffb6b9 30%, transparent 60%); filter: blur(12px); opacity: 0.85;"></div>
+  <div class="absolute inset-0 pointer-events-none -z-10" style="background: radial-gradient(circle at 20% 30%, #7b8cff 30%, transparent 60%), radial-gradient(circle at 80% 70%, #e66465 30%, transparent 60%), radial-gradient(circle at 60% 20%, #fff 20%, transparent 60%), radial-gradient(circle at 80% 20%, #b993ff 40%, transparent 70%), radial-gradient(circle at 10% 80%, #ffb6b9 30%, transparent 60%); filter: blur(12px); opacity: 0.85;"></div>
   {#if !showingOverview && selectedLessonContent}
     <div class="p-6">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-6 rounded-xl mb-6">
+      <h1 class="p-6 mb-6 text-3xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
         {selectedLessonContent.t}
       </h1>
       
       {#if selectedLessonContent.h}
-        <div class="mb-4 p-4 bg-gray-100/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-lg border border-gray-300/50 dark:border-slate-800/50">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Homework/Notes</h3>
-          <div class="prose prose-gray dark:prose-invert prose-indigo max-w-none">
+        <div class="p-4 mb-4 rounded-lg border backdrop-blur-sm bg-white/70 dark:bg-slate-900/50 border-gray-300/50 dark:border-slate-800/50">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Homework/Notes</h3>
+          <div class="max-w-none prose prose-gray dark:prose-invert prose-indigo">
             <p class="text-gray-700 dark:text-slate-300">{selectedLessonContent.h}</p>
           </div>
         </div>
@@ -155,16 +155,16 @@ function sortModules(modules: Module[]): Module[] {
 
       {#if selectedLessonContent.r && selectedLessonContent.r.length > 0}
         <div class="mb-6">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-4 rounded-xl mb-4">
+          <h3 class="p-4 mb-4 text-xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
             Lesson Resources
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {#each selectedLessonContent.r as resource}
-              <div class="p-4 rounded-lg border-2 {getFileColor(resource.mimetype)}/50 backdrop-blur-sm transition-all cursor-pointer hover:bg-gray-200/30 dark:hover:bg-slate-800/30">
+              <div class="p-4 rounded-lg border-2 {getFileColor(resource.mimetype)}/50 backdrop-blur-sm transition-all cursor-pointer hover:bg-white/50 dark:hover:bg-gray-200/30">
                 <div class="flex items-center mb-2">
-                  <span class="text-2xl mr-3">{getFileIcon(resource.mimetype)}</span>
+                  <span class="mr-3 text-2xl">{getFileIcon(resource.mimetype)}</span>
                   <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-gray-900 dark:text-white truncate">{resource.t}</div>
+                    <div class="font-semibold text-gray-900 truncate dark:text-white">{resource.t}</div>
                     <div class="text-xs text-gray-600 dark:text-slate-400">{formatFileSize(resource.size)}</div>
                   </div>
                 </div>
@@ -178,16 +178,16 @@ function sortModules(modules: Module[]): Module[] {
         {@const lessonDoc = parseLessonDocument(selectedLessonContent)}
         {#if lessonDoc?.document?.modules}
           {@const sortedModules = sortModules(lessonDoc.document.modules)}
-          <div class="prose prose-invert prose-indigo max-w-none">
+          <div class="max-w-none prose prose-gray dark:prose-invert prose-indigo">
             {#each sortedModules as module}
               {@const renderedModule = renderModule(module)}
               {#if renderedModule}
                 {#if renderedModule.type === 'title'}
-                  <h2 class="text-xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600 to-purple-700 p-4 rounded-xl my-4">
+                  <h2 class="p-4 my-4 text-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl">
                     {renderedModule.content}
                   </h2>
                 {:else if renderedModule.type === 'text'}
-                  <div class="my-4 p-4 bg-gray-100 dark:bg-slate-900 rounded-xl">
+                  <div class="p-4 my-4 bg-gray-100 rounded-xl bg-white/70 dark:bg-slate-900">
                     {@html sanitizeHtml(renderedModule.content)}
                   </div>
                 {:else if renderedModule.type === 'link'}
@@ -201,35 +201,35 @@ function sortModules(modules: Module[]): Module[] {
     </div>
   {:else}
     <div class="p-6">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-6 rounded-xl mb-6">
+      <h1 class="p-6 mb-6 text-3xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
         {coursePayload.t}
       </h1>
 
       {#if parsedDocument?.document?.modules}
         {@const sortedModules = sortModules(parsedDocument.document.modules)}
-        <div class="prose prose-invert prose-indigo max-w-none">
+        <div class="max-w-none prose prose-gray dark:prose-invert prose-indigo">
           {#each sortedModules as module}
             {@const renderedModule = renderModule(module)}
             {#if renderedModule}
               {#if renderedModule.type === 'title'}
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm p-4 rounded-xl mb-4">
+                <h2 class="p-4 mb-4 text-xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
                   {renderedModule.content}
                 </h2>
               {:else if renderedModule.type === 'text'}
-                <div class="mb-6 p-4 bg-gray-100/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl border border-gray-300/50 dark:border-slate-800/50">
+                <div class="p-4 mb-6 text-black rounded-xl border backdrop-blur-sm bg-white/70 dark:bg-slate-900/50 border-gray-300/50 dark:border-slate-800/50">
                   {@html sanitizeHtml(renderedModule.content)}
                 </div>
               {:else if renderedModule.type === 'resources'}
                 <div class="mb-6">
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {#each renderedModule.content as resource}
                       {@const fileDetails = coursePayload.cf.find(f => f.uuid === resource.uuid)}
                       {#if fileDetails}
-                        <div class="p-4 rounded-lg border-2 {getFileColor(fileDetails.mimetype)}/50 backdrop-blur-sm transition-all cursor-pointer hover:bg-gray-200/30 dark:hover:bg-slate-800/30">
+                        <div class="p-4 rounded-lg border-2 {getFileColor(fileDetails.mimetype)}/50 hover:{getFileColor(fileDetails.mimetype)}/80 backdrop-blur-sm transition-all cursor-pointer dark:hover:brightness-125">
                           <div class="flex items-center mb-2">
-                            <span class="text-2xl mr-3">{getFileIcon(fileDetails.mimetype)}</span>
+                            <span class="mr-3 text-2xl">{getFileIcon(fileDetails.mimetype)}</span>
                             <div class="flex-1 min-w-0">
-                              <div class="font-semibold text-gray-900 dark:text-white truncate">{fileDetails.filename}</div>
+                              <div class="font-semibold text-gray-900 truncate dark:text-white">{fileDetails.filename}</div>
                               <div class="text-xs text-gray-600 dark:text-slate-400">{formatFileSize(fileDetails.size)}</div>
                             </div>
                           </div>

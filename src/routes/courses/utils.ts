@@ -28,7 +28,7 @@ export function renderDraftJSText(content: DraftJSContent): string {
             const before = text.substring(0, range.offset);
             const linkText = text.substring(range.offset, range.offset + range.length);
             const after = text.substring(range.offset + range.length);
-            text = `${before}<a href="${entity.data.href || entity.data.url}" class="text-indigo-400 hover:text-purple-300 underline transition-colors" target="_blank" rel="noopener noreferrer">${linkText}</a>${after}`;
+            text = `${before}<a href="${entity.data.href || entity.data.url}" class="text-indigo-400 underline transition-colors hover:text-purple-300" target="_blank" rel="noopener noreferrer">${linkText}</a>${after}`;
           }
         }
       }
@@ -36,13 +36,13 @@ export function renderDraftJSText(content: DraftJSContent): string {
       // Apply block-level formatting
       switch (block.type) {
         case 'header-one':
-          return `<h1 class="text-2xl font-bold mb-4 text-white">${text}</h1>`;
+          return `<h1 class="mb-4 text-2xl font-bold text-white">${text}</h1>`;
         case 'header-two':
-          return `<h2 class="text-xl font-bold mb-3 text-white">${text}</h2>`;
+          return `<h2 class="mb-3 text-xl font-bold text-white">${text}</h2>`;
         case 'header-three':
-          return `<h3 class="text-lg font-bold mb-2 text-white">${text}</h3>`;
+          return `<h3 class="mb-2 text-lg font-bold text-white">${text}</h3>`;
         default:
-          return `<p class="mb-2 text-slate-300">${text}</p>`;
+          return `<p class="mb-2 dark:text-slate-300">${text}</p>`;
       }
     })
     .join('');
