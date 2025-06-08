@@ -407,17 +407,10 @@
 					<div class="signin-form-content">
 						<img src="/32x32.png" alt="Logo" class="signin-logo" />
 						<h2 class="signin-title">Sign in to your account</h2>
-						<p class="signin-desc">Don't have an account? Ask an admin to create one for you.</p>
+						<p class="signin-desc">Don't have a SEQTA account? Ask your school administrator to create one for you.</p>
 						<form onsubmit={startLogin} class="signin-form">
 							<label for="seqtaUrl">SEQTA URL</label>
 							<input id="seqtaUrl" type="text" bind:value={seqtaUrl} placeholder="https://schoolname.seqta.com" class="signin-input" autocomplete="username" required />
-							<!-- If you want username/password fields instead, replace the above input with those fields and bind as needed -->
-							<div class="signin-options">
-								<label class="remember-me">
-									<input type="checkbox" /> Remember me
-								</label>
-								<a href="#" class="forgot-password">Forgot password?</a>
-							</div>
 							<button type="submit" class="signin-btn">
 								Sign in
 							</button>
@@ -427,10 +420,19 @@
 				<div class="signin-image-panel"></div>
 			</div>
 			<style>
+				html, body {
+					height: 100vh;
+					overflow: hidden;
+				}
+				main {
+					height: 100vh;
+					overflow: hidden;
+				}
 				.signin-container {
 					display: flex;
 					height: 100vh;
 					width: 100vw;
+					overflow: hidden;
 				}
 				.signin-form-panel {
 					background: #232323;
@@ -442,6 +444,8 @@
 					align-items: center;
 					justify-content: center;
 					padding: 0 2rem;
+					height: 100vh;
+					overflow: hidden;
 				}
 				.signin-form-content {
 					width: 100%;
@@ -475,27 +479,10 @@
 					padding: 0.7rem 0.9rem;
 					border-radius: 6px;
 					border: none;
-					background: #f3f4f6;
+					background: #fff;
 					color: #232323;
 					font-size: 1rem;
 					margin-bottom: 0.5rem;
-				}
-				.signin-options {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					margin: 1rem 0;
-				}
-				.remember-me {
-					display: flex;
-					align-items: center;
-					font-size: 0.95rem;
-					color: #b0b0b0;
-				}
-				.forgot-password {
-					color: #3b82f6;
-					text-decoration: none;
-					font-size: 0.95rem;
 				}
 				.signin-btn {
 					width: 100%;
@@ -518,6 +505,10 @@
 					background: url('/images/signin.jpg') center center / cover no-repeat;
 					min-width: 0;
 					min-height: 100vh;
+					height: 100vh;
+					overflow: hidden;
+					background-size: cover;
+					background-position: center;
 				}
 				@media (max-width: 900px) {
 					.signin-container {
