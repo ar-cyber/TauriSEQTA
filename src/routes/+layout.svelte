@@ -402,274 +402,136 @@
 	<!-- Main Content -->
 	<main class="overflow-y-auto flex-1 bg-gray-50 rounded-tl-2xl dark:bg-slate-950">
 		{#if $needsSetup}
+			<div class="signin-container">
+				<div class="signin-form-panel">
+					<div class="signin-form-content">
+						<img src="/32x32.png" alt="Logo" class="signin-logo" />
+						<h2 class="signin-title">Sign in to your account</h2>
+						<p class="signin-desc">Don't have an account? Ask an admin to create one for you.</p>
+						<form onsubmit={startLogin} class="signin-form">
+							<label for="seqtaUrl">SEQTA URL</label>
+							<input id="seqtaUrl" type="text" bind:value={seqtaUrl} placeholder="https://schoolname.seqta.com" class="signin-input" autocomplete="username" required />
+							<!-- If you want username/password fields instead, replace the above input with those fields and bind as needed -->
+							<div class="signin-options">
+								<label class="remember-me">
+									<input type="checkbox" /> Remember me
+								</label>
+								<a href="#" class="forgot-password">Forgot password?</a>
+							</div>
+							<button type="submit" class="signin-btn">
+								Sign in
+							</button>
+						</form>
+					</div>
+				</div>
+				<div class="signin-image-panel"></div>
+			</div>
 			<style>
-				.auth-header {
-					width: 100%;
-					text-align: center;
-					font-size: 2.2rem;
-					font-weight: 800;
-					color: #fff;
-					letter-spacing: 0.03em;
-					margin-bottom: 2.5rem;
-					margin-top: 2.5rem;
-					z-index: 10;
-					text-shadow: 0 2px 16px rgba(0,0,0,0.25);
-				}
-				.auth-panels {
+				.signin-container {
 					display: flex;
-					width: 100%;
 					height: 100vh;
-					min-height: 600px;
-					background: #111;
-					position: relative;
+					width: 100vw;
 				}
-				.auth-panel {
-					flex: 1 1 0%;
-					transition: flex-basis 0.5s cubic-bezier(0.4,0,0.2,1), flex-grow 0.5s cubic-bezier(0.4,0,0.2,1), background 0.4s, box-shadow 0.4s;
+				.signin-form-panel {
+					background: #232323;
+					color: #fff;
+					width: 100%;
+					max-width: 480px;
+					min-width: 320px;
 					display: flex;
 					align-items: center;
 					justify-content: center;
-					position: relative;
-					cursor: pointer;
-					min-width: 0;
-					min-height: 0;
-					overflow: hidden;
+					padding: 0 2rem;
 				}
-				.auth-panel.ext {
-					background: linear-gradient(120deg, rgba(36,99,235,0.25) 0%, rgba(36,99,235,0.10) 100%), rgba(0,0,0,0.7);
-					backdrop-filter: blur(16px) saturate(1.2);
-					box-shadow: 0 8px 32px 0 rgba(36,99,235,0.15);
-				}
-				.auth-panel.web {
-					background: linear-gradient(120deg, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.10) 100%), rgba(0,0,0,0.7);
-					backdrop-filter: blur(16px) saturate(1.2);
-					box-shadow: 0 8px 32px 0 rgba(139,92,246,0.15);
-				}
-				.auth-panel .blur-overlay {
-					position: absolute;
-					top: 0; left: 0; right: 0; bottom: 0;
-					background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.10) 100%);
-					backdrop-filter: blur(32px) saturate(1.2);
-					z-index: 1;
-					pointer-events: none;
-				}
-				.auth-panel > .panel-content {
-					position: relative;
-					z-index: 2;
+				.signin-form-content {
 					width: 100%;
+					max-width: 340px;
+					margin: 0 auto;
 					display: flex;
 					flex-direction: column;
-					align-items: center;
-					justify-content: center;
+					gap: 1.5rem;
 				}
-				.auth-panel.collapsed {
-					flex-basis: 15%;
-					flex-grow: 0;
-					flex-shrink: 1;
-					justify-content: center;
+				.signin-logo {
+					width: 36px;
+					margin-bottom: 2rem;
 				}
-				.auth-panel.expanded {
-					flex-basis: 70%;
-					flex-grow: 1;
-					flex-shrink: 0;
-					justify-content: center;
-				}
-				.auth-panel.full {
-					flex-basis: 100%;
-					flex-grow: 1;
-					flex-shrink: 0;
-					justify-content: center;
-					z-index: 20;
-					cursor: default;
-				}
-				.auth-panel.hide {
-					flex-basis: 0%;
-					flex-grow: 0;
-					flex-shrink: 1;
-					opacity: 0;
-					pointer-events: none;
-				}
-				.auth-label {
-					font-size: 2rem;
+				.signin-title {
+					font-size: 1.6rem;
 					font-weight: 700;
-					letter-spacing: 0.1em;
-					color: #fff;
-					opacity: 0.7;
-					user-select: none;
-					text-align: center;
-					writing-mode: vertical-rl;
-					text-orientation: mixed;
+					margin-bottom: 0.5rem;
 				}
-				.auth-panel.expanded .auth-label,
-				.auth-panel.full .auth-label {
-					writing-mode: initial;
-					text-orientation: initial;
-					font-size: 2rem;
+				.signin-desc {
+					color: #b0b0b0;
+					font-size: 1rem;
 					margin-bottom: 1.5rem;
 				}
-				.auth-panel.full .panel-content {
-					align-items: center;
-					justify-content: center;
-				}
-				.auth-backdrop {
-					position: fixed;
-					top: 0; left: 0; right: 0; bottom: 0;
-					background: rgba(0,0,0,0.25);
-					z-index: 15;
-					transition: opacity 0.3s;
-				}
-				.auth-back-btn {
-					position: absolute;
-					top: 2rem;
-					right: 2rem;
-					background: rgba(0,0,0,0.5);
-					color: #fff;
-					border: none;
-					border-radius: 0.5rem;
-					padding: 0.5rem 1.2rem;
+				.signin-form label {
 					font-size: 1rem;
+					margin-bottom: 0.25rem;
+					margin-top: 1rem;
+				}
+				.signin-input {
+					width: 100%;
+					padding: 0.7rem 0.9rem;
+					border-radius: 6px;
+					border: none;
+					background: #f3f4f6;
+					color: #232323;
+					font-size: 1rem;
+					margin-bottom: 0.5rem;
+				}
+				.signin-options {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					margin: 1rem 0;
+				}
+				.remember-me {
+					display: flex;
+					align-items: center;
+					font-size: 0.95rem;
+					color: #b0b0b0;
+				}
+				.forgot-password {
+					color: #3b82f6;
+					text-decoration: none;
+					font-size: 0.95rem;
+				}
+				.signin-btn {
+					width: 100%;
+					background: #2563eb;
+					color: #fff;
 					font-weight: 600;
+					font-size: 1.1rem;
+					border: none;
+					border-radius: 6px;
+					padding: 0.8rem 0;
+					margin-top: 0.5rem;
 					cursor: pointer;
-					z-index: 30;
-					box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 					transition: background 0.2s;
 				}
-				.auth-back-btn:hover {
-					background: rgba(0,0,0,0.7);
+				.signin-btn:hover {
+					background: #1d4ed8;
+				}
+				.signin-image-panel {
+					flex: 1;
+					background: url('/images/signin.jpg') center center / cover no-repeat;
+					min-width: 0;
+					min-height: 100vh;
 				}
 				@media (max-width: 900px) {
-					.auth-header {
-						font-size: 1.5rem;
-						margin-bottom: 1.2rem;
-						margin-top: 1.2rem;
-					}
-					.auth-panels {
+					.signin-container {
 						flex-direction: column;
-						height: 100vh;
 					}
-					.auth-panel {
-						min-height: 40vh;
-						min-width: 100vw;
+					.signin-image-panel {
+						display: none;
 					}
-					.auth-panel.collapsed {
-						flex-basis: 15vh;
-					}
-					.auth-panel.expanded {
-						flex-basis: 70vh;
-					}
-					.auth-panel.full {
-						flex-basis: 100vh;
-					}
-					.auth-label {
-						writing-mode: initial;
-						font-size: 1.5rem;
+					.signin-form-panel {
+						max-width: 100vw;
+						min-width: 0;
 					}
 				}
 			</style>
-			<div class="auth-header">Choose Authentication Method</div>
-			{#if selected}
-				<div
-					class="auth-backdrop"
-					role="button"
-					tabindex="0"
-					onclick={() => selected = ''}
-					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && (selected = '')}
-				></div>
-			{/if}
-			<div class="auth-panels">
-				<!-- Extension Panel -->
-				<div
-					class="auth-panel ext {selected === 'extension' ? 'full' : selected === 'web' ? 'hide' : hovered === 'extension' ? 'expanded' : 'collapsed'}"
-					onmouseenter={() => { if (!selected) hovered = 'extension'; }}
-					onmouseleave={() => { if (!selected) hovered = ''; }}
-					onclick={() => { if (!selected) selected = 'extension'; }}
-					role="button"
-					tabindex="0"
-					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && !selected && (selected = 'extension')}
-				>
-					<div class="blur-overlay"></div>
-					<div class="panel-content">
-						{#if selected === 'extension' || (!selected && hovered === 'extension')}
-							{#if selected === 'extension'}
-								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
-							{/if}
-							<div class="auth-label">Extension Authentication</div>
-							<div class="mt-4 space-y-4 text-slate-100">
-								<p class="text-base">
-									For the best experience, use our browser extension for seamless authentication and extra features.
-								</p>
-								<div>
-									<h3 class="mb-2 font-semibold">Supported Browsers:</h3>
-									<ul class="space-y-2 text-base list-disc list-inside">
-										<li>Google Chrome</li>
-										<li>Mozilla Firefox</li>
-									</ul>
-								</div>
-								<div>
-									<h3 class="mb-2 font-semibold">Features:</h3>
-									<ul class="space-y-2 text-base list-disc list-inside">
-										<li>Automatic session management</li>
-										<li>Secure cookie handling</li>
-										<li>Enhanced performance</li>
-										<li>Additional browser integration features</li>
-									</ul>
-								</div>
-								<p class="text-base text-slate-300">
-									Don't have the extension? Use the web version instead.
-								</p>
-							</div>
-						{:else}
-							<div class="auth-label">Extension</div>
-						{/if}
-					</div>
-				</div>
-				<!-- Web Auth Panel -->
-				<div
-					class="auth-panel web {selected === 'web' ? 'full' : selected === 'extension' ? 'hide' : hovered === 'web' ? 'expanded' : 'collapsed'}"
-					onmouseenter={() => { if (!selected) hovered = 'web'; }}
-					onmouseleave={() => { if (!selected) hovered = ''; }}
-					onclick={() => { if (!selected) selected = 'web'; }}
-					role="button"
-					tabindex="0"
-					onkeydown={e => (e.key === 'Enter' || e.key === ' ') && !selected && (selected = 'web')}
-				>
-					<div class="blur-overlay"></div>
-					<div class="panel-content">
-						{#if selected === 'web' || (!selected && hovered === 'web')}
-							{#if selected === 'web'}
-								<button class="auth-back-btn" onclick={() => selected = ''}>Back</button>
-							{/if}
-							<div style="width:100%;max-width:480px;padding:2.5rem;">
-								<div class="auth-label">Web Authentication</div>
-								<p class="mb-4 text-base text-gray-600 dark:text-slate-300">
-									Enter the full URL to your school's SEQTA page, then sign in in the window that opens. We'll securely save your session cookie.
-								</p>
-								<div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
-									<div class="flex items-center mb-2 w-full">
-										<Icon src={GlobeAlt} class="mr-2 w-5 h-5" />
-										<input
-											type="text"
-											bind:value={seqtaUrl}
-											placeholder="https://schoolname.seqta.com"
-											class="flex-1 px-3 py-2 text-gray-900 bg-white rounded-lg border border-gray-300 outline-none dark:bg-slate-800/40 dark:text-white dark:border-slate-800 focus:ring"
-										/>
-									</div>
-									<button
-										onclick={startLogin}
-										class="flex justify-center items-center py-2 w-11/12 font-semibold rounded-lg transition-transform duration-300"
-										style="background: #8b5cf6; color: white;"
-									>
-										<Icon src={ArrowRightOnRectangle} class="mr-2 w-5 h-5" />
-										Sign in with Web
-									</button>
-								</div>
-							</div>
-						{:else}
-							<div class="auth-label">Web</div>
-						{/if}
-					</div>
-				</div>
-			</div>
 		{:else}
 			{@render children()}
 		{/if}
