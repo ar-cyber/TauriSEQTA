@@ -663,18 +663,14 @@
           href={shortcut.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] bg-gray-200/40 dark:bg-slate-800/40 backdrop-blur-sm border border-gray-300/50 dark:border-slate-700/50 hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] overflow-hidden"
+          class="group relative flex flex-col items-center justify-center p-6 rounded-2xl transition-all duration-200 bg-white/80 dark:bg-slate-900/60 border border-gray-200 dark:border-slate-800 shadow-sm hover:accent-bg hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring cursor-pointer"
+          tabindex="0"
+          aria-label={shortcut.name}
         >
-          <div class="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 from-indigo-600/10 to-purple-700/10 group-hover:opacity-100"></div>
-          <div
-            class="flex relative justify-center items-center mb-3 w-12 h-12 text-2xl text-white bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg sm:w-14 sm:h-14 sm:text-3xl animate-gradient"
-          >
+          <div class="flex relative justify-center items-center mb-4 w-16 h-16 text-3xl rounded-2xl accent-bg text-white shadow-lg transition-all duration-200 group-hover:scale-110 group-active:scale-95">
             {shortcut.icon}
           </div>
-                      <span
-              class="relative text-sm font-medium text-center text-gray-900 transition-colors sm:text-base dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-200"
-            >{shortcut.name}</span
-          >
+          <span class="relative text-base font-semibold text-center text-gray-900 dark:text-white mt-1 transition-colors">{shortcut.name}</span>
         </a>
       {/each}
     </div>
@@ -711,15 +707,14 @@
           <p class="mt-4 text-gray-600 dark:text-slate-400">Loading your schedule...</p>
         </div>
       {:else if lessons.length === 0}
-        <div class="flex flex-col gap-6 justify-center items-center px-4 py-12 w-full sm:flex-row sm:gap-12 sm:px-14 sm:py-16">
-          <div
-            class="flex justify-center items-center w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-gradient"
-          >
-            <span class="text-3xl sm:text-5xl">Q</span>
+        <div class="flex flex-col gap-6 justify-center items-center px-4 py-16 w-full sm:flex-row sm:gap-12 sm:px-14 sm:py-20">
+          <div class="flex justify-center items-center w-20 h-20 sm:w-28 sm:h-28 rounded-full accent-bg text-white shadow-lg">
+            <span class="text-4xl sm:text-6xl">📚</span>
           </div>
-          <p class="text-xl text-center text-gray-700 sm:text-2xl dark:text-slate-300">
-            No lessons available for this day.
-          </p>
+          <div class="flex flex-col items-center">
+            <p class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-2">No lessons today!</p>
+            <p class="text-lg text-center text-gray-600 dark:text-slate-300">Enjoy your free time or check your other tasks.</p>
+          </div>
         </div>
       {:else}
         <div class="flex overflow-x-scroll">
