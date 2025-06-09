@@ -13,6 +13,7 @@
     BookOpen,
     BuildingOffice,
     ArrowTopRightOnSquare,
+    XMark,
   } from "svelte-hero-icons";
 
   const studentId = 69; //! literally changes nothing but was used in the original seqta code.
@@ -60,6 +61,12 @@
   let weatherError = $state("");
 
   let selectedTab = $state<'list' | 'board'>('list');
+  let showPortalModal = $state(false);
+  let isClosing = $state(false);
+
+  let portalUrl = $state<string>('');
+  let loadingPortal = $state<boolean>(true);
+  let portalError = $state<string>('');
 
   function formatDate(date: Date): string {
     const y = date.getFullYear();
@@ -352,6 +359,34 @@
     }
   }
 
+  async function loadPortal() {
+    try {
+      const response = await seqtaFetch('/seqta/student/load/portals?', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: { splash: true }
+      });
+
+      const data = JSON.parse(response);
+      if (data.status === '200' && data.payload?.url) {
+        portalUrl = data.payload.url;
+      } else {
+        portalError = 'Failed to load portal URL';
+      }
+    } catch (e) {
+      portalError = 'Error loading portal';
+    } finally {
+      loadingPortal = false;
+    }
+  }
+
+  async function closeModal() {
+    isClosing = true;
+    await new Promise(resolve => setTimeout(resolve, 200)); // Wait for animation
+    showPortalModal = false;
+    isClosing = false;
+  }
+
   onMount(async () => {
     await Promise.all([
       loadLessons(),
@@ -361,6 +396,7 @@
       fetchHomepageNotices(),
       loadHomepageShortcuts(),
       loadWeatherSettings(),
+      loadPortal()
     ]);
     if (weatherEnabled && weatherLocation) fetchWeather();
   });
@@ -392,22 +428,48 @@
 </script>
 
 <style>
-	@keyframes gradient-shift {
-		0% {
-			background-position: 0% 50%;
-		}
-		50% {
-			background-position: 100% 50%;
-		}
-		100% {
-			background-position: 0% 50%;
-		}
-	}
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 
-	.animate-gradient {
-		background-size: 200% 200%;
-		animation: gradient-shift 8s ease infinite;
-	}
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.2s ease-out;
+  }
 </style>
 
 <div
@@ -716,5 +778,78 @@
         </div>
       {/if}
     </div>
+
+    <!-- Welcome Portal Window -->
+    <div
+      class="overflow-hidden relative rounded-2xl border shadow-xl backdrop-blur-sm bg-white/80 dark:bg-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
+    >
+      <div
+        class="flex justify-between items-center px-4 py-3 bg-gradient-to-br border-b from-gray-100/70 dark:from-slate-800/70 to-gray-100/30 dark:to-slate-800/30 border-gray-300/50 dark:border-slate-700/50"
+      >
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Welcome Portal</h3>
+        <button
+          onclick={() => showPortalModal = true}
+          class="px-3 py-1.5 text-sm rounded-lg transition-all duration-300 text-nowrap accent-text hover:accent-bg-hover hover:text-white"
+        >
+          Open Full Screen
+          <Icon src={ArrowTopRightOnSquare} class="inline ml-1 w-4 h-4" />
+        </button>
+      </div>
+
+      <div class="h-[400px]">
+        {#if loadingPortal}
+          <div class="flex flex-col items-center justify-center h-full">
+            <div class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500"></div>
+            <p class="mt-4 text-slate-400">Loading welcome portal...</p>
+          </div>
+        {:else if portalError}
+          <div class="flex flex-col items-center justify-center h-full">
+            <div class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-3xl shadow-[0_0_20px_rgba(239,68,68,0.3)] animate-gradient">
+              ⚠️
+            </div>
+            <p class="mt-4 text-xl text-slate-300">{portalError}</p>
+          </div>
+        {:else if portalUrl}
+          <iframe
+            src={portalUrl}
+            class="w-full h-full border-0"
+            title="Welcome Portal"
+          ></iframe>
+        {/if}
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Full Screen Modal -->
+{#if showPortalModal || isClosing}
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    class:animate-fade-in={showPortalModal && !isClosing}
+    class:animate-fade-out={isClosing}
+    onclick={() => closeModal()}
+  >
+    <div
+      class="relative w-[80%] h-[80%] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl"
+      class:animate-fade-in={showPortalModal && !isClosing}
+      class:animate-fade-out={isClosing}
+      onclick={(e) => e.stopPropagation()}
+    >
+      <div class="absolute top-4 right-4 z-10">
+        <button
+          onclick={() => closeModal()}
+          class="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-800 transition-colors"
+        >
+          <Icon src={XMark} class="w-6 h-6" />
+        </button>
+      </div>
+      {#if portalUrl}
+        <iframe
+          src={portalUrl}
+          class="w-full h-full border-0 rounded-2xl"
+          title="Welcome Portal"
+        ></iframe>
+      {/if}
+    </div>
+  </div>
+{/if}
