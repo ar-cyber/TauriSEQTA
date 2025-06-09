@@ -653,7 +653,7 @@
 </style>
 
 <div
-  class="p-8 mx-auto max-w-7xl min-h-screen"
+  class="p-8 mx-auto min-h-screen"
 >
   <div class="space-y-8">
     <!-- Shortcuts Section -->

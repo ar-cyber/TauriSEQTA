@@ -315,12 +315,13 @@
 	<!-- Top Bar -->
 	<header class="h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 border-b border-base-300 backdrop-blur-md bg-white/70 dark:bg-slate-900/60 shadow-sm">
 		<div class="flex items-center space-x-4">
-			<button
-				class="p-2 hover:bg-base-300 rounded-lg transition-colors"
+	<button
+				class="p-3 rounded-xl bg-base-200 hover:accent-bg shadow-md transition-all duration-200 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
 				onclick={() => (sidebarOpen = !sidebarOpen)}
-			>
-				<Icon src={Bars3} class="w-6 h-6" />
-			</button>
+				aria-label="Toggle sidebar"
+	>
+		<Icon src={Bars3} class="w-6 h-6" />
+	</button>
 			<h1 class="text-xl font-semibold">DesQTA</h1>
 		</div>
 		
@@ -339,10 +340,20 @@
 			
 			{#if userInfo}
 				<div class="flex items-center space-x-2">
-					<div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center">
-						{userInfo.userName.charAt(0)}
-					</div>
+					<img
+						src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
+						alt="Profile picture"
+						class="w-8 h-8 rounded-full border border-gray-300 dark:border-slate-700 shadow-sm object-cover"
+					/>
 					<span class="hidden md:inline">{userInfo.userName}</span>
+					<button
+						class="ml-2 p-2 rounded-lg hover:accent-bg focus:accent-bg active:accent-bg transition-colors transition-transform duration-200 text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 accent-ring transform hover:scale-105 active:scale-95"
+						onclick={handleLogout}
+						aria-label="Logout"
+						title="Logout"
+					>
+						<Icon src={ArrowRightOnRectangle} class="w-6 h-6" />
+					</button>
 				</div>
 			{/if}
 		</div>
@@ -357,82 +368,82 @@
 			<nav class="p-4 space-y-2">
 				<a
 					href="/"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname === '/'}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname === '/'}
 				>
-					<Icon src={Home} class="w-6 h-6" />
+					<Icon src={Home} class="w-7 h-7" />
 					<span>Dashboard</span>
 				</a>
 				
 				<a
 					href="/courses"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/courses')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/courses')}
 				>
-					<Icon src={BookOpen} class="w-6 h-6" />
+					<Icon src={BookOpen} class="w-7 h-7" />
 					<span>Courses</span>
 				</a>
 				
 				<a
 					href="/assessments"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/assessments')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/assessments')}
 				>
-					<Icon src={ClipboardDocumentList} class="w-6 h-6" />
+					<Icon src={ClipboardDocumentList} class="w-7 h-7" />
 					<span>Assessments</span>
 				</a>
 				
 				<a
 					href="/timetable"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/timetable')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/timetable')}
 				>
-					<Icon src={CalendarDays} class="w-6 h-6" />
+					<Icon src={CalendarDays} class="w-7 h-7" />
 					<span>Timetable</span>
 				</a>
 				
 				<a
 					href="/direqt-messages"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/direqt-messages')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/direqt-messages')}
 				>
-					<Icon src={ChatBubbleLeftRight} class="w-6 h-6" />
+					<Icon src={ChatBubbleLeftRight} class="w-7 h-7" />
 					<span>Messages</span>
 				</a>
 				
 				<a
 					href="/notices"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/notices')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/notices')}
 				>
-					<Icon src={DocumentText} class="w-6 h-6" />
+					<Icon src={DocumentText} class="w-7 h-7" />
 					<span>Notices</span>
 				</a>
 				
 				<a
 					href="/news"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/news')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/news')}
 				>
-					<Icon src={Newspaper} class="w-6 h-6" />
+					<Icon src={Newspaper} class="w-7 h-7" />
 					<span>News</span>
 				</a>
 				
 				<a
 					href="/reports"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/reports')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/reports')}
 				>
-					<Icon src={ChartBar} class="w-6 h-6" />
+					<Icon src={ChartBar} class="w-7 h-7" />
 					<span>Reports</span>
 				</a>
 				
 				<a
 					href="/settings"
-					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-					class:bg-base-300={$page.url.pathname.startsWith('/settings')}
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/settings')}
 				>
-					<Icon src={Cog6Tooth} class="w-6 h-6" />
+					<Icon src={Cog6Tooth} class="w-7 h-7" />
 					<span>Settings</span>
 				</a>
 			</nav>
@@ -440,25 +451,30 @@
 
 		<!-- Main Content -->
 		<main class="flex-1 transition-all duration-300" class:ml-64={sidebarOpen}>
-			<div class="container mx-auto p-6">
+			<div class="{sidebarOpen ? 'container mx-auto' : 'w-full'} p-6 transition-all duration-300">
 				{#if $needsSetup}
-					<div class="max-w-md mx-auto mt-8 p-6 bg-base-200 rounded-lg shadow-lg">
-						<h2 class="text-2xl font-bold mb-4">Welcome to DesQTA</h2>
-						<p class="mb-4">Please enter your SEQTA URL to get started:</p>
-						<div class="space-y-4">
-							<input
-								type="text"
-								bind:value={seqtaUrl}
-								placeholder="https://your-school.seqta.com.au"
-								class="input input-bordered w-full"
-							/>
-							<button
-								class="btn btn-primary w-full"
-								onclick={startLogin}
-								disabled={!seqtaUrl}
-							>
-								Login
-							</button>
+					<div class="max-w-5xl mx-auto mt-24 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up border border-gray-200 dark:border-slate-800">
+						<div class="hidden md:block md:w-2/3 bg-gray-100 dark:bg-slate-800">
+							<img src="/images/signin.jpg" alt="Sign in" class="object-cover w-full h-full min-h-[400px]" />
+						</div>
+						<div class="w-full md:w-1/3 flex flex-col justify-center p-10 md:p-16">
+							<h2 class="text-4xl font-extrabold mb-2 text-gray-900 dark:text-white">Welcome to DesQTA</h2>
+							<p class="mb-8 text-lg text-gray-600 dark:text-slate-300">Sign in to continue to your dashboard</p>
+							<div class="space-y-6">
+								<input
+									type="text"
+									bind:value={seqtaUrl}
+									placeholder="https://your-school.seqta.com.au"
+									class="w-full px-5 py-4 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm text-lg"
+								/>
+								<button
+									class="w-full py-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xl shadow-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+									onclick={startLogin}
+									disabled={!seqtaUrl}
+								>
+									Sign In
+								</button>
+							</div>
 						</div>
 					</div>
 				{:else}
@@ -466,10 +482,10 @@
 				{/if}
 			</div>
 		</main>
-	</div>
-</div>
+					</div>
+				</div>
 
-<style>
+			<style>
 	/* Add smooth transitions */
 	.transition-transform {
 		transition-property: transform;
@@ -485,8 +501,8 @@
 	/* Add active state styles */
 	.bg-base-300 {
 		background-color: hsl(var(--b3));
-	}
-</style>
+				}
+			</style>
 
 <!-- Mobile Menu Overlay -->
 {#if isMobile && isMobileMenuOpen}
