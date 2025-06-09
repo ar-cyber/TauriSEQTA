@@ -321,14 +321,35 @@
 	<!-- Top Bar -->
 	<header class="h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 border-b border-base-300 backdrop-blur-md bg-white/70 dark:bg-slate-900/60 shadow-sm">
 		<div class="flex items-center space-x-4">
-	<button
-				class="p-3 rounded-xl bg-base-200 hover:accent-bg shadow-md transition-all duration-200 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+			<button
+				class="p-3 rounded-xl bg-base-200 hover:bg-gray-300 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white shadow-md transition-all duration-200 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-400"
 				onclick={() => (sidebarOpen = !sidebarOpen)}
 				aria-label="Toggle sidebar"
-	>
-		<Icon src={Bars3} class="w-6 h-6" />
-	</button>
+			>
+				<Icon src={Bars3} class="w-6 h-6" />
+			</button>
 			<h1 class="text-xl font-semibold">DesQTA</h1>
+			{#if weatherEnabled && weatherData}
+				<div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-base-200/80 dark:bg-slate-800/60 shadow text-sm font-medium ml-2">
+					<span class="flex items-center gap-1">
+						<svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+							{#if weatherData.weathercode === 0}
+								<!-- Clear -->
+								<circle cx="12" cy="12" r="8" fill="#facc15" />
+							{:else if weatherData.weathercode === 1 || weatherData.weathercode === 2}
+								<!-- Partly Cloudy -->
+								<ellipse cx="12" cy="15" rx="7" ry="4" fill="#a3a3a3" />
+								<circle cx="16" cy="10" r="5" fill="#facc15" />
+							{:else}
+								<!-- Cloudy/Other -->
+								<ellipse cx="12" cy="15" rx="7" ry="4" fill="#a3a3a3" />
+							{/if}
+						</svg>
+						<span>{Math.round(weatherData.temperature)}°C</span>
+					</span>
+					<span class="hidden sm:inline text-gray-600 dark:text-gray-300">{weatherData.location}</span>
+				</div>
+			{/if}
 		</div>
 		
 		<div class="flex items-center space-x-4">
