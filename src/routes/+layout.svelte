@@ -6,6 +6,7 @@
 
 	import { onMount } from 'svelte';
 	import '../app.css';
+	import { page } from '$app/stores';
 	import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
 	import {
 		Icon,
@@ -50,6 +51,11 @@
 	// Add hovered and selected state for login UI
 	let hovered = $state<'extension' | 'web' | ''>('');
 	let selected = $state<'extension' | 'web' | ''>('');
+
+	let sidebarOpen = $state(true);
+	let isDarkMode = $derived($theme === 'dark');
+	let notifications = $state([]);
+	let unreadNotifications = $state(0);
 
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
@@ -305,229 +311,182 @@
 	];
 </script>
 
-<div class="flex flex-col pt-2 h-screen md:flex-row">
-	<!-- Mobile Menu Button -->
-	<button
-		class="fixed top-4 right-4 z-50 p-2 bg-white rounded-lg md:hidden hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
-		onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
-	>
-		<Icon src={Bars3} class="w-6 h-6" />
-	</button>
-
-	<!-- Sidebar -->
-	<aside
-		class="flex fixed z-40 flex-col justify-between px-2 pb-2 space-y-2 w-full h-full transition-transform duration-300 ease-in-out transform md:w-64 md:relative"
-		class:translate-x-0={isMobileMenuOpen || !isMobile}
-		class:-translate-x-full={!isMobileMenuOpen && isMobile}
-	>
-		<div class="flex overflow-y-scroll flex-col gap-2 h-full">
-			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-white dark:bg-slate-900">
-				<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
-				<span class="text-lg font-bold tracking-wide">DesQTA</span>
-			</div>
-			{#each menu as item}
-				<a 
-					href={item.path} 
-					class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:scale-[1.03] group"
-					onclick={() => isMobile && (isMobileMenuOpen = false)}
-				>
-					<Icon src={item.icon} class="mr-4 w-6 h-6" />
-					<span class="text-base font-bold">{item.label}</span>
-					{#if item.hasSub}
-						<svg
-							class="ml-auto w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-						</svg>
-					{/if}
-				</a>
-			{/each}
-			{#if weatherEnabled}
-				<div class="flex flex-col justify-center p-4 mx-2 my-4 text-white rounded-2xl shadow animate-fade-in" style="background: linear-gradient(120deg, var(--accent-color-value) 0%, color-mix(in srgb, var(--accent-color-value) 70%, black) 100%);">
-					{#if loadingWeather}
-						<div>Loading weather…</div>
-					{:else if weatherError}
-						<div class="text-red-400">{weatherError}</div>
-					{:else if weatherData}
-						<div class="flex flex-col gap-1">
-							<div class="flex gap-2 items-center text-base font-bold">
-								<span>Weather in {weatherData.location}, {weatherData.country}</span>
-							</div>
-							<div class="flex gap-2 items-center mt-2">
-								<span class="text-2xl font-bold">{Math.round(weatherData.temperature)}°C</span>
-								<span class="text-lg">{weatherData.weathercode === 0 ? '☀️' : weatherData.weathercode < 4 ? '🌤️' : weatherData.weathercode < 45 ? '☁️' : '🌧️'}</span>
-								<span class="text-xs">{weatherData.windspeed} km/h wind</span>
-							</div>
-						</div>
-					{/if}
+<div class="min-h-screen bg-base-100 flex flex-col" class:dark={isDarkMode}>
+	<!-- Top Bar -->
+	<header class="h-16 bg-base-200 border-b border-base-300 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50">
+		<div class="flex items-center space-x-4">
+			<button
+				class="p-2 hover:bg-base-300 rounded-lg transition-colors"
+				onclick={() => (sidebarOpen = !sidebarOpen)}
+			>
+				<Icon src={Bars3} class="w-6 h-6" />
+			</button>
+			<h1 class="text-xl font-semibold">DesQTA</h1>
+		</div>
+		
+		<div class="flex items-center space-x-4">
+			<button
+				class="p-2 hover:bg-base-300 rounded-lg transition-colors relative"
+				onclick={() => (notifications = [])}
+			>
+				<Icon src={Bell} class="w-6 h-6" />
+				{#if unreadNotifications > 0}
+					<span class="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full w-5 h-5 flex items-center justify-center">
+						{unreadNotifications}
+					</span>
+				{/if}
+			</button>
+			
+			{#if userInfo}
+				<div class="flex items-center space-x-2">
+					<div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center">
+						{userInfo.userName.charAt(0)}
+					</div>
+					<span class="hidden md:inline">{userInfo.userName}</span>
 				</div>
 			{/if}
 		</div>
-		<div>
-			<div class="flex justify-between">
-				{#if userInfo}
-					<div class="flex gap-3 items-center px-2 py-1 bg-transparent rounded-lg">
-						<!-- Avatar with initials -->
-						<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white rounded-full select-none" style="background-color: var(--accent-color-value);">
-							{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
-						</div>
-						<div class="flex flex-col flex-1 min-w-0">
-							<div class="flex gap-2 items-center">
-								<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
-							</div>
-							<div class="flex gap-2 items-center min-w-0 text-xs text-gray-500 dark:text-slate-400">
-								<span class="font-mono">{userInfo.userCode}</span>
-								<span>•</span>
-								<span class="font-mono">{userInfo.meta.governmentID}</span>
-							</div>
-						</div>
-					</div>
-				{/if}
-				{#if !$needsSetup}
-					<button 
-						onclick={handleLogout}
-						class="px-2 py-1 font-semibold text-gray-600 rounded-lg transition hover:text-gray-800 dark:text-zinc-400 dark:hover:text-zinc-50"
-					>
-						<Icon src={ArrowLeftStartOnRectangle} class="size-4" />
-					</button>
-				{/if}
-			</div>
-		</div>
-	</aside>
+	</header>
 
-	<!-- Main Content -->
-	<main class="overflow-y-auto flex-1 bg-gray-50 rounded-tl-2xl dark:bg-slate-950">
-		{#if $needsSetup}
-			<div class="signin-container">
-				<div class="signin-form-panel">
-					<div class="signin-form-content">
-						<img src="/32x32.png" alt="Logo" class="signin-logo" />
-						<h2 class="signin-title">Sign in to your account</h2>
-						<p class="signin-desc">Don't have a SEQTA account? Ask your school administrator to create one for you.</p>
-						<form onsubmit={startLogin} class="signin-form">
-							<label for="seqtaUrl">SEQTA URL</label>
-							<input id="seqtaUrl" type="text" bind:value={seqtaUrl} placeholder="https://schoolname.seqta.com" class="signin-input" autocomplete="username" required />
-							<button type="submit" class="signin-btn">
-								Sign in
+	<div class="flex flex-1 pt-16">
+		<!-- Sidebar -->
+		<aside
+			class="bg-base-200 border-r border-base-300 w-64 fixed left-0 top-16 bottom-0 transition-transform duration-300 ease-in-out z-40"
+			class:translate-x-[-100%]={!sidebarOpen}
+		>
+			<nav class="p-4 space-y-2">
+				<a
+					href="/"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname === '/'}
+				>
+					<Icon src={Home} class="w-6 h-6" />
+					<span>Dashboard</span>
+				</a>
+				
+				<a
+					href="/courses"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/courses')}
+				>
+					<Icon src={BookOpen} class="w-6 h-6" />
+					<span>Courses</span>
+				</a>
+				
+				<a
+					href="/assessments"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/assessments')}
+				>
+					<Icon src={ClipboardDocumentList} class="w-6 h-6" />
+					<span>Assessments</span>
+				</a>
+				
+				<a
+					href="/timetable"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/timetable')}
+				>
+					<Icon src={CalendarDays} class="w-6 h-6" />
+					<span>Timetable</span>
+				</a>
+				
+				<a
+					href="/direqt-messages"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/direqt-messages')}
+				>
+					<Icon src={ChatBubbleLeftRight} class="w-6 h-6" />
+					<span>Messages</span>
+				</a>
+				
+				<a
+					href="/notices"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/notices')}
+				>
+					<Icon src={DocumentText} class="w-6 h-6" />
+					<span>Notices</span>
+				</a>
+				
+				<a
+					href="/news"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/news')}
+				>
+					<Icon src={Newspaper} class="w-6 h-6" />
+					<span>News</span>
+				</a>
+				
+				<a
+					href="/reports"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/reports')}
+				>
+					<Icon src={ChartBar} class="w-6 h-6" />
+					<span>Reports</span>
+				</a>
+				
+				<a
+					href="/settings"
+					class="flex items-center space-x-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
+					class:bg-base-300={$page.url.pathname.startsWith('/settings')}
+				>
+					<Icon src={Cog6Tooth} class="w-6 h-6" />
+					<span>Settings</span>
+				</a>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="flex-1 transition-all duration-300" class:ml-64={sidebarOpen}>
+			<div class="container mx-auto p-6">
+				{#if $needsSetup}
+					<div class="max-w-md mx-auto mt-8 p-6 bg-base-200 rounded-lg shadow-lg">
+						<h2 class="text-2xl font-bold mb-4">Welcome to DesQTA</h2>
+						<p class="mb-4">Please enter your SEQTA URL to get started:</p>
+						<div class="space-y-4">
+							<input
+								type="text"
+								bind:value={seqtaUrl}
+								placeholder="https://your-school.seqta.com.au"
+								class="input input-bordered w-full"
+							/>
+							<button
+								class="btn btn-primary w-full"
+								onclick={startLogin}
+								disabled={!seqtaUrl}
+							>
+								Login
 							</button>
-						</form>
+						</div>
 					</div>
-				</div>
-				<div class="signin-image-panel"></div>
+				{:else}
+					<slot />
+				{/if}
 			</div>
-			<style>
-				html, body {
-					height: 100vh;
-					overflow: hidden;
-				}
-				main {
-					height: 100vh;
-					overflow: hidden;
-				}
-				.signin-container {
-					display: flex;
-					height: 100vh;
-					width: 100vw;
-					overflow: hidden;
-				}
-				.signin-form-panel {
-					background: #232323;
-					color: #fff;
-					width: 100%;
-					max-width: 480px;
-					min-width: 320px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					padding: 0 2rem;
-					height: 100vh;
-					overflow: hidden;
-				}
-				.signin-form-content {
-					width: 100%;
-					max-width: 340px;
-					margin: 0 auto;
-					display: flex;
-					flex-direction: column;
-					gap: 1.5rem;
-				}
-				.signin-logo {
-					width: 36px;
-					margin-bottom: 2rem;
-				}
-				.signin-title {
-					font-size: 1.6rem;
-					font-weight: 700;
-					margin-bottom: 0.5rem;
-				}
-				.signin-desc {
-					color: #b0b0b0;
-					font-size: 1rem;
-					margin-bottom: 1.5rem;
-				}
-				.signin-form label {
-					font-size: 1rem;
-					margin-bottom: 0.25rem;
-					margin-top: 1rem;
-				}
-				.signin-input {
-					width: 100%;
-					padding: 0.7rem 0.9rem;
-					border-radius: 6px;
-					border: none;
-					background: #fff;
-					color: #232323;
-					font-size: 1rem;
-					margin-bottom: 0.5rem;
-				}
-				.signin-btn {
-					width: 100%;
-					background: #2563eb;
-					color: #fff;
-					font-weight: 600;
-					font-size: 1.1rem;
-					border: none;
-					border-radius: 6px;
-					padding: 0.8rem 0;
-					margin-top: 0.5rem;
-					cursor: pointer;
-					transition: background 0.2s;
-				}
-				.signin-btn:hover {
-					background: #1d4ed8;
-				}
-				.signin-image-panel {
-					flex: 1;
-					background: url('/images/signin.jpg') center center / cover no-repeat;
-					min-width: 0;
-					min-height: 100vh;
-					height: 100vh;
-					overflow: hidden;
-					background-size: cover;
-					background-position: center;
-				}
-				@media (max-width: 900px) {
-					.signin-container {
-						flex-direction: column;
-					}
-					.signin-image-panel {
-						display: none;
-					}
-					.signin-form-panel {
-						max-width: 100vw;
-						min-width: 0;
-					}
-				}
-			</style>
-		{:else}
-			{@render children()}
-		{/if}
-	</main>
+		</main>
+	</div>
 </div>
+
+<style>
+	/* Add smooth transitions */
+	.transition-transform {
+		transition-property: transform;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 300ms;
+	}
+
+	/* Add hover effects */
+	.hover\:bg-base-300:hover {
+		background-color: hsl(var(--b3));
+	}
+
+	/* Add active state styles */
+	.bg-base-300 {
+		background-color: hsl(var(--b3));
+	}
+</style>
 
 <!-- Mobile Menu Overlay -->
 {#if isMobile && isMobileMenuOpen}
