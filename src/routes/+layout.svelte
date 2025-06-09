@@ -313,7 +313,7 @@
 
 <div class="min-h-screen bg-base-100 flex flex-col" class:dark={isDarkMode}>
 	<!-- Top Bar -->
-	<header class="h-16 bg-base-200 border-b border-base-300 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50">
+	<header class="h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 border-b border-base-300 backdrop-blur-md bg-white/70 dark:bg-slate-900/60 shadow-sm">
 		<div class="flex items-center space-x-4">
 			<button
 				class="p-2 hover:bg-base-300 rounded-lg transition-colors"
