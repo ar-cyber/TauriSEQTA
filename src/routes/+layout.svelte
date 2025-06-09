@@ -57,6 +57,11 @@
 	let notifications = $state([]);
 	let unreadNotifications = $state(0);
 
+	// Add state for dropdown and about modal
+	let showUserDropdown = $state(false);
+	let showAboutModal = $state(false);
+	let aboutClosing = $state(false);
+
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
 		needsSetup.set(!sessionExists);
@@ -124,6 +129,7 @@
 		userCode: string;
 		userDesc: string;
 		userName: string;
+		displayName?: string;
 	}
 
 	async function loadUserInfo() {
@@ -339,21 +345,38 @@
 			</button>
 			
 			{#if userInfo}
-				<div class="flex items-center space-x-2">
-					<img
-						src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
-						alt="Profile picture"
-						class="w-8 h-8 rounded-full border border-gray-300 dark:border-slate-700 shadow-sm object-cover"
-					/>
-					<span class="hidden md:inline">{userInfo.userName}</span>
+				<div class="relative">
 					<button
-						class="ml-2 p-2 rounded-lg hover:accent-bg focus:accent-bg active:accent-bg transition-colors transition-transform duration-200 text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 accent-ring transform hover:scale-105 active:scale-95"
-						onclick={handleLogout}
-						aria-label="Logout"
-						title="Logout"
+						class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-base-200 hover:bg-base-300 shadow transition-all duration-200 focus:outline-none focus:ring-2 accent-ring"
+						onclick={() => showUserDropdown = !showUserDropdown}
+						aria-label="User menu"
+						tabindex="0"
 					>
-						<Icon src={ArrowRightOnRectangle} class="w-6 h-6" />
+						<img
+							src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
+							alt="Profile picture"
+							class="w-8 h-8 rounded-full border border-gray-300 dark:border-slate-700 shadow-sm object-cover"
+						/>
+						<span class="hidden md:inline font-semibold text-gray-900 dark:text-white">
+							{userInfo.userDesc || userInfo.userName}
+						</span>
 					</button>
+					{#if showUserDropdown}
+						<div class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-50 dropdown-animate-in">
+							<button
+								class="w-full text-left px-5 py-3 rounded-t-xl hover:bg-base-200 transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95"
+								onclick={() => { showUserDropdown = false; showAboutModal = true; }}
+							>
+								About
+							</button>
+							<button
+								class="w-full text-left px-5 py-3 rounded-b-xl hover:bg-base-200 transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95"
+								onclick={() => { showUserDropdown = false; handleLogout(); }}
+							>
+								Sign out
+							</button>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -502,6 +525,21 @@
 	.bg-base-300 {
 		background-color: hsl(var(--b3));
 				}
+
+	@keyframes dropdown-fade-in {
+		0% { opacity: 0; transform: translateY(-10px); }
+		100% { opacity: 1; transform: translateY(0); }
+	}
+	@keyframes dropdown-fade-out {
+		0% { opacity: 1; transform: translateY(0); }
+		100% { opacity: 0; transform: translateY(-10px); }
+	}
+	.dropdown-animate-in {
+		animation: dropdown-fade-in 0.18s cubic-bezier(0.4,0,0.2,1);
+	}
+	.dropdown-animate-out {
+		animation: dropdown-fade-out 0.15s cubic-bezier(0.4,0,0.2,1);
+	}
 			</style>
 
 <!-- Mobile Menu Overlay -->
@@ -513,4 +551,26 @@
 		tabindex="0"
 		onkeydown={(e) => e.key === 'Enter' && (isMobileMenuOpen = false)}
 	></div>
+{/if}
+
+<!-- About Modal -->
+{#if showAboutModal || aboutClosing}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+		tabindex="0" role="dialog" aria-modal="true"
+		class:animate-fade-in={showAboutModal && !aboutClosing}
+		class:animate-fade-out={aboutClosing}
+		onclick={() => { aboutClosing = true; setTimeout(() => { showAboutModal = false; aboutClosing = false; }, 200); }}>
+		<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-md w-full relative"
+			onclick={(e) => e.stopPropagation()}
+			class:animate-fade-in={showAboutModal && !aboutClosing}
+			class:animate-fade-out={aboutClosing}
+		>
+			<button class="absolute top-4 right-4 p-2 rounded-lg hover:bg-base-200 transition-colors" onclick={() => { aboutClosing = true; setTimeout(() => { showAboutModal = false; aboutClosing = false; }, 200); }} aria-label="Close About">
+				<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+			</button>
+			<h2 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">About DesQTA</h2>
+			<p class="mb-4 text-gray-700 dark:text-slate-300">DesQTA is a modern, beautiful SEQTA client for desktop, designed for productivity and delight. Built with Svelte, Tauri, and love.</p>
+			<div class="text-sm text-gray-500 dark:text-slate-400">Version 1.0.0<br/>© 2025 DesQTA Team</div>
+		</div>
+	</div>
 {/if} 
