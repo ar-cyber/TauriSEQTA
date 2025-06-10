@@ -219,7 +219,7 @@ onMount(async () => {
 });
 </script>
 
-<div class="flex w-full h-full bg-gray-50 dark:bg-black">
+<div class="flex w-full h-full bg-gray-50 dark:bg-slate-800/50">
   <!-- Subject Selection Sidebar -->
   <SubjectSidebar
     bind:search
@@ -296,7 +296,7 @@ onMount(async () => {
   }
   
   :global(.course-content .section) {
-    @apply m-4 bg-slate-900 rounded-xl overflow-hidden;
+    @apply m-4 bg-slate-800/50 rounded-xl overflow-hidden;
   }
   
   :global(.course-content a) {
@@ -309,7 +309,7 @@ onMount(async () => {
   
   /* File/document styling */
   :global(.course-content .file-item) {
-    @apply bg-slate-800 rounded-lg p-4 m-2 hover:bg-slate-700 transition-colors cursor-pointer;
+    @apply bg-slate-700/50 rounded-lg p-4 m-2 hover:bg-slate-600/50 transition-colors cursor-pointer;
   }
   
   :global(.course-content .file-grid) {

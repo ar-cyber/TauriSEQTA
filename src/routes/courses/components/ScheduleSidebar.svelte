@@ -142,13 +142,13 @@ function getJumpButtonText(target: any) {
 }
 </script>
 
-<aside class="flex flex-col w-64 h-full border-r bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-800">
-  <div class="px-4 py-3 border-b border-gray-300 dark:border-slate-800">
+<aside class="flex flex-col w-64 h-full border-r bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border-gray-300/50 dark:border-slate-700/50">
+  <div class="px-4 py-3 border-b border-gray-300/50 dark:border-slate-700/50">
     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Course Content</h3>
   </div>
   <div class="overflow-y-auto flex-1">
     <button 
-      class="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-slate-800 border-l-2 border-transparent hover:accent-border transition-all {showingOverview ? 'bg-gray-100 dark:bg-slate-800 accent-border' : ''}"
+      class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all {showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
       onclick={onSelectOverview}>
       <div class="font-medium text-gray-900 dark:text-white text-sm">📚 Course Overview</div>
       <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
@@ -159,10 +159,10 @@ function getJumpButtonText(target: any) {
     {#if jumpTarget}
       {@const buttonText = getJumpButtonText(jumpTarget)}
       <button 
-        class="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-slate-800 border-l-2 hover:border-emerald-500 transition-all bg-gradient-to-r from-emerald-100/20 dark:from-emerald-900/20 to-transparent border-emerald-500/30"
+        class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all"
         onclick={jumpToToday}>
-        <div class="font-medium text-emerald-700 dark:text-emerald-300 text-sm">🕐 {buttonText.title}</div>
-        <div class="text-xs text-emerald-600 dark:text-emerald-400/80 mt-1">
+        <div class="font-medium text-gray-900 dark:text-white text-sm">🕐 {buttonText.title}</div>
+        <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
           {buttonText.subtitle}
         </div>
       </button>
@@ -170,13 +170,13 @@ function getJumpButtonText(target: any) {
 
     {#each filteredSchedule as termSchedule}
       <div class="mb-4">
-        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white">
+        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white border border-gray-300/50 dark:border-slate-700/50">
           Term {termSchedule.t} - Week {termSchedule.w}
         </div>
         {#each termSchedule.l as lesson, lessonIndex}
           {@const currentLessonContent = coursePayload?.w?.[termSchedule.n]?.[lessonIndex]}
           <button
-            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all {selectedLesson === lesson && !showingOverview ? 'bg-gray-100 dark:bg-slate-800/50 accent-border' : ''}"
+            class="w-full px-4 py-2 text-left text-sm hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all {selectedLesson === lesson && !showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
             onclick={() => onSelectLesson({ termSchedule, lesson, lessonIndex })}>
             <div class="font-medium text-gray-900 dark:text-white text-sm">{lesson.p} {formatLessonDate(lesson.d)}</div>
             <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
