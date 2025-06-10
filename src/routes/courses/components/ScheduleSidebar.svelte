@@ -170,7 +170,7 @@ function getJumpButtonText(target: any) {
 
     {#each filteredSchedule as termSchedule}
       <div class="mb-4">
-        <div class="px-4 py-2 bg-gradient-to-r from-indigo-600/80 to-purple-700/80 backdrop-blur-sm text-sm font-semibold text-white">
+        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white">
           Term {termSchedule.t} - Week {termSchedule.w}
         </div>
         {#each termSchedule.l as lesson, lessonIndex}

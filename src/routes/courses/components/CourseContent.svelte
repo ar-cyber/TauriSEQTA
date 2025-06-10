@@ -137,10 +137,10 @@ function sortModules(modules: Module[]): Module[] {
 
 <div class="overflow-y-auto relative flex-1">
   <!-- Mesh Gradient Background -->
-  <div class="absolute inset-0 pointer-events-none -z-10" style="background: radial-gradient(circle at 20% 30%, #7b8cff 30%, transparent 60%), radial-gradient(circle at 80% 70%, #e66465 30%, transparent 60%), radial-gradient(circle at 60% 20%, #fff 20%, transparent 60%), radial-gradient(circle at 80% 20%, #b993ff 40%, transparent 70%), radial-gradient(circle at 10% 80%, #ffb6b9 30%, transparent 60%); filter: blur(12px); opacity: 0.85;"></div>
+  <div class="absolute inset-0 pointer-events-none -z-10" style="background: radial-gradient(circle at 20% 30%, var(--accent) 30%, transparent 60%), radial-gradient(circle at 80% 70%, var(--accent) 30%, transparent 60%), radial-gradient(circle at 60% 20%, #fff 20%, transparent 60%), radial-gradient(circle at 80% 20%, var(--accent) 40%, transparent 70%), radial-gradient(circle at 10% 80%, var(--accent) 30%, transparent 60%); filter: blur(12px); opacity: 0.85;"></div>
   {#if !showingOverview && selectedLessonContent}
     <div class="p-6">
-      <h1 class="p-6 mb-6 text-3xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
+      <h1 class="p-6 mb-6 text-3xl font-bold text-white accent-bg rounded-xl backdrop-blur-sm">
         {selectedLessonContent.t}
       </h1>
       
@@ -155,7 +155,7 @@ function sortModules(modules: Module[]): Module[] {
 
       {#if selectedLessonContent.r && selectedLessonContent.r.length > 0}
         <div class="mb-6">
-          <h3 class="p-4 mb-4 text-xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
+          <h3 class="p-4 mb-4 text-xl font-bold text-white accent-bg rounded-xl backdrop-blur-sm">
             Lesson Resources
           </h3>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -183,7 +183,7 @@ function sortModules(modules: Module[]): Module[] {
               {@const renderedModule = renderModule(module)}
               {#if renderedModule}
                 {#if renderedModule.type === 'title'}
-                  <h2 class="p-4 my-4 text-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl">
+                  <h2 class="p-4 my-4 text-xl font-bold text-white accent-bg rounded-xl">
                     {renderedModule.content}
                   </h2>
                 {:else if renderedModule.type === 'text'}
@@ -201,7 +201,7 @@ function sortModules(modules: Module[]): Module[] {
     </div>
   {:else}
     <div class="p-6">
-      <h1 class="p-6 mb-6 text-3xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
+      <h1 class="p-6 mb-6 text-3xl font-bold text-white accent-bg rounded-xl backdrop-blur-sm">
         {coursePayload.t}
       </h1>
 
@@ -212,7 +212,7 @@ function sortModules(modules: Module[]): Module[] {
             {@const renderedModule = renderModule(module)}
             {#if renderedModule}
               {#if renderedModule.type === 'title'}
-                <h2 class="p-4 mb-4 text-xl font-bold text-white bg-gradient-to-r rounded-xl backdrop-blur-sm from-indigo-600/80 to-purple-700/80">
+                <h2 class="p-4 mb-4 text-xl font-bold text-white accent-bg rounded-xl backdrop-blur-sm">
                   {renderedModule.content}
                 </h2>
               {:else if renderedModule.type === 'text'}
