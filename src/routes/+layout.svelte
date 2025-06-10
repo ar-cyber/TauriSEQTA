@@ -4,7 +4,7 @@
 	import { seqtaFetch } from '../utils/netUtil';
 	import { cache } from '../utils/cache';
 
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
@@ -72,21 +72,33 @@
 
 	onMount(checkSession);
 
-	listen<string>('reload', (event) => {
-		location.reload();
-		checkSession();
-	})
+	let unlisten: (() => void) | undefined;
+	onMount(async () => {
+		unlisten = await listen<string>('reload', () => {
+			location.reload();
+		});
+	});
+
+	onDestroy(() => {
+		if (unlisten) unlisten();
+	});
 
 	async function startLogin() {
 		if (!seqtaUrl) return;
 		await invoke('create_login_window', { url: seqtaUrl });
 
-		// Poll every 1.5 s until the cookie is saved (login window closes itself)
+		// Poll every 1s until the cookie is saved (login window closes itself)
 		const timer = setInterval(async () => {
 			const sessionExists = await invoke<boolean>('check_session_exists');
-			needsSetup.set(!sessionExists);
-			if (sessionExists) clearInterval(timer);
-		}, 1500);
+			if (sessionExists) {
+				clearInterval(timer);
+				needsSetup.set(false);
+				await loadUserInfo();
+			}
+		}, 1000);
+
+		// Clear interval after 5 minutes to prevent infinite polling
+		setTimeout(() => clearInterval(timer), 5 * 60 * 1000);
 	}
 
 	async function getAPIData(url: string, parameters: Map<string, string>) {
@@ -375,7 +387,7 @@
 					>
 						<img
 							src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
-							alt="Profile picture"
+							alt=""
 							class="w-8 h-8 rounded-full border border-gray-300 dark:border-slate-700 shadow-sm object-cover"
 						/>
 						<span class="hidden md:inline font-semibold text-gray-900 dark:text-white">
@@ -526,10 +538,10 @@
 				{/if}
 			</div>
 		</main>
-					</div>
-				</div>
+	</div>
+</div>
 
-			<style>
+<style>
 	/* Add smooth transitions */
 	.transition-transform {
 		transition-property: transform;
@@ -542,56 +554,35 @@
 		background-color: hsl(var(--b3));
 	}
 
-	/* Add active state styles */
-	.bg-base-300 {
-		background-color: hsl(var(--b3));
-				}
-
 	@keyframes dropdown-fade-in {
 		0% { opacity: 0; transform: translateY(-10px); }
 		100% { opacity: 1; transform: translateY(0); }
 	}
-	@keyframes dropdown-fade-out {
-		0% { opacity: 1; transform: translateY(0); }
-		100% { opacity: 0; transform: translateY(-10px); }
-	}
 	.dropdown-animate-in {
 		animation: dropdown-fade-in 0.18s cubic-bezier(0.4,0,0.2,1);
 	}
-	.dropdown-animate-out {
-		animation: dropdown-fade-out 0.15s cubic-bezier(0.4,0,0.2,1);
-	}
-			</style>
+</style>
 
 <!-- Mobile Menu Overlay -->
-{#if isMobile && isMobileMenuOpen}
-	<div 
-		class="fixed inset-0 z-30 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-50"
-		onclick={() => isMobileMenuOpen = false}
+{#if isMobileMenuOpen}
+	<div
+		class="fixed inset-0 bg-black/50 z-40"
+		onclick={() => (isMobileMenuOpen = false)}
+		onkeydown={(e) => e.key === 'Escape' && (isMobileMenuOpen = false)}
 		role="button"
 		tabindex="0"
-		onkeydown={(e) => e.key === 'Enter' && (isMobileMenuOpen = false)}
+		aria-label="Close mobile menu"
 	></div>
 {/if}
 
 <!-- About Modal -->
-{#if showAboutModal || aboutClosing}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-		tabindex="0" role="dialog" aria-modal="true"
-		class:animate-fade-in={showAboutModal && !aboutClosing}
-		class:animate-fade-out={aboutClosing}
-		onclick={() => { aboutClosing = true; setTimeout(() => { showAboutModal = false; aboutClosing = false; }, 200); }}>
-		<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-md w-full relative"
-			onclick={(e) => e.stopPropagation()}
-			class:animate-fade-in={showAboutModal && !aboutClosing}
-			class:animate-fade-out={aboutClosing}
-		>
-			<button class="absolute top-4 right-4 p-2 rounded-lg hover:bg-base-200 transition-colors" onclick={() => { aboutClosing = true; setTimeout(() => { showAboutModal = false; aboutClosing = false; }, 200); }} aria-label="Close About">
-				<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-			</button>
-			<h2 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">About DesQTA</h2>
-			<p class="mb-4 text-gray-700 dark:text-slate-300">DesQTA is a modern, beautiful SEQTA client for desktop, designed for productivity and delight. Built with Svelte, Tauri, and love.</p>
-			<div class="text-sm text-gray-500 dark:text-slate-400">Version 1.0.0<br/>© 2025 DesQTA Team</div>
-		</div>
-	</div>
+{#if showAboutModal}
+	<div
+		class="fixed inset-0 bg-black/50 z-50"
+		onclick={() => (showAboutModal = false)}
+		onkeydown={(e) => e.key === 'Escape' && (showAboutModal = false)}
+		role="button"
+		tabindex="0"
+		aria-label="Close about modal"
+	></div>
 {/if} 
