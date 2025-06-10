@@ -910,7 +910,7 @@
                   class="flex justify-center items-center w-12 h-12 bg-gradient-to-br rounded-xl shadow-lg sm:h-14 sm:w-14 animate-gradient"
                   style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);"
                 >
-                  <span class="text-xl sm:text-2xl">📄</span>
+                  <Icon src={DocumentText} class="w-6 h-6 text-white" />
                 </div>
 
                 <div class="flex-1 min-w-0">
