@@ -41,15 +41,15 @@ const dispatch = createEventDispatcher<{
           <div class="space-y-2">
             {#each activeSubjects.filter(subjectMatches) as subject, i}
               <button
-                class="w-full p-3 text-left bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 transition-all duration-200 animate-slide-in"
+                class="w-full p-3 text-left bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 transition-all duration-200 animate-slide-in group hover:shadow-lg hover:scale-[1.02] active:scale-95"
                 style="animation-delay: {i * 50}ms"
                 on:click={() => dispatch('selectSubject', subject)}
               >
                 <div class="flex items-center">
-                  <span class="text-2xl mr-3">{subject.icon}</span>
+                  <span class="text-2xl mr-3 group-hover:scale-110 transition-transform duration-300">{subject.icon}</span>
                   <div>
-                    <h4 class="font-medium text-gray-900 dark:text-white">{subject.title}</h4>
-                    <p class="text-sm text-gray-500 dark:text-slate-400">{subject.description}</p>
+                    <h4 class="font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{subject.title}</h4>
+                    <p class="text-sm text-gray-500 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">{subject.description}</p>
                   </div>
                 </div>
               </button>
@@ -70,17 +70,17 @@ const dispatch = createEventDispatcher<{
     {:else}
       {#each activeSubjects.filter(subjectMatches) as subj, i}
         <button 
-          class="px-6 py-3 w-full text-left font-bold text-base text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
+          class="px-6 py-3 w-full text-left font-bold text-base text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 group {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
           style="animation: fadeIn 0.3s ease-out {i * 0.05}s both;"
           on:click={() => dispatch('selectSubject', subj)}>
-          {subj.title}
+          <span class="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{subj.title}</span>
         </button>
       {/each}
       <div class="my-2 border-t border-gray-300/50 dark:border-slate-700/50"></div>
       {#each otherFolders.filter(folderMatches) as folder, i}
         <div style="animation: fadeIn 0.3s ease-out {i * 0.05}s both;">
           <button 
-            class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all duration-200 cursor-pointer text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border hover:translate-x-1"
+            class="flex justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all duration-200 cursor-pointer text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border hover:translate-x-1 active:scale-95"
             on:click={() => dispatch('toggleFolder', folder.code)}>
             <span class="text-base font-bold">{folder.code}</span>
             <svg 
@@ -97,10 +97,10 @@ const dispatch = createEventDispatcher<{
             <div class="animate-expand">
               {#each folder.subjects.filter(subjectMatches) as subj, j}
               <button 
-                  class="pl-10 pr-6 py-2 font-medium text-sm text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
+                  class="pl-10 pr-6 py-2 font-medium text-sm text-gray-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 group {selectedSubject && selectedSubject.classunit === subj.classunit ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
                   style="animation: fadeIn 0.2s ease-out {j * 0.05}s both;"
                 on:click={() => dispatch('selectSubject', subj)}>
-                {subj.title}
+                <span class="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{subj.title}</span>
               </button>
             {/each}
             </div>

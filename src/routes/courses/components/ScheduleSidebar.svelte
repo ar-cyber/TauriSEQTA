@@ -148,10 +148,10 @@ function getJumpButtonText(target: any) {
   </div>
   <div class="overflow-y-auto flex-1">
     <button 
-      class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 animate-slide-in"
+      class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
       onclick={onSelectOverview}>
-      <div class="font-medium text-gray-900 dark:text-white text-sm">📚 Course Overview</div>
-      <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
+      <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">📚 Course Overview</div>
+      <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
         Main course content and resources
       </div>
     </button>
@@ -159,11 +159,11 @@ function getJumpButtonText(target: any) {
     {#if jumpTarget}
       {@const buttonText = getJumpButtonText(jumpTarget)}
       <button 
-        class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 animate-slide-in"
+        class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
         style="animation-delay: 0.1s;"
         onclick={jumpToToday}>
-        <div class="font-medium text-gray-900 dark:text-white text-sm">🕐 {buttonText.title}</div>
-        <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
+        <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">🕐 {buttonText.title}</div>
+        <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
           {buttonText.subtitle}
         </div>
       </button>
@@ -171,17 +171,17 @@ function getJumpButtonText(target: any) {
 
     {#each filteredSchedule as termSchedule, i}
       <div class="mb-4 animate-slide-in" style="animation-delay: {0.2 + i * 0.1}s;">
-        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white border border-gray-300/50 dark:border-slate-700/50">
+        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white border border-gray-300/50 dark:border-slate-700/50 group-hover:brightness-110 transition-all duration-300">
           Term {termSchedule.t} - Week {termSchedule.w}
         </div>
         {#each termSchedule.l as lesson, lessonIndex}
           {@const currentLessonContent = coursePayload?.w?.[termSchedule.n]?.[lessonIndex]}
           <button
-            class="w-full px-4 py-2 text-left text-sm hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 animate-slide-in {selectedLesson === lesson && !showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
+            class="w-full px-4 py-2 text-left text-sm hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group {selectedLesson === lesson && !showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
             style="animation-delay: {0.3 + lessonIndex * 0.05}s;"
             onclick={() => onSelectLesson({ termSchedule, lesson, lessonIndex })}>
-            <div class="font-medium text-gray-900 dark:text-white text-sm">{lesson.p} {formatLessonDate(lesson.d)}</div>
-            <div class="text-xs text-gray-600 dark:text-slate-400 mt-1">
+            <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{lesson.p} {formatLessonDate(lesson.d)}</div>
+            <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
               {#if currentLessonContent?.t}
                 {currentLessonContent.t}
               {:else}

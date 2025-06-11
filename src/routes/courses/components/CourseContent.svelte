@@ -158,13 +158,13 @@ function sortModules(modules: Module[]): Module[] {
           </h3>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {#each selectedLessonContent.r as resource, i}
-              <div class={`relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${getFileColor(resource.mimetype)} animate-slide-in`} style="animation-delay: {0.3 + i * 0.1}s;">
+              <div class={`relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 ${getFileColor(resource.mimetype)} animate-slide-in`} style="animation-delay: {0.3 + i * 0.1}s;">
                 <span class="absolute -top-4 -left-4 w-20 h-20 rounded-full blur-2xl opacity-40 pointer-events-none animate-pulse" style={`background: radial-gradient(circle at 40% 60%, var(--tw-gradient-from, #fff), transparent 70%); --tw-gradient-from: ${getFileColor(resource.mimetype).match(/bg-([a-z]+)-900/) ? getFileColor(resource.mimetype).replace(/.*bg-([a-z]+)-900.*/, 'var(--tw-color-$1-400)') : 'var(--tw-color-indigo-400)'}`}></span>
-                <div class="flex items-center mb-2">
-                  <span class="mr-3 text-2xl animate-bounce">{getFileIcon(resource.mimetype)}</span>
+                <div class="flex items-center mb-2 group">
+                  <span class="mr-3 text-2xl animate-bounce group-hover:scale-110 transition-transform duration-300">{getFileIcon(resource.mimetype)}</span>
                   <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-gray-900 truncate dark:text-white">{resource.t}</div>
-                    <div class="text-xs text-gray-600 dark:text-slate-400">{formatFileSize(resource.size)}</div>
+                    <div class="font-semibold text-gray-900 truncate dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{resource.t}</div>
+                    <div class="text-xs text-gray-600 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">{formatFileSize(resource.size)}</div>
                   </div>
                 </div>
               </div>
@@ -186,7 +186,7 @@ function sortModules(modules: Module[]): Module[] {
                     {renderedModule.content}
                   </h2>
                 {:else if renderedModule.type === 'text'}
-                  <div class="p-4 my-4 rounded-xl border backdrop-blur-sm bg-white/80 dark:bg-slate-800/50 border-gray-300/50 dark:border-slate-700/50 animate-slide-in" style="animation-delay: {0.4 + i * 0.1}s;">
+                  <div class="p-4 my-4 rounded-xl border backdrop-blur-sm bg-white/80 dark:bg-slate-800/50 border-gray-300/50 dark:border-slate-700/50 animate-slide-in hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all duration-300" style="animation-delay: {0.4 + i * 0.1}s;">
                     {@html sanitizeHtml(renderedModule.content)}
                   </div>
                 {:else if renderedModule.type === 'link'}
@@ -226,7 +226,7 @@ function sortModules(modules: Module[]): Module[] {
                     {#each renderedModule.content as resource, j}
                       {@const fileDetails = coursePayload.cf.find(f => f.uuid === resource.uuid)}
                       {#if fileDetails}
-                        <div class={`relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${getFileColor(fileDetails.mimetype)} animate-slide-in`} style="animation-delay: {0.3 + j * 0.1}s;">
+                        <div class={`relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 ${getFileColor(fileDetails.mimetype)} animate-slide-in`} style="animation-delay: {0.3 + j * 0.1}s;">
                           <span class="absolute -top-4 -left-4 w-20 h-20 rounded-full blur-2xl opacity-40 pointer-events-none animate-pulse" style={`background: radial-gradient(circle at 40% 60%, var(--tw-gradient-from, #fff), transparent 70%); --tw-gradient-from: ${getFileColor(fileDetails.mimetype).match(/bg-([a-z]+)-900/) ? getFileColor(fileDetails.mimetype).replace(/.*bg-([a-z]+)-900.*/, 'var(--tw-color-$1-400)') : 'var(--tw-color-indigo-400)'}`}></span>
                           <div class="flex items-center mb-2">
                             <span class="mr-3 text-2xl animate-bounce">{getFileIcon(fileDetails.mimetype)}</span>
