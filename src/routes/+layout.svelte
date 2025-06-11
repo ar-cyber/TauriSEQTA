@@ -4,8 +4,9 @@
 	import { seqtaFetch } from '../utils/netUtil';
 	import { cache } from '../utils/cache';
 
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import '../app.css';
+	import { page } from '$app/stores';
 	import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
 	import {
 		Icon,
@@ -26,7 +27,8 @@
 		CalendarDays,
 		GlobeAlt,
 		ArrowRightOnRectangle,
-		Bars3
+		Bars3,
+		XMark
 	} from 'svelte-hero-icons';
 
 	import { writable } from 'svelte/store';
@@ -51,6 +53,16 @@
 	let hovered = $state<'extension' | 'web' | ''>('');
 	let selected = $state<'extension' | 'web' | ''>('');
 
+	let sidebarOpen = $state(true);
+	let isDarkMode = $derived($theme === 'dark');
+	let notifications = $state([]);
+	let unreadNotifications = $state(0);
+
+	// Add state for dropdown and about modal
+	let showUserDropdown = $state(false);
+	let showAboutModal = $state(false);
+	let aboutClosing = $state(false);
+
 	async function checkSession() {
 		const sessionExists = await invoke<boolean>('check_session_exists');
 		needsSetup.set(!sessionExists);
@@ -61,21 +73,33 @@
 
 	onMount(checkSession);
 
-	listen<string>('reload', (event) => {
-		location.reload();
-		checkSession();
-	})
+	let unlisten: (() => void) | undefined;
+	onMount(async () => {
+		unlisten = await listen<string>('reload', () => {
+			location.reload();
+		});
+	});
+
+	onDestroy(() => {
+		if (unlisten) unlisten();
+	});
 
 	async function startLogin() {
 		if (!seqtaUrl) return;
 		await invoke('create_login_window', { url: seqtaUrl });
 
-		// Poll every 1.5 s until the cookie is saved (login window closes itself)
+		// Poll every 1s until the cookie is saved (login window closes itself)
 		const timer = setInterval(async () => {
 			const sessionExists = await invoke<boolean>('check_session_exists');
-			needsSetup.set(!sessionExists);
-			if (sessionExists) clearInterval(timer);
-		}, 1500);
+			if (sessionExists) {
+				clearInterval(timer);
+				needsSetup.set(false);
+				await loadUserInfo();
+			}
+		}, 1000);
+
+		// Clear interval after 5 minutes to prevent infinite polling
+		setTimeout(() => clearInterval(timer), 5 * 60 * 1000);
 	}
 
 	async function getAPIData(url: string, parameters: Map<string, string>) {
@@ -118,6 +142,7 @@
 		userCode: string;
 		userDesc: string;
 		userName: string;
+		displayName?: string;
 	}
 
 	async function loadUserInfo() {
@@ -305,237 +330,292 @@
 	];
 </script>
 
-<div class="flex flex-col pt-2 h-screen md:flex-row">
-	<!-- Mobile Menu Button -->
-	<button
-		class="fixed top-4 right-4 z-50 p-2 bg-white rounded-lg md:hidden hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
-		onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
-	>
-		<Icon src={Bars3} class="w-6 h-6" />
-	</button>
-
-	<!-- Sidebar -->
-	<aside
-		class="flex fixed z-40 flex-col justify-between px-2 pb-2 space-y-2 w-full h-full transition-transform duration-300 ease-in-out transform md:w-64 md:relative"
-		class:translate-x-0={isMobileMenuOpen || !isMobile}
-		class:-translate-x-full={!isMobileMenuOpen && isMobile}
-	>
-		<div class="flex overflow-y-scroll flex-col gap-2 h-full">
-			<div class="flex sticky top-0 items-center px-4 pt-4 pb-2 w-full bg-white dark:bg-slate-900">
-				<img src="/32x32.png" alt="DesQTA Logo" class="mr-3 w-8 h-8 select-none" draggable="false" />
-				<span class="text-lg font-bold tracking-wide">DesQTA</span>
-			</div>
-			{#each menu as item}
-				<a 
-					href={item.path} 
-					class="flex items-center px-4 py-3 rounded transition-transform duration-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:scale-[1.03] group"
-					onclick={() => isMobile && (isMobileMenuOpen = false)}
-				>
-					<Icon src={item.icon} class="mr-4 w-6 h-6" />
-					<span class="text-base font-bold">{item.label}</span>
-					{#if item.hasSub}
-						<svg
-							class="ml-auto w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+<div class="min-h-screen bg-base-100 flex flex-col" class:dark={isDarkMode}>
+	<!-- Top Bar -->
+	<header class="h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 border-b border-base-300 backdrop-blur-md bg-white/70 dark:bg-slate-900/60 shadow-sm">
+		<div class="flex items-center space-x-4">
+			<button
+				class="p-3 rounded-xl bg-base-200 hover:bg-gray-300 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white shadow-md transition-all duration-200 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-400"
+				onclick={() => (sidebarOpen = !sidebarOpen)}
+				aria-label="Toggle sidebar"
+			>
+				<Icon src={Bars3} class="w-6 h-6" />
+			</button>
+			<h1 class="text-xl font-semibold">DesQTA</h1>
+			{#if weatherEnabled && weatherData}
+				<div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-base-200/80 dark:bg-slate-800/60 shadow text-sm font-medium ml-2">
+					<span class="flex items-center gap-1">
+						<svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+							{#if weatherData.weathercode === 0}
+								<!-- Clear -->
+								<circle cx="12" cy="12" r="8" fill="#facc15" />
+							{:else if weatherData.weathercode === 1 || weatherData.weathercode === 2}
+								<!-- Partly Cloudy -->
+								<ellipse cx="12" cy="15" rx="7" ry="4" fill="#a3a3a3" />
+								<circle cx="16" cy="10" r="5" fill="#facc15" />
+							{:else}
+								<!-- Cloudy/Other -->
+								<ellipse cx="12" cy="15" rx="7" ry="4" fill="#a3a3a3" />
+							{/if}
 						</svg>
-					{/if}
-				</a>
-			{/each}
-			{#if weatherEnabled}
-				<div class="flex flex-col justify-center p-4 mx-2 my-4 text-white rounded-2xl shadow animate-fade-in" style="background: linear-gradient(120deg, var(--accent-color-value) 0%, color-mix(in srgb, var(--accent-color-value) 70%, black) 100%);">
-					{#if loadingWeather}
-						<div>Loading weather…</div>
-					{:else if weatherError}
-						<div class="text-red-400">{weatherError}</div>
-					{:else if weatherData}
-						<div class="flex flex-col gap-1">
-							<div class="flex gap-2 items-center text-base font-bold">
-								<span>Weather in {weatherData.location}, {weatherData.country}</span>
-							</div>
-							<div class="flex gap-2 items-center mt-2">
-								<span class="text-2xl font-bold">{Math.round(weatherData.temperature)}°C</span>
-								<span class="text-lg">{weatherData.weathercode === 0 ? '☀️' : weatherData.weathercode < 4 ? '🌤️' : weatherData.weathercode < 45 ? '☁️' : '🌧️'}</span>
-								<span class="text-xs">{weatherData.windspeed} km/h wind</span>
-							</div>
+						<span>{Math.round(weatherData.temperature)}°C</span>
+					</span>
+					<span class="hidden sm:inline text-gray-600 dark:text-gray-300">{weatherData.location}</span>
+				</div>
+			{/if}
+		</div>
+		
+		<div class="flex items-center space-x-4">
+			<button
+				class="p-2 hover:bg-base-300 rounded-lg transition-colors relative"
+				onclick={() => (notifications = [])}
+			>
+				<Icon src={Bell} class="w-6 h-6" />
+				{#if unreadNotifications > 0}
+					<span class="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full w-5 h-5 flex items-center justify-center">
+						{unreadNotifications}
+					</span>
+				{/if}
+			</button>
+			
+			{#if userInfo}
+				<div class="relative">
+					<button
+						class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-base-200 hover:bg-base-300 shadow transition-all duration-200 focus:outline-none focus:ring-2 accent-ring"
+						onclick={() => showUserDropdown = !showUserDropdown}
+						aria-label="User menu"
+						tabindex="0"
+					>
+						<img
+							src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
+							alt=""
+							class="w-8 h-8 rounded-full border border-gray-300 dark:border-slate-700 shadow-sm object-cover"
+						/>
+						<span class="hidden md:inline font-semibold text-gray-900 dark:text-white">
+							{userInfo.userDesc || userInfo.userName}
+						</span>
+					</button>
+					{#if showUserDropdown}
+						<div class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 z-50 dropdown-animate-in">
+							<button
+								class="w-full text-left px-5 py-3 rounded-t-xl hover:bg-base-200 transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95"
+								onclick={() => { showUserDropdown = false; showAboutModal = true; }}
+							>
+								About
+							</button>
+							<button
+								class="w-full text-left px-5 py-3 rounded-b-xl hover:bg-base-200 transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95"
+								onclick={() => { showUserDropdown = false; handleLogout(); }}
+							>
+								Sign out
+							</button>
 						</div>
 					{/if}
 				</div>
 			{/if}
 		</div>
-		<div>
-			<div class="flex justify-between">
-				{#if userInfo}
-					<div class="flex gap-3 items-center px-2 py-1 bg-transparent rounded-lg">
-						<!-- Avatar with initials -->
-						<div class="flex justify-center items-center w-8 h-8 text-base font-bold text-white rounded-full select-none" style="background-color: var(--accent-color-value);">
-							{userInfo.userDesc?.split(' ').map((n: string) => n[0]).join('').slice(0,2)}
-						</div>
-						<div class="flex flex-col flex-1 min-w-0">
-							<div class="flex gap-2 items-center">
-								<span class="text-base font-semibold truncate">{userInfo.userDesc}</span>
-							</div>
-							<div class="flex gap-2 items-center min-w-0 text-xs text-gray-500 dark:text-slate-400">
-								<span class="font-mono">{userInfo.userCode}</span>
-								<span>•</span>
-								<span class="font-mono">{userInfo.meta.governmentID}</span>
-							</div>
-						</div>
-					</div>
-				{/if}
-				{#if !$needsSetup}
-					<button 
-						onclick={handleLogout}
-						class="px-2 py-1 font-semibold text-gray-600 rounded-lg transition hover:text-gray-800 dark:text-zinc-400 dark:hover:text-zinc-50"
-					>
-						<Icon src={ArrowLeftStartOnRectangle} class="size-4" />
-					</button>
-				{/if}
-			</div>
-		</div>
-	</aside>
+	</header>
 
-	<!-- Main Content -->
-	<main class="overflow-y-auto flex-1 bg-gray-50 rounded-tl-2xl dark:bg-slate-950">
-		{#if $needsSetup}
-			<div class="signin-container">
-				<div class="signin-form-panel">
-					<div class="signin-form-content">
-						<img src="/32x32.png" alt="Logo" class="signin-logo" />
-						<h2 class="signin-title">Sign in to your account</h2>
-						<p class="signin-desc">Don't have a SEQTA account? Ask your school administrator to create one for you.</p>
-						<form onsubmit={startLogin} class="signin-form">
-							<label for="seqtaUrl">SEQTA URL</label>
-							<input id="seqtaUrl" type="text" bind:value={seqtaUrl} placeholder="https://schoolname.seqta.com" class="signin-input" autocomplete="username" required />
-							<button type="submit" class="signin-btn">
-								Sign in
-							</button>
-						</form>
+	<div class="flex flex-1 pt-16">
+		<!-- Sidebar -->
+		<aside
+			class="bg-base-200 border-r border-base-300 w-64 fixed left-0 top-16 bottom-0 transition-transform duration-300 ease-in-out z-40"
+			class:translate-x-[-100%]={!sidebarOpen}
+		>
+			<nav class="p-4 space-y-2">
+				<a
+					href="/"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname === '/'}
+				>
+					<Icon src={Home} class="w-7 h-7" />
+					<span>Dashboard</span>
+				</a>
+				
+				<a
+					href="/courses"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/courses')}
+				>
+					<Icon src={BookOpen} class="w-7 h-7" />
+					<span>Courses</span>
+				</a>
+				
+				<a
+					href="/assessments"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/assessments')}
+				>
+					<Icon src={ClipboardDocumentList} class="w-7 h-7" />
+					<span>Assessments</span>
+				</a>
+				
+				<a
+					href="/timetable"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/timetable')}
+				>
+					<Icon src={CalendarDays} class="w-7 h-7" />
+					<span>Timetable</span>
+				</a>
+				
+				<a
+					href="/direqt-messages"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/direqt-messages')}
+				>
+					<Icon src={ChatBubbleLeftRight} class="w-7 h-7" />
+					<span>Messages</span>
+				</a>
+				
+				<a
+					href="/notices"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/notices')}
+				>
+					<Icon src={DocumentText} class="w-7 h-7" />
+					<span>Notices</span>
+				</a>
+				
+				<a
+					href="/news"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/news')}
+				>
+					<Icon src={Newspaper} class="w-7 h-7" />
+					<span>News</span>
+				</a>
+				
+				<a
+					href="/reports"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/reports')}
+				>
+					<Icon src={ChartBar} class="w-7 h-7" />
+					<span>Reports</span>
+				</a>
+				
+				<a
+					href="/settings"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/settings')}
+				>
+					<Icon src={Cog6Tooth} class="w-7 h-7" />
+					<span>Settings</span>
+				</a>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="flex-1 transition-all duration-300" class:ml-64={sidebarOpen}>
+			<div class="{sidebarOpen ? 'container mx-auto' : 'w-full'} p-6 transition-all duration-300">
+				{#if $needsSetup}
+					<div class="max-w-5xl mx-auto mt-24 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up border border-gray-200 dark:border-slate-800">
+						<div class="hidden md:block md:w-2/3 bg-gray-100 dark:bg-slate-800">
+							<img src="/images/signin.jpg" alt="Sign in" class="object-cover w-full h-full min-h-[400px]" />
+						</div>
+						<div class="w-full md:w-1/3 flex flex-col justify-center p-10 md:p-16">
+							<h2 class="text-4xl font-extrabold mb-2 text-gray-900 dark:text-white">Welcome to DesQTA</h2>
+							<p class="mb-8 text-lg text-gray-600 dark:text-slate-300">Sign in to continue to your dashboard</p>
+							<div class="space-y-6">
+								<input
+									type="text"
+									bind:value={seqtaUrl}
+									placeholder="https://your-school.seqta.com.au"
+									class="w-full px-5 py-4 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm text-lg"
+								/>
+								<button
+									class="w-full py-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xl shadow-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+									onclick={startLogin}
+									disabled={!seqtaUrl}
+								>
+									Sign In
+								</button>
+							</div>
+						</div>
 					</div>
-				</div>
-				<div class="signin-image-panel"></div>
+				{:else}
+					<slot />
+				{/if}
 			</div>
-			<style>
-				html, body {
-					height: 100vh;
-					overflow: hidden;
-				}
-				main {
-					height: 100vh;
-					overflow: hidden;
-				}
-				.signin-container {
-					display: flex;
-					height: 100vh;
-					width: 100vw;
-					overflow: hidden;
-				}
-				.signin-form-panel {
-					background: #232323;
-					color: #fff;
-					width: 100%;
-					max-width: 480px;
-					min-width: 320px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					padding: 0 2rem;
-					height: 100vh;
-					overflow: hidden;
-				}
-				.signin-form-content {
-					width: 100%;
-					max-width: 340px;
-					margin: 0 auto;
-					display: flex;
-					flex-direction: column;
-					gap: 1.5rem;
-				}
-				.signin-logo {
-					width: 36px;
-					margin-bottom: 2rem;
-				}
-				.signin-title {
-					font-size: 1.6rem;
-					font-weight: 700;
-					margin-bottom: 0.5rem;
-				}
-				.signin-desc {
-					color: #b0b0b0;
-					font-size: 1rem;
-					margin-bottom: 1.5rem;
-				}
-				.signin-form label {
-					font-size: 1rem;
-					margin-bottom: 0.25rem;
-					margin-top: 1rem;
-				}
-				.signin-input {
-					width: 100%;
-					padding: 0.7rem 0.9rem;
-					border-radius: 6px;
-					border: none;
-					background: #fff;
-					color: #232323;
-					font-size: 1rem;
-					margin-bottom: 0.5rem;
-				}
-				.signin-btn {
-					width: 100%;
-					background: #2563eb;
-					color: #fff;
-					font-weight: 600;
-					font-size: 1.1rem;
-					border: none;
-					border-radius: 6px;
-					padding: 0.8rem 0;
-					margin-top: 0.5rem;
-					cursor: pointer;
-					transition: background 0.2s;
-				}
-				.signin-btn:hover {
-					background: #1d4ed8;
-				}
-				.signin-image-panel {
-					flex: 1;
-					background: url('/images/signin.jpg') center center / cover no-repeat;
-					min-width: 0;
-					min-height: 100vh;
-					height: 100vh;
-					overflow: hidden;
-					background-size: cover;
-					background-position: center;
-				}
-				@media (max-width: 900px) {
-					.signin-container {
-						flex-direction: column;
-					}
-					.signin-image-panel {
-						display: none;
-					}
-					.signin-form-panel {
-						max-width: 100vw;
-						min-width: 0;
-					}
-				}
-			</style>
-		{:else}
-			{@render children()}
-		{/if}
-	</main>
+		</main>
+	</div>
 </div>
 
+<style>
+	/* Add smooth transitions */
+	.transition-transform {
+		transition-property: transform;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 300ms;
+	}
+
+	/* Add hover effects */
+	.hover\:bg-base-300:hover {
+		background-color: hsl(var(--b3));
+	}
+
+	@keyframes dropdown-fade-in {
+		0% { opacity: 0; transform: translateY(-10px); }
+		100% { opacity: 1; transform: translateY(0); }
+	}
+	.dropdown-animate-in {
+		animation: dropdown-fade-in 0.18s cubic-bezier(0.4,0,0.2,1);
+	}
+</style>
+
 <!-- Mobile Menu Overlay -->
-{#if isMobile && isMobileMenuOpen}
-	<div 
-		class="fixed inset-0 z-30 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-50"
-		onclick={() => isMobileMenuOpen = false}
+{#if isMobileMenuOpen}
+	<div
+		class="fixed inset-0 bg-black/50 z-40"
+		onclick={() => (isMobileMenuOpen = false)}
+		onkeydown={(e) => e.key === 'Escape' && (isMobileMenuOpen = false)}
 		role="button"
 		tabindex="0"
-		onkeydown={(e) => e.key === 'Enter' && (isMobileMenuOpen = false)}
+		aria-label="Close mobile menu"
 	></div>
-{/if} 
+{/if}
+
+<!-- About Modal -->
+{#if showAboutModal}
+	<div
+		class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		onclick={() => (showAboutModal = false)}
+		onkeydown={(e) => e.key === 'Escape' && (showAboutModal = false)}
+		role="dialog"
+		aria-modal="true"
+		aria-label="About Modal"
+		tabindex="0"
+	>
+		<div
+			class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-fade-in-up"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+		>
+			<div class="p-6">
+				<div class="flex justify-between items-start mb-6">
+					<h2 class="text-2xl font-bold text-gray-900 dark:text-white">About DesQTA</h2>
+					<button
+						class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors"
+						onclick={() => (showAboutModal = false)}
+						aria-label="Close modal"
+					>
+						<Icon src={XMark} class="w-6 h-6" />
+					</button>
+				</div>
+				<div class="space-y-4 text-gray-600 dark:text-gray-300">
+					<p>DesQTA is a modern, feature-rich desktop application designed to enhance your learning experience.</p>
+					<p>Version: 1.0.0</p>
+					<p>Built with:</p>
+					<ul class="list-disc list-inside space-y-2">
+						<li>SvelteKit</li>
+						<li>Tauri</li>
+						<li>TailwindCSS</li>
+					</ul>
+					<p>© 2025 DesQTA. All rights reserved.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
