@@ -200,7 +200,7 @@ function getJumpButtonText(target: any) {
       </div>
     {/if}
   </div>
-</aside>
+</aside> 
 
 <style>
   @keyframes fadeIn {

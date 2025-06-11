@@ -191,7 +191,7 @@ function sortModules(modules: Module[]): Module[] {
                   </div>
                 {:else if renderedModule.type === 'link'}
                   <div class="animate-slide-in" style="animation-delay: {0.4 + i * 0.1}s;">
-                    <LinkPreview url={renderedModule.content} preview={linkPreviews.get(renderedModule.content)} />
+                  <LinkPreview url={renderedModule.content} preview={linkPreviews.get(renderedModule.content)} />
                   </div>
                 {/if}
               {/if}
@@ -242,7 +242,7 @@ function sortModules(modules: Module[]): Module[] {
                 </div>
               {:else if renderedModule.type === 'link'}
                 <div class="animate-slide-in" style="animation-delay: {0.2 + i * 0.1}s;">
-                  <LinkPreview url={renderedModule.content} preview={linkPreviews.get(renderedModule.content)} />
+                <LinkPreview url={renderedModule.content} preview={linkPreviews.get(renderedModule.content)} />
                 </div>
               {/if}
             {/if}
@@ -251,7 +251,7 @@ function sortModules(modules: Module[]): Module[] {
       {/if}
     </div>
   {/if}
-</div>
+</div> 
 
 <style>
   @keyframes fadeIn {

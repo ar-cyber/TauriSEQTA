@@ -27,7 +27,8 @@
 		CalendarDays,
 		GlobeAlt,
 		ArrowRightOnRectangle,
-		Bars3
+		Bars3,
+		XMark
 	} from 'svelte-hero-icons';
 
 	import { writable } from 'svelte/store';
@@ -578,11 +579,43 @@
 <!-- About Modal -->
 {#if showAboutModal}
 	<div
-		class="fixed inset-0 bg-black/50 z-50"
+		class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 		onclick={() => (showAboutModal = false)}
 		onkeydown={(e) => e.key === 'Escape' && (showAboutModal = false)}
-		role="button"
+		role="dialog"
+		aria-modal="true"
+		aria-label="About Modal"
 		tabindex="0"
-		aria-label="Close about modal"
-	></div>
-{/if} 
+	>
+		<div
+			class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-fade-in-up"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+		>
+			<div class="p-6">
+				<div class="flex justify-between items-start mb-6">
+					<h2 class="text-2xl font-bold text-gray-900 dark:text-white">About DesQTA</h2>
+					<button
+						class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors"
+						onclick={() => (showAboutModal = false)}
+						aria-label="Close modal"
+					>
+						<Icon src={XMark} class="w-6 h-6" />
+					</button>
+				</div>
+				<div class="space-y-4 text-gray-600 dark:text-gray-300">
+					<p>DesQTA is a modern, feature-rich desktop application designed to enhance your learning experience.</p>
+					<p>Version: 1.0.0</p>
+					<p>Built with:</p>
+					<ul class="list-disc list-inside space-y-2">
+						<li>SvelteKit</li>
+						<li>Tauri</li>
+						<li>TailwindCSS</li>
+					</ul>
+					<p>© 2025 DesQTA. All rights reserved.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}

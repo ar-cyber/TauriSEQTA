@@ -145,7 +145,7 @@ function getEmbedIcon(type: string): string {
       </a>
     {/if}
   {/if}
-{/if}
+{/if} 
 
 <style>
   @keyframes fadeIn {
