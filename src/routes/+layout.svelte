@@ -510,27 +510,63 @@
 		<main class="flex-1 transition-all duration-300" class:ml-64={sidebarOpen}>
 			<div class="{sidebarOpen ? 'container mx-auto' : 'w-full'} p-6 transition-all duration-300">
 				{#if $needsSetup}
-					<div class="max-w-5xl mx-auto mt-24 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up border border-gray-200 dark:border-slate-800">
-						<div class="hidden md:block md:w-2/3 bg-gray-100 dark:bg-slate-800">
-							<img src="/images/signin.jpg" alt="Sign in" class="object-cover w-full h-full min-h-[400px]" />
-						</div>
-						<div class="w-full md:w-1/3 flex flex-col justify-center p-10 md:p-16">
-							<h2 class="text-4xl font-extrabold mb-2 text-gray-900 dark:text-white">Welcome to DesQTA</h2>
-							<p class="mb-8 text-lg text-gray-600 dark:text-slate-300">Sign in to continue to your dashboard</p>
-							<div class="space-y-6">
-								<input
-									type="text"
-									bind:value={seqtaUrl}
-									placeholder="https://your-school.seqta.com.au"
-									class="w-full px-5 py-4 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm text-lg"
-								/>
-								<button
-									class="w-full py-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xl shadow-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-									onclick={startLogin}
-									disabled={!seqtaUrl}
-								>
-									Sign In
-								</button>
+					<div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
+						<div class="w-full max-w-5xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up border border-gray-200 dark:border-slate-800">
+							<!-- Left side - Image and branding -->
+							<div class="hidden md:block md:w-2/3 relative">
+								<div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 dark:from-indigo-500/10 dark:to-purple-500/10"></div>
+								<img src="/images/signin.jpg" alt="Sign in" class="object-cover w-full h-full min-h-[600px]" />
+								<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex flex-col justify-end p-8">
+									<h1 class="text-4xl font-bold text-white mb-4">Welcome to DesQTA</h1>
+									<p class="text-lg text-gray-200">Experience SEQTA Learn like never before with our powerful desktop application</p>
+								</div>
+							</div>
+
+							<!-- Right side - Login form -->
+							<div class="w-full md:w-1/3 flex flex-col justify-center p-8 md:p-12">
+								<div class="md:hidden mb-8 text-center">
+									<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to DesQTA</h1>
+									<p class="text-gray-600 dark:text-gray-300">Experience SEQTA Learn like never before with our powerful desktop application</p>
+								</div>
+
+								<div class="space-y-6">
+									<div>
+										<label for="seqta-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+											SEQTA URL
+										</label>
+										<div class="relative">
+											<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+												<svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+													<path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+												</svg>
+											</div>
+											<input
+												id="seqta-url"
+												type="text"
+												bind:value={seqtaUrl}
+												placeholder="your-school.seqta.com.au"
+												class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+											/>
+										</div>
+										<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+											Enter your school's SEQTA URL to get started
+										</p>
+									</div>
+
+									<button
+										class="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-lg shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+										onclick={startLogin}
+										disabled={!seqtaUrl}
+									>
+										Sign In
+									</button>
+
+									<div class="text-center">
+										<p class="text-sm text-gray-600 dark:text-gray-400">
+											Need help? <a href="https://github.com/betterseqta/desqta" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline">Visit GitHub</a>
+										</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
