@@ -19,6 +19,8 @@
 	let barPaths: { path: string; count: number; status: string }[] = [];
 	let yLabels: string[] = [];
 
+	const studentId = 69;
+
 	function isValidDate(dateStr: string): boolean {
 		const date = new Date(dateStr);
 		return date instanceof Date && !isNaN(date.getTime());
@@ -76,20 +78,27 @@
 		loading = true;
 		error = null;
 		try {
-			// Fetch upcoming and past assessments for all active subjects
-			const studentId = 69;
-			// Fetch subjects
+			// Fetch all folders and all subjects (not just active)
 			const classesRes = await seqtaFetch('/seqta/student/load/subjects?', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json; charset=utf-8' },
 				body: {}
 			});
-			const classesResJson = JSON.parse(classesRes);
-			const activeClass = classesResJson.payload.find((c: any) => c.active);
-			const activeSubjects = activeClass ? activeClass.subjects : [];
-			const activeCodes = activeSubjects.map((s: any) => s.code);
+			const data = JSON.parse(classesRes);
+			const folders = data.payload;
+			const allSubjects = folders.flatMap((f: any) => f.subjects);
 
-			// Fetch upcoming assessments
+			// Remove duplicate subjects by programme+metaclass
+			const uniqueSubjectsMap = new Map();
+			allSubjects.forEach((s: any) => {
+				const key = `${s.programme}-${s.metaclass}`;
+				if (!uniqueSubjectsMap.has(key)) uniqueSubjectsMap.set(key, s);
+			});
+			const uniqueSubjects = Array.from(uniqueSubjectsMap.values());
+
+			// Fetch upcoming assessments for current active subjects (optional, can be skipped if you want only past)
+			const activeFolder = folders.find((f: any) => f.active === 1);
+			const activeSubjects = activeFolder ? activeFolder.subjects : [];
 			const assessmentsRes = await seqtaFetch('/seqta/student/assessment/list/upcoming?', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -97,8 +106,8 @@
 			});
 			const upcomingAssessments = JSON.parse(assessmentsRes).payload;
 
-			// Fetch past assessments for each active subject
-			const pastAssessmentsPromises = activeSubjects.map((subject: any) =>
+			// Fetch past assessments for every subject ever
+			const pastAssessmentsPromises = uniqueSubjects.map((subject: any) =>
 				seqtaFetch('/seqta/student/assessment/list/past?', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -225,6 +234,21 @@
 		if (grade >= 50) return 'rgb(239, 68, 68)'; // red
 		return 'rgb(239, 68, 68)'; // red
 	}
+
+	function getLetterGrade(percentage: number | undefined): string {
+		if (percentage === undefined) return '';
+		if (percentage >= 90) return 'A+';
+		if (percentage >= 85) return 'A';
+		if (percentage >= 80) return 'A-';
+		if (percentage >= 75) return 'B+';
+		if (percentage >= 70) return 'B';
+		if (percentage >= 65) return 'B-';
+		if (percentage >= 60) return 'C+';
+		if (percentage >= 55) return 'C';
+		if (percentage >= 50) return 'C-';
+		if (percentage >= 40) return 'D';
+		return 'E';
+	}
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -292,7 +316,7 @@
 								class="fill-gray-500 dark:fill-gray-400 text-xs"
 								text-anchor="middle"
 							>
-								{status}%
+								{status}% {getLetterGrade((() => { const [min] = status.split('-'); return Number(min); })())}
 							</text>
 							<text
 								x={padding + i * (barWidth + barSpacing) + barWidth / 2}
@@ -346,7 +370,7 @@
 												? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
 												: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}"
 										>
-											{assessment.finalGrade}%
+											{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
 										</span>
 									{:else}
 										<span class="text-gray-500">Not graded</span>
