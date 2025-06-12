@@ -327,7 +327,7 @@
 		{ label: 'Reports', icon: ChartBar, path: '/reports' },
 		{ label: 'Settings', icon: Cog6Tooth, path: '/settings' },
 		{ label: 'Timetable', icon: CalendarDays, path: '/timetable' },
-		{ label: 'Analytics', icon: ChartBar, path: '/analytics' }
+		{ label: 'Analytics', icon: AcademicCap, path: '/analytics' }
 	];
 </script>
 
@@ -509,7 +509,7 @@
 					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
 					class:accent-bg={$page.url.pathname.startsWith('/analytics')}
 				>
-					<Icon src={ChartBar} class="w-7 h-7" />
+					<Icon src={AcademicCap} class="w-7 h-7" />
 					<span>Analytics</span>
 				</a>
 			</nav>
