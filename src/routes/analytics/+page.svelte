@@ -28,6 +28,13 @@
 
 	let expandedSubjects: Record<string, boolean> = {};
 
+	// Filter state
+	let filterSubject = '';
+	let filterStatus = '';
+	let filterMinGrade: number | null = null;
+	let filterMaxGrade: number | null = null;
+	let filterSearch = '';
+
 	function isValidDate(dateStr: string): boolean {
 		const date = new Date(dateStr);
 		return date instanceof Date && !isNaN(date.getTime());
@@ -304,6 +311,25 @@
 			deleteLoading = false;
 		}
 	}
+
+	function getFilteredAssessments(data: AnalyticsData | null): Assessment[] {
+		if (!data) return [];
+		return data.filter(a => {
+			if (filterSubject && a.subject !== filterSubject) return false;
+			if (filterStatus && a.status !== filterStatus) return false;
+			if (filterMinGrade !== null && (a.finalGrade ?? -1) < filterMinGrade) return false;
+			if (filterMaxGrade !== null && (a.finalGrade ?? 101) > filterMaxGrade) return false;
+			if (filterSearch && !(
+				a.title.toLowerCase().includes(filterSearch.toLowerCase()) ||
+				a.subject.toLowerCase().includes(filterSearch.toLowerCase())
+			)) return false;
+			return true;
+		});
+	}
+
+	function hasActiveFilters() {
+		return !!(filterSubject || filterStatus || filterMinGrade !== null || filterMaxGrade !== null || filterSearch);
+	}
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -408,55 +434,131 @@
 				</span>
 				Raw Data
 			</h2>
+			<div class="mb-6 flex flex-wrap gap-4 items-end">
+				<div>
+					<label for="filter-subject" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Subject</label>
+					<select id="filter-subject" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm" bind:value={filterSubject}>
+						<option value="">All</option>
+						{#each Array.from(new Set((analyticsData || []).map(a => a.subject))) as subject}
+							<option value={subject}>{subject}</option>
+						{/each}
+					</select>
+				</div>
+				<div>
+					<label for="filter-status" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Status</label>
+					<select id="filter-status" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm" bind:value={filterStatus}>
+						<option value="">All</option>
+						<option value="MARKS_RELEASED">Marks Released</option>
+						<option value="OVERDUE">Overdue</option>
+						<option value="PENDING">Pending</option>
+						<option value="UPCOMING">Upcoming</option>
+					</select>
+				</div>
+				<div>
+					<label for="filter-min-grade" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Min Grade</label>
+					<input id="filter-min-grade" type="number" min="0" max="100" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-20" bind:value={filterMinGrade} placeholder="0" />
+				</div>
+				<div>
+					<label for="filter-max-grade" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Max Grade</label>
+					<input id="filter-max-grade" type="number" min="0" max="100" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-20" bind:value={filterMaxGrade} placeholder="100" />
+				</div>
+				<div class="flex-1 min-w-[160px]">
+					<label for="filter-search" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Search</label>
+					<input id="filter-search" type="text" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-full" bind:value={filterSearch} placeholder="Title or subject..." />
+				</div>
+				{#if hasActiveFilters()}
+					<button class="ml-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring text-sm font-semibold" on:click={() => { filterSubject = ''; filterStatus = ''; filterMinGrade = null; filterMaxGrade = null; filterSearch = ''; }}>
+						Clear Filters
+					</button>
+				{/if}
+			</div>
+			<div class="mb-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+				Showing {hasActiveFilters() ? getFilteredAssessments(analyticsData).length : (analyticsData ? analyticsData.length : 0)} entr{(hasActiveFilters() ? getFilteredAssessments(analyticsData).length : (analyticsData ? analyticsData.length : 0)) === 1 ? 'y' : 'ies'}
+			</div>
 			<div class="overflow-x-auto">
-				{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
-					<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80" in:slide={{ duration: 350 }}>
-						<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
-							<span class="flex items-center gap-2">
-								{#if expandedSubjects[subject]}
-									<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
-								{:else}
-									<Icon src={ChevronRight} class="w-5 h-5 text-indigo-500" />
-								{/if}
-								<span>{subject}</span>
-							</span>
-						</button>
-						{#if expandedSubjects[subject]}
-							<div transition:fade={{ duration: 250 }}>
-								<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-									<thead>
-										<tr>
-											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
-											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
-										</tr>
-									</thead>
-									<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-										{#each assessments as assessment}
+				{#if hasActiveFilters()}
+					<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+						<thead>
+							<tr>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subject</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+							{#each getFilteredAssessments(analyticsData) as assessment}
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.subject}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm">
+										{#if assessment.finalGrade !== undefined}
+											<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
+												? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+												: assessment.finalGrade >= 60
+												? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+												: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+												{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
+											</span>
+										{:else}
+											<span class="text-gray-500">Not graded</span>
+										{/if}
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{:else}
+					{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
+						<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80" in:slide={{ duration: 350 }}>
+							<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
+								<span class="flex items-center gap-2">
+									{#if expandedSubjects[subject]}
+										<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
+									{:else}
+										<Icon src={ChevronRight} class="w-5 h-5 text-indigo-500" />
+									{/if}
+									<span>{subject}</span>
+								</span>
+							</button>
+							{#if expandedSubjects[subject]}
+								<div transition:fade={{ duration: 250 }}>
+									<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+										<thead>
 											<tr>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm">
-													{#if assessment.finalGrade !== undefined}
-														<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
-															? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-															: assessment.finalGrade >= 60
-															? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-															: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
-															{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
-														</span>
-													{:else}
-														<span class="text-gray-500">Not graded</span>
-													{/if}
-												</td>
-												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
+												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
 											</tr>
-										{/each}
-									</tbody>
-								</table>
-							</div>
-						{/if}
-					</div>
-				{/each}
+										</thead>
+										<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+											{#each assessments as assessment}
+												<tr>
+													<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
+													<td class="px-6 py-4 whitespace-nowrap text-sm">
+														{#if assessment.finalGrade !== undefined}
+															<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
+																? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+																: assessment.finalGrade >= 60
+																? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+																: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+																{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
+															</span>
+														{:else}
+															<span class="text-gray-500">Not graded</span>
+														{/if}
+													</td>
+													<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							{/if}
+						</div>
+					{/each}
+				{/if}
 			</div>
 		</div>
 	{:else}
@@ -469,7 +571,7 @@
 		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
 			<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 w-full max-w-md border border-gray-200 dark:border-slate-700 animate-fade-in-up relative">
 				<h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Delete Analytics Data?</h3>
-				<p class="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete all analytics data? This action cannot be undone.</p>
+				<p class="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete all analytics data?</p>
 				{#if deleteError}
 					<div class="mb-4 text-red-600 dark:text-red-400">{deleteError}</div>
 				{/if}
