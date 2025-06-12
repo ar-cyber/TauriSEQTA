@@ -117,6 +117,7 @@ pub fn run() {
             settings::save_settings,
             analytics::save_analytics,
             analytics::load_analytics,
+            analytics::delete_analytics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
