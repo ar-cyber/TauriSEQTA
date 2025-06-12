@@ -3,6 +3,7 @@
 	import { invoke } from '@tauri-apps/api/core';
 	import type { AnalyticsData, Assessment } from '$lib/types';
 	import { seqtaFetch } from '../../utils/netUtil';
+	import { Icon, ChevronDown, ChevronRight } from 'svelte-hero-icons';
 
 	let analyticsData: AnalyticsData | null = null;
 	let loading = true;
@@ -20,6 +21,8 @@
 	let yLabels: string[] = [];
 
 	const studentId = 69;
+
+	let expandedSubjects: Record<string, boolean> = {};
 
 	function isValidDate(dateStr: string): boolean {
 		const date = new Date(dateStr);
@@ -257,6 +260,21 @@
 		if (percentage >= 40) return 'D';
 		return 'E';
 	}
+
+	function toggleSubject(subject: string) {
+		expandedSubjects[subject] = !expandedSubjects[subject];
+	}
+
+	// Helper function to group by subject
+	function groupBySubject(data: AnalyticsData | null): Record<string, Assessment[]> {
+		const grouped: Record<string, Assessment[]> = {};
+		if (!data) return grouped;
+		for (const a of data) {
+			if (!grouped[a.subject]) grouped[a.subject] = [];
+			grouped[a.subject].push(a);
+		}
+		return grouped;
+	}
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -281,8 +299,13 @@
 				Delete Data
 			</button>
 		</div>
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-			<h2 class="text-xl font-semibold mb-4">Grade Distribution</h2>
+		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700">
+			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
+				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/></svg>
+				</span>
+				Grade Distribution
+			</h2>
 			<div class="overflow-x-auto">
 				<svg {width} {height} class="min-w-[800px]">
 					<!-- Grid lines -->
@@ -340,57 +363,60 @@
 			</div>
 		</div>
 
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-			<h2 class="text-xl font-semibold mb-4">Raw Data</h2>
+		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700">
+			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
+				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+				</span>
+				Raw Data
+			</h2>
 			<div class="overflow-x-auto">
-				<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-					<thead>
-						<tr>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-								Subject
-							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-								Title
-							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-								Grade
-							</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-								Due Date
-							</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-						{#each analyticsData as assessment}
-							<tr>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-									{assessment.subject}
-								</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-									{assessment.title}
-								</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm">
-									{#if assessment.finalGrade !== undefined}
-										<span
-											class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
-												? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-												: assessment.finalGrade >= 60
-												? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-												: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}"
-										>
-											{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
-										</span>
-									{:else}
-										<span class="text-gray-500">Not graded</span>
-									{/if}
-								</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-									{new Date(assessment.due).toLocaleDateString()}
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
+				{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
+					<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80">
+						<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
+							<span class="flex items-center gap-2">
+								{#if expandedSubjects[subject]}
+									<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
+								{:else}
+									<Icon src={ChevronRight} class="w-5 h-5 text-indigo-500" />
+								{/if}
+								<span>{subject}</span>
+							</span>
+						</button>
+						{#if expandedSubjects[subject]}
+							<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead>
+									<tr>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+									{#each assessments as assessment}
+										<tr>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm">
+												{#if assessment.finalGrade !== undefined}
+													<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
+														? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+														: assessment.finalGrade >= 60
+														? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+														: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+														{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
+													</span>
+												{:else}
+													<span class="text-gray-500">Not graded</span>
+												{/if}
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						{/if}
+					</div>
+				{/each}
 			</div>
 		</div>
 	{:else}
