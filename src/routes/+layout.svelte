@@ -326,7 +326,8 @@
 		{ label: 'Notices', icon: Bell, path: '/notices' },
 		{ label: 'Reports', icon: ChartBar, path: '/reports' },
 		{ label: 'Settings', icon: Cog6Tooth, path: '/settings' },
-		{ label: 'Timetable', icon: CalendarDays, path: '/timetable' }
+		{ label: 'Timetable', icon: CalendarDays, path: '/timetable' },
+		{ label: 'Analytics', icon: ChartBar, path: '/analytics' }
 	];
 </script>
 
@@ -503,6 +504,14 @@
 					<Icon src={Cog6Tooth} class="w-7 h-7" />
 					<span>Settings</span>
 				</a>
+				<a
+					href="/analytics"
+					class="flex items-center gap-4 px-5 py-3 text-lg font-semibold rounded-xl bg-base-200 hover:accent-bg transition-all duration-200 shadow-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+					class:accent-bg={$page.url.pathname.startsWith('/analytics')}
+				>
+					<Icon src={ChartBar} class="w-7 h-7" />
+					<span>Analytics</span>
+				</a>
 			</nav>
 		</aside>
 
@@ -527,9 +536,9 @@
 								<div class="md:hidden mb-8 text-center">
 									<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to DesQTA</h1>
 									<p class="text-gray-600 dark:text-gray-300">Experience SEQTA Learn like never before with our powerful desktop application</p>
-								</div>
+						</div>
 
-								<div class="space-y-6">
+							<div class="space-y-6">
 									<div>
 										<label for="seqta-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 											SEQTA URL
@@ -540,10 +549,10 @@
 													<path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
 												</svg>
 											</div>
-											<input
+								<input
 												id="seqta-url"
-												type="text"
-												bind:value={seqtaUrl}
+									type="text"
+									bind:value={seqtaUrl}
 												placeholder="your-school.seqta.com.au"
 												class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
 											/>
@@ -553,13 +562,13 @@
 										</p>
 									</div>
 
-									<button
+								<button
 										class="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-lg shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-										onclick={startLogin}
-										disabled={!seqtaUrl}
-									>
-										Sign In
-									</button>
+									onclick={startLogin}
+									disabled={!seqtaUrl}
+								>
+									Sign In
+								</button>
 
 									<div class="text-center">
 										<p class="text-sm text-gray-600 dark:text-gray-400">
@@ -658,14 +667,14 @@
 							<h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">About DesQTA</h2>
 							<p class="text-gray-600 dark:text-gray-400">Your SEQTA Learn Desktop Experience</p>
 						</div>
-						<button
+					<button
 							class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors hover:scale-110 active:scale-95"
-							onclick={() => (showAboutModal = false)}
-							aria-label="Close modal"
-						>
-							<Icon src={XMark} class="w-6 h-6" />
-						</button>
-					</div>
+						onclick={() => (showAboutModal = false)}
+						aria-label="Close modal"
+					>
+						<Icon src={XMark} class="w-6 h-6" />
+					</button>
+				</div>
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
 						<div class="flex flex-col gap-6 h-full">
@@ -736,7 +745,7 @@
 										<Icon src={DocumentText} class="w-5 h-5 text-indigo-500" />
 										<span class="text-gray-900 dark:text-white">Notice Board</span>
 									</li>
-								</ul>
+					</ul>
 							</div>
 							<div class="bg-gray-50 dark:bg-slate-800/50 rounded-xl p-6 flex-1 flex flex-col justify-between min-h-[160px]">
 								<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Links</h3>

@@ -10,6 +10,8 @@ mod login;
 mod netgrab;
 #[path = "utils/settings.rs"]
 mod settings;
+#[path = "utils/analytics.rs"]
+mod analytics;
 
 use tauri::Manager;
 use tauri_plugin_notification;
@@ -112,7 +114,9 @@ pub fn run() {
             login::logout,
             login::force_reload,
             settings::get_settings,
-            settings::save_settings
+            settings::save_settings,
+            analytics::save_analytics,
+            analytics::load_analytics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

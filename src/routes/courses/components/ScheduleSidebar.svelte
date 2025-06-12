@@ -148,27 +148,27 @@ function getJumpButtonText(target: any) {
   </div>
   <div class="overflow-y-auto flex-1 min-h-0">
     <div class="sticky top-0 z-10 bg-white/90 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-300/50 dark:border-slate-700/50">
-      <button 
+    <button 
         class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
-        onclick={onSelectOverview}>
+      onclick={onSelectOverview}>
         <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">📚 Course Overview</div>
         <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
-          Main course content and resources
-        </div>
-      </button>
+        Main course content and resources
+      </div>
+    </button>
 
-      {#if jumpTarget}
-        {@const buttonText = getJumpButtonText(jumpTarget)}
-        <button 
+    {#if jumpTarget}
+      {@const buttonText = getJumpButtonText(jumpTarget)}
+      <button 
           class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
-          style="animation-delay: 0.1s;"
-          onclick={jumpToToday}>
+        style="animation-delay: 0.1s;"
+        onclick={jumpToToday}>
           <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">🕐 {buttonText.title}</div>
           <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
-            {buttonText.subtitle}
-          </div>
-        </button>
-      {/if}
+          {buttonText.subtitle}
+        </div>
+      </button>
+    {/if}
     </div>
 
     {#each filteredSchedule as termSchedule, i}
