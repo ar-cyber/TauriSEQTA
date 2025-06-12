@@ -4,6 +4,7 @@
 	import type { AnalyticsData, Assessment } from '$lib/types';
 	import { seqtaFetch } from '../../utils/netUtil';
 	import { Icon, ChevronDown, ChevronRight } from 'svelte-hero-icons';
+	import { fade, slide, scale } from 'svelte/transition';
 
 	let analyticsData: AnalyticsData | null = null;
 	let loading = true;
@@ -286,7 +287,7 @@
 		</div>
 	{:else if showGrabData}
 		<div class="flex flex-col items-center justify-center h-64 gap-4">
-			<button class="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition" on:click={grabData}>
+			<button class="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-indigo-700" on:click={grabData}>
 				Grab Data
 			</button>
 			{#if error}
@@ -295,11 +296,11 @@
 		</div>
 	{:else if analyticsData}
 		<div class="flex justify-end mb-4">
-			<button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition" on:click={deleteAnalytics}>
+			<button class="px-4 py-2 bg-red-600 text-white rounded transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-red-700" on:click={deleteAnalytics}>
 				Delete Data
 			</button>
 		</div>
-		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700">
+		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700" in:fade={{ duration: 400 }}>
 			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
 				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/></svg>
@@ -335,7 +336,7 @@
 
 					<!-- Bars -->
 					{#each barPaths as { path, count, status }, i}
-						<g class="transition-all duration-300 hover:opacity-80">
+						<g class="transition-all duration-300 hover:opacity-80" in:scale={{ duration: 350, delay: i * 60 }}>
 							<path
 								d={path}
 								fill={getStatusColor(status)}
@@ -363,7 +364,7 @@
 			</div>
 		</div>
 
-		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700">
+		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700" in:fade={{ duration: 400, delay: 100 }}>
 			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
 				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -372,8 +373,8 @@
 			</h2>
 			<div class="overflow-x-auto">
 				{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
-					<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80">
-						<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
+					<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80" in:slide={{ duration: 350 }}>
+						<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
 							<span class="flex items-center gap-2">
 								{#if expandedSubjects[subject]}
 									<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
@@ -384,36 +385,38 @@
 							</span>
 						</button>
 						{#if expandedSubjects[subject]}
-							<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-								<thead>
-									<tr>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
-									</tr>
-								</thead>
-								<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-									{#each assessments as assessment}
+							<div transition:fade={{ duration: 250 }}>
+								<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+									<thead>
 										<tr>
-											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
-											<td class="px-6 py-4 whitespace-nowrap text-sm">
-												{#if assessment.finalGrade !== undefined}
-													<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
-														? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-														: assessment.finalGrade >= 60
-														? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-														: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
-														{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
-													</span>
-												{:else}
-													<span class="text-gray-500">Not graded</span>
-												{/if}
-											</td>
-											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
+											<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
 										</tr>
-									{/each}
-								</tbody>
-							</table>
+									</thead>
+									<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+										{#each assessments as assessment}
+											<tr>
+												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
+												<td class="px-6 py-4 whitespace-nowrap text-sm">
+													{#if assessment.finalGrade !== undefined}
+														<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
+															? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+															: assessment.finalGrade >= 60
+															? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+															: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+															{assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
+														</span>
+													{:else}
+														<span class="text-gray-500">Not graded</span>
+													{/if}
+												</td>
+												<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
 						{/if}
 					</div>
 				{/each}
