@@ -214,6 +214,16 @@
 		const maxCount = Math.max(...Object.values(gradeRanges), 1);
 		const yScale = (height - padding * 2) / maxCount;
 
+		// Generate y-axis labels at intervals of 10
+		const yStep = Math.max(10, Math.ceil(maxCount / 10) * 10 / 10); // At least 10, or enough to keep ~10 labels
+		yLabels = [];
+		for (let i = 0; i <= maxCount; i += yStep) {
+			yLabels.push(i.toString());
+		}
+		if (yLabels[yLabels.length - 1] !== maxCount.toString()) {
+			yLabels.push(maxCount.toString());
+		}
+
 		// Generate bar paths
 		barPaths = Object.entries(gradeRanges).map(([range, count], index) => {
 			const x = padding + index * (barWidth + barSpacing);
@@ -221,8 +231,6 @@
 			const path = `M ${x} ${height - padding} h ${barWidth} v -${barHeight} h -${barWidth} Z`;
 			return { path, count, status: range };
 		});
-
-		yLabels = Array.from({ length: maxCount + 1 }, (_, i) => i.toString());
 	}
 
 	function getStatusColor(status: string): string {
