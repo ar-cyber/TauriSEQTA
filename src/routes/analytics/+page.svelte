@@ -10,6 +10,9 @@
 	let loading = true;
 	let error: string | null = null;
 	let showGrabData = false;
+	let showDeleteModal = false;
+	let deleteLoading = false;
+	let deleteError: string | null = null;
 
 	// Graph dimensions
 	const width = 800;
@@ -276,6 +279,31 @@
 		}
 		return grouped;
 	}
+
+	function openDeleteModal() {
+		showDeleteModal = true;
+		deleteError = null;
+	}
+
+	function closeDeleteModal() {
+		showDeleteModal = false;
+		deleteError = null;
+	}
+
+	async function confirmDeleteAnalytics() {
+		deleteLoading = true;
+		deleteError = null;
+		try {
+			await invoke('delete_analytics');
+			analyticsData = null;
+			showGrabData = true;
+			showDeleteModal = false;
+		} catch (e) {
+			deleteError = 'Failed to delete analytics data';
+		} finally {
+			deleteLoading = false;
+		}
+	}
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -286,17 +314,26 @@
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
 		</div>
 	{:else if showGrabData}
-		<div class="flex flex-col items-center justify-center h-64 gap-4">
-			<button class="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-indigo-700" on:click={grabData}>
-				Grab Data
-			</button>
-			{#if error}
-				<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{error}</div>
-			{/if}
+		<div class="flex flex-col items-center justify-center h-96 gap-6">
+			<div class="bg-white/90 dark:bg-slate-900/90 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700 max-w-lg w-full flex flex-col items-center animate-fade-in-up">
+				<svg class="w-12 h-12 mb-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+				<h2 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">No Analytics Data</h2>
+				<p class="text-gray-600 dark:text-gray-300 mb-4 text-center">
+					To get started, click <span class="font-semibold text-indigo-600 dark:text-indigo-400">Grab Data</span> below.<br />
+					This will securely fetch and save your assessment data <span class="font-semibold">locally</span> on your device.<br />
+					<strong>Your data never leaves your computer</strong>—everything is processed and stored privately for your own analytics.
+				</p>
+				<button class="mt-2 px-6 py-3 bg-indigo-600 text-white rounded-lg shadow transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-indigo-700 text-lg font-semibold" on:click={grabData}>
+					Grab Data
+				</button>
+				{#if error}
+					<div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg w-full text-center">{error}</div>
+				{/if}
+			</div>
 		</div>
 	{:else if analyticsData}
 		<div class="flex justify-end mb-4">
-			<button class="px-4 py-2 bg-red-600 text-white rounded transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-red-700" on:click={deleteAnalytics}>
+			<button class="px-4 py-2 bg-red-600 text-white rounded transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-red-700" on:click={openDeleteModal}>
 				Delete Data
 			</button>
 		</div>
@@ -425,6 +462,27 @@
 	{:else}
 		<div class="text-center text-gray-500 dark:text-gray-400">
 			No analytics data available
+		</div>
+	{/if}
+
+	{#if showDeleteModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+			<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 w-full max-w-md border border-gray-200 dark:border-slate-700 animate-fade-in-up relative">
+				<h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Delete Analytics Data?</h3>
+				<p class="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete all analytics data? This action cannot be undone.</p>
+				{#if deleteError}
+					<div class="mb-4 text-red-600 dark:text-red-400">{deleteError}</div>
+				{/if}
+				<div class="flex justify-end gap-3">
+					<button class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={closeDeleteModal} disabled={deleteLoading}>Cancel</button>
+					<button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={confirmDeleteAnalytics} disabled={deleteLoading}>
+						{#if deleteLoading}
+							<span class="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full align-middle"></span>
+						{/if}
+						Delete
+					</button>
+				</div>
+			</div>
 		</div>
 	{/if}
 </div> 
