@@ -449,116 +449,115 @@
 				Delete Data
 			</button>
 		</div>
-		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700" in:fade={{ duration: 400 }}>
-			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/></svg>
-				</span>
-				Grade Distribution
-			</h2>
-			<div class="overflow-x-auto">
-				<svg {width} {height} class="min-w-[800px]">
-					<!-- Grid lines -->
-					{#each yLabels as _, i}
-						<line
-							x1={padding}
-							y1={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
-							x2={width - padding}
-							y2={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
-							class="stroke-gray-200 dark:stroke-gray-700"
-							stroke-width="1"
-						/>
-					{/each}
-
-					<!-- Y-axis labels -->
-					{#each yLabels as label, i}
-						<text
-							x={padding - 10}
-							y={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
-							class="fill-gray-500 dark:fill-gray-400 text-xs"
-							text-anchor="end"
-							dominant-baseline="middle"
-						>
-							{label}
-						</text>
-					{/each}
-
-					<!-- Bars -->
-					{#each barPaths as { path, count, status }, i}
-						<g class="transition-all duration-300 hover:opacity-80" in:scale={{ duration: 350, delay: i * 60 }}>
-							<path
-								d={path}
-								fill={getStatusColor(status)}
-								class="transition-all duration-300"
+		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700 flex flex-col lg:flex-row gap-8" in:fade={{ duration: 400 }}>
+			<div class="flex-1 min-w-[350px] max-w-[600px] flex flex-col">
+				<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
+					<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/></svg>
+					</span>
+					Grade Distribution
+				</h2>
+				<div class="overflow-x-auto">
+					<svg {width} {height} class="min-w-[350px] max-w-[600px]">
+						<!-- Grid lines -->
+						{#each yLabels as _, i}
+							<line
+								x1={padding}
+								y1={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
+								x2={width - padding}
+								y2={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
+								class="stroke-gray-200 dark:stroke-gray-700"
+								stroke-width="1"
 							/>
+						{/each}
+						<!-- Y-axis labels -->
+						{#each yLabels as label, i}
 							<text
-								x={padding + i * (barWidth + barSpacing) + barWidth / 2}
-								y={height - padding + 20}
+								x={padding - 10}
+								y={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
 								class="fill-gray-500 dark:fill-gray-400 text-xs"
-								text-anchor="middle"
+								text-anchor="end"
+								dominant-baseline="middle"
 							>
-								{status}% {getLetterGrade((() => { const [min] = status.split('-'); return Number(min); })())}
+								{label}
 							</text>
-							<text
-								x={padding + i * (barWidth + barSpacing) + barWidth / 2}
-								y={height - padding - count * ((height - padding * 2) / Math.max(...yLabels.map(Number), 1)) - 10}
-								class="fill-gray-900 dark:fill-gray-100 text-sm font-medium"
-								text-anchor="middle"
-							>
-								{count}
-							</text>
-						</g>
-					{/each}
-				</svg>
+						{/each}
+						<!-- Bars -->
+						{#each barPaths as { path, count, status }, i}
+							<g class="transition-all duration-300 hover:opacity-80" in:scale={{ duration: 350, delay: i * 60 }}>
+								<path
+									d={path}
+									fill={getStatusColor(status)}
+									class="transition-all duration-300"
+								/>
+								<text
+									x={padding + i * (barWidth + barSpacing) + barWidth / 2}
+									y={height - padding + 20}
+									class="fill-gray-500 dark:fill-gray-400 text-xs"
+									text-anchor="middle"
+								>
+									{status}% {getLetterGrade((() => { const [min] = status.split('-'); return Number(min); })())}
+								</text>
+								<text
+									x={padding + i * (barWidth + barSpacing) + barWidth / 2}
+									y={height - padding - count * ((height - padding * 2) / Math.max(...yLabels.map(Number), 1)) - 10}
+									class="fill-gray-900 dark:fill-gray-100 text-sm font-medium"
+									text-anchor="middle"
+								>
+									{count}
+								</text>
+							</g>
+						{/each}
+					</svg>
+				</div>
 			</div>
-		</div>
-
-		<div class="mb-6">
-			<h3 class="text-lg font-semibold mb-2">Average Grade by Month</h3>
-			<div class="bg-white dark:bg-slate-800 rounded-lg shadow p-4">
-				{#if analyticsData && analyticsData.length > 0}
-					<div class="flex justify-center line-graph-container" style="position:relative;">
-						<svg width={graphWidth} height={graphHeight} viewBox={`0 0 ${graphWidth} ${graphHeight}`} xmlns="http://www.w3.org/2000/svg">
-							<!-- Y-axis -->
-							<line x1={graphPadding} y1={graphPadding} x2={graphPadding} y2={graphHeight - graphPadding} stroke="#fff" stroke-width="2" />
-							<!-- X-axis -->
-							<line x1={graphPadding} y1={graphHeight - graphPadding} x2={graphWidth - graphPadding} y2={graphHeight - graphPadding} stroke="#fff" stroke-width="2" />
-							<!-- Y-axis ticks and labels -->
-							{#each yTicks as tick}
-								<line x1={graphPadding - 5} y1={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding)} x2={graphPadding} y2={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding)} stroke="#fff" stroke-width="2" />
-								<text x={graphPadding - 10} y={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding) + 4} text-anchor="end" font-size="12" fill="#fff">{tick}</text>
-							{/each}
-							<!-- X-axis month labels -->
-							{#each monthlyPoints as point, i}
-								{#if i % showMonthEvery === 0 || i === monthlyPoints.length - 1}
-									<text x={point.x} y={graphHeight - graphPadding + 18} text-anchor="middle" font-size="12" fill="#fff" transform={`rotate(-35,${point.x},${graphHeight - graphPadding + 18})`}>{point.month}</text>
+			<div class="flex-1 min-w-[400px] max-w-[800px] flex flex-col">
+				<h3 class="text-lg font-semibold mb-2">Average Grade by Month</h3>
+				<div class="h-full flex items-center justify-center">
+					{#if analyticsData && analyticsData.length > 0}
+						<div class="flex justify-center line-graph-container" style="position:relative;">
+							<svg width={1000} height={300} viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+								<!-- Y-axis -->
+								<line x1={graphPadding} y1={graphPadding} x2={graphPadding} y2={300 - graphPadding} stroke="#fff" stroke-width="2" />
+								<!-- X-axis -->
+								<line x1={graphPadding} y1={300 - graphPadding} x2={1000 - graphPadding} y2={300 - graphPadding} stroke="#fff" stroke-width="2" />
+								<!-- Y-axis ticks and labels -->
+								{#each yTicks as tick}
+									<line x1={graphPadding - 5} y1={300 - graphPadding - (tick / 100) * (300 - 2 * graphPadding)} x2={graphPadding} y2={300 - graphPadding - (tick / 100) * (300 - 2 * graphPadding)} stroke="#fff" stroke-width="2" />
+									<text x={graphPadding - 10} y={300 - graphPadding - (tick / 100) * (300 - 2 * graphPadding) + 4} text-anchor="end" font-size="14" fill="#fff">{tick}</text>
+								{/each}
+								<!-- X-axis month labels -->
+								{#each monthlyPoints as point, i}
+									{#if i % showMonthEvery === 0 || i === monthlyPoints.length - 1}
+										<text x={graphPadding + (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding)} y={300 - graphPadding + 24} text-anchor="middle" font-size="14" fill="#fff" transform={`rotate(-35,${graphPadding + (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding)},${300 - graphPadding + 24})`}>{point.month}</text>
+									{/if}
+								{/each}
+								<!-- Line path -->
+								{#if monthlyPoints.length > 1}
+									<polyline fill="none" stroke="blue" stroke-width="2.5" points={monthlyPoints.map((p, i) => `${graphPadding + (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding)},${300 - graphPadding - (p.avg / 100) * (300 - 2 * graphPadding)}`).join(' ')} />
 								{/if}
-							{/each}
-							<!-- Line path -->
-							{#if monthlyPoints.length > 1}
-								<polyline fill="none" stroke="blue" stroke-width="2" points={monthlyPoints.map(p => `${p.x},${p.y}`).join(' ')} />
-							{/if}
-							<!-- Points -->
-							{#each monthlyPoints as point}
-								<circle cx={point.x} cy={point.y} r="4" fill="blue"
-									on:mouseover={(e) => showTooltip(e, point)}
-									on:mouseout={hideTooltip}
-									style="cursor:pointer" />
-							{/each}
-						</svg>
-						<!-- Tooltip overlay is rendered here -->
-						{#if tooltip.show}
-							<div style="position:absolute; left:0; top:0; pointer-events:none; z-index:10; width:{graphWidth}px; height:{graphHeight}px;">
-								<div style="position:absolute; left:{tooltip.x}px; top:{tooltip.y}px; background:rgba(30,41,59,0.95); color:white; padding:8px 12px; border-radius:8px; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.2); white-space:nowrap; transform:translate(-50%,-100%);">
-									<div><strong>{tooltip.month}</strong></div>
-									<div>Avg: {tooltip.avg.toFixed(1)}%</div>
+								<!-- Points -->
+								{#each monthlyPoints as point, i}
+									<circle cx={graphPadding + (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding)} cy={300 - graphPadding - (point.avg / 100) * (300 - 2 * graphPadding)} r="5" fill="blue"
+										on:mouseover={(e) => showTooltip(e, { ...point, x: graphPadding + (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding), y: 300 - graphPadding - (point.avg / 100) * (300 - 2 * graphPadding) })}
+										on:mouseout={hideTooltip}
+										style="cursor:pointer" />
+								{/each}
+							</svg>
+							<!-- Tooltip overlay is rendered here -->
+							{#if tooltip.show}
+								<div style="position:absolute; left:0; top:0; pointer-events:none; z-index:10; width:1000px; height:300px;">
+									<div style="position:absolute; left:{tooltip.x}px; top:{tooltip.y}px; background:rgba(30,41,59,0.95); color:white; padding:8px 12px; border-radius:8px; font-size:16px; box-shadow:0 2px 8px rgba(0,0,0,0.2); white-space:nowrap; transform:translate(-50%,-100%);">
+										<div><strong>{tooltip.month}</strong></div>
+										<div>Avg: {tooltip.avg.toFixed(1)}%</div>
+									</div>
 								</div>
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<p class="text-gray-500 dark:text-gray-400">No data available</p>
-				{/if}
+							{/if}
+						</div>
+					{:else}
+						<p class="text-gray-500 dark:text-gray-400">No data available</p>
+					{/if}
+				</div>
 			</div>
 		</div>
 
