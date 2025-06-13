@@ -33,11 +33,11 @@
 
 {#if isEmbeddable && embedUrl}
   <div
-    class="mb-6 p-4 max-w-xl bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 animate-slide-in">
-    <div class="flex items-center justify-between mb-4">
+    class="p-4 mb-6 max-w-xl bg-white rounded-xl border dark:bg-slate-900 border-slate-300 dark:border-slate-700 animate-slide-in">
+    <div class="flex justify-between items-center mb-4">
       <div class="flex items-center">
-        <span class="text-2xl mr-3 animate-bounce">{getEmbedIcon(embedType)}</span>
-        <h4 class="text-slate-900 dark:text-white font-semibold">
+        <span class="mr-3 text-2xl animate-bounce">{getEmbedIcon(embedType)}</span>
+        <h4 class="font-semibold text-slate-900 dark:text-white">
           {getDomainName(url)}
         </h4>
       </div>
@@ -45,9 +45,9 @@
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center accent-text hover:accent-bg-hover font-medium text-sm transition-all duration-200 hover:scale-105">
+        class="flex items-center text-sm font-medium transition-all duration-200 accent-text hover:accent-bg-hover hover:scale-105">
         <svg
-          class="w-4 h-4 mr-1 transition-transform duration-200 group-hover:translate-x-1"
+          class="mr-1 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24">
@@ -62,7 +62,7 @@
     </div>
 
     <div
-      class="relative w-full bg-slate-100 dark:bg-black rounded-lg overflow-hidden animate-fade-in">
+      class="overflow-hidden relative w-full rounded-lg bg-slate-100 dark:bg-black animate-fade-in">
       {#if embedType === 'video'}
         <div class="relative pb-[42%] h-0">
           <iframe
@@ -102,18 +102,18 @@
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      class="block mb-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-indigo-500 transition-all duration-300 group overflow-hidden animate-slide-in hover:shadow-lg">
-      <div class="relative w-full h-48 bg-slate-200 dark:bg-slate-800 overflow-clip">
+      class="block overflow-hidden mb-4 bg-white rounded-xl border transition-all duration-300 dark:bg-slate-900 border-slate-300 dark:border-slate-700 hover:border-indigo-500 group animate-slide-in hover:shadow-lg">
+      <div class="relative w-full h-48 overflow-clip bg-slate-200 dark:bg-slate-800">
         <img
           src={preview.image}
           alt={preview.title}
-          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" />
         <div
-          class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 group-hover:opacity-90">
+          class="absolute inset-0 bg-gradient-to-t via-transparent to-transparent transition-opacity duration-300 from-black/80 group-hover:opacity-90">
         </div>
-        <div class="absolute bottom-2 left-4 right-4">
+        <div class="absolute bottom-2 right-4 left-4">
           <h4
-            class="text-lg font-semibold text-white mb-0 transition-colors duration-300 line-clamp-2 group-hover:text-indigo-300">
+            class="mb-0 text-lg font-semibold text-white transition-colors duration-300 line-clamp-2 group-hover:text-indigo-300">
             {preview.title}
           </h4>
         </div>
@@ -122,19 +122,19 @@
       <div class="p-4">
         {#if preview.description}
           <p
-            class="text-slate-700 dark:text-slate-300 text-sm mb-3 line-clamp-3 transition-colors duration-300 group-hover:text-slate-900 dark:group-hover:text-white">
+            class="mb-3 text-sm transition-colors duration-300 text-slate-700 dark:text-slate-300 line-clamp-3 group-hover:text-slate-900 dark:group-hover:text-white">
             {preview.description}
           </p>
         {/if}
 
-        <div class="flex items-center justify-between">
+        <div class="flex justify-between items-center">
           <span
-            class="text-slate-500 dark:text-slate-400 text-xs transition-colors duration-300 group-hover:text-slate-700 dark:group-hover:text-slate-300"
+            class="text-xs transition-colors duration-300 text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300"
             >{getDomainName(url)}</span>
           <span
-            class="inline-flex items-center accent-text group-hover:accent-bg-hover font-medium text-sm transition-all duration-300 group-hover:translate-x-1">
+            class="inline-flex items-center text-sm font-medium transition-all duration-300 accent-text group-hover:accent-bg-hover group-hover:translate-x-1">
             <svg
-              class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:translate-x-1"
+              class="mr-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24">
@@ -154,33 +154,33 @@
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      class="block mb-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-indigo-500 transition-all duration-300 group animate-slide-in hover:shadow-lg">
+      class="block p-4 mb-4 bg-white rounded-xl border transition-all duration-300 dark:bg-slate-900 border-slate-300 dark:border-slate-700 hover:border-indigo-500 group animate-slide-in hover:shadow-lg">
       <h4
-        class="text-lg mt-0 font-semibold text-slate-900 dark:text-white mb-2 transition-colors duration-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-300">
+        class="mt-0 mb-2 text-lg font-semibold transition-colors duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300">
         {preview.title}
       </h4>
       {#if preview.description}
         <p
-          class="text-slate-700 dark:text-slate-300 text-sm mb-3 line-clamp-3 transition-colors duration-300 group-hover:text-slate-900 dark:group-hover:text-white">
+          class="mb-3 text-sm transition-colors duration-300 text-slate-700 dark:text-slate-300 line-clamp-3 group-hover:text-slate-900 dark:group-hover:text-white">
           {preview.description}
         </p>
       {/if}
-      <div class="flex items-center justify-between">
+      <div class="flex justify-between items-center">
         <div class="flex items-center">
           {#if preview.image}
             <img
               src={preview.image}
               alt={preview.title}
-              class="size-6 rounded-lg mr-4 my-0 transition-transform duration-300 group-hover:scale-110" />
+              class="my-0 mr-4 rounded-lg transition-transform duration-300 size-6 group-hover:scale-110" />
           {/if}
           <span
-            class="text-slate-500 dark:text-slate-400 text-xs transition-colors duration-300 group-hover:text-slate-700 dark:group-hover:text-slate-300"
+            class="text-xs transition-colors duration-300 text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300"
             >{getDomainName(url)}</span>
         </div>
         <span
-          class="inline-flex items-center accent-text group-hover:accent-bg-hover font-medium text-sm transition-all duration-300 group-hover:translate-x-1">
+          class="inline-flex items-center text-sm font-medium transition-all duration-300 accent-text group-hover:accent-bg-hover group-hover:translate-x-1">
           <svg
-            class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:translate-x-1"
+            class="mr-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24">

@@ -124,7 +124,7 @@
         type="date"
         value={formatDate(selectedDate)}
         onchange={updateDate}
-        class="px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        class="px-4 py-2 bg-white rounded-lg border text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
     </div>
   </div>
 

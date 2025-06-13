@@ -461,8 +461,8 @@
   }
 </script>
 
-<div class="container mx-auto">
-  <h1 class="mb-8 text-3xl font-bold">Analytics Dashboard</h1>
+<div class="container px-6 py-7 mx-auto">
+  <h1 class="mb-8 text-2xl font-bold">Analytics Dashboard</h1>
 
   {#if loading}
     <div class="flex justify-center items-center h-64">
@@ -471,7 +471,7 @@
   {:else if showGrabData}
     <div class="flex flex-col gap-6 justify-center items-center h-96">
       <div
-        class="flex flex-col items-center p-8 w-full max-w-lg rounded-2xl border border-slate-200 shadow-xl bg-white/90 dark:bg-slate-900/90 dark:border-slate-700 animate-fade-in-up">
+        class="flex flex-col items-center p-8 w-full max-w-lg rounded-2xl border shadow-xl border-slate-200 bg-white/90 dark:bg-slate-900/90 dark:border-slate-700 animate-fade-in-up">
         <svg
           class="mb-4 w-12 h-12 text-indigo-500"
           fill="none"
@@ -515,7 +515,7 @@
       </button>
     </div>
     <div
-      class="flex flex-col gap-8 p-8 mb-8 rounded-2xl border border-slate-200 shadow-xl bg-white/80 dark:bg-slate-900/80 dark:border-slate-700 lg:flex-row"
+      class="flex flex-col gap-8 p-8 mb-8 rounded-2xl border shadow-xl border-slate-200 bg-white/80 dark:bg-slate-900/80 dark:border-slate-700 lg:flex-row"
       in:fade={{ duration: 400 }}>
       <div class="flex-1 min-w-[350px] max-w-[600px] flex flex-col">
         <h2 class="flex gap-2 items-center mb-6 text-2xl font-bold text-slate-900 dark:text-white">
@@ -695,11 +695,11 @@
     </div>
 
     <div
-      class="p-8 rounded-2xl border border-slate-200 shadow-xl bg-white/80 dark:bg-slate-900/80 dark:border-slate-700"
+      class="p-8 rounded-2xl border shadow-xl border-slate-200 bg-white/80 dark:bg-slate-900/80 dark:border-slate-700"
       in:fade={{ duration: 400, delay: 100 }}>
       <h2 class="flex gap-2 items-center mb-6 text-2xl font-bold text-slate-900 dark:text-white">
         <span
-          class="inline-block flex justify-center items-center w-6 h-6 text-white bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full shadow">
+          class="flex justify-center items-center w-6 h-6 text-white bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full shadow">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
             ><path
               stroke-linecap="round"
@@ -783,7 +783,7 @@
         </div>
         {#if hasActiveFilters()}
           <button
-            class="px-4 py-2 ml-2 text-sm font-semibold text-slate-800 bg-slate-200 rounded-lg transition-all duration-200 transform dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+            class="px-4 py-2 ml-2 text-sm font-semibold rounded-lg transition-all duration-200 transform text-slate-800 bg-slate-200 dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
             on:click={() => {
               filterSubject = '';
               filterStatus = '';
@@ -814,25 +814,25 @@
             <thead>
               <tr>
                 <th
-                  class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                  class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                   >Subject</th>
                 <th
-                  class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                  class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                   >Title</th>
                 <th
-                  class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                  class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                   >Grade</th>
                 <th
-                  class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                  class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                   >Due Date</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
               {#each getFilteredAssessments(analyticsData) as assessment}
                 <tr>
-                  <td class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap dark:text-slate-100"
+                  <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
                     >{assessment.subject}</td>
-                  <td class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap dark:text-slate-100"
+                  <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
                     >{assessment.title}</td>
                   <td class="px-6 py-4 text-sm whitespace-nowrap">
                     {#if assessment.finalGrade !== undefined}
@@ -849,7 +849,7 @@
                       <span class="text-slate-500">Not graded</span>
                     {/if}
                   </td>
-                  <td class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap dark:text-slate-100"
+                  <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
                     >{new Date(assessment.due).toLocaleDateString()}</td>
                 </tr>
               {/each}
@@ -878,13 +878,13 @@
                     <thead>
                       <tr>
                         <th
-                          class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                           >Title</th>
                         <th
-                          class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                           >Grade</th>
                         <th
-                          class="px-6 py-3 text-xs font-medium tracking-wider text-left text-slate-500 uppercase dark:text-slate-400"
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
                           >Due Date</th>
                       </tr>
                     </thead>
@@ -892,7 +892,7 @@
                       {#each assessments as assessment}
                         <tr>
                           <td
-                            class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap dark:text-slate-100"
+                            class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
                             >{assessment.title}</td>
                           <td class="px-6 py-4 text-sm whitespace-nowrap">
                             {#if assessment.finalGrade !== undefined}
@@ -910,7 +910,7 @@
                             {/if}
                           </td>
                           <td
-                            class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap dark:text-slate-100"
+                            class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
                             >{new Date(assessment.due).toLocaleDateString()}</td>
                         </tr>
                       {/each}
@@ -944,7 +944,7 @@
       {/if}
       <div class="flex gap-3 justify-end">
         <button
-          class="px-4 py-2 text-slate-800 bg-slate-200 rounded-lg transition-all duration-200 transform dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+          class="px-4 py-2 rounded-lg transition-all duration-200 transform text-slate-800 bg-slate-200 dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
           on:click={closeDeleteModal}
           disabled={deleteLoading}>Cancel</button>
         <button

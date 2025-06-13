@@ -40,10 +40,10 @@
 </script>
 
 <aside
-  class="flex flex-col border-r xl:w-64 border-slate-300/50 dark:border-slate-800/50 bg-slate-100/10 dark:bg-slate-900/10 backdrop-blur-sm">
+  class="flex flex-col border-r backdrop-blur-sm xl:w-64 border-slate-300/50 dark:border-slate-800/50 bg-slate-100/10 dark:bg-slate-900/10">
   <div class="p-4 border-b border-slate-300/50 dark:border-slate-800/50">
     <button
-      class="flex gap-2 items-center px-4 py-2.5 w-full text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-200 hover:from-indigo-600 hover:to-blue-600 hover:shadow-xl hover:shadow-indigo-500/30 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+      class="flex gap-2 items-center px-4 py-2.5 w-full text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl shadow-lg transition-all duration-200 sm:text-base shadow-indigo-500/20 hover:from-indigo-600 hover:to-blue-600 hover:shadow-xl hover:shadow-indigo-500/30 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
       onclick={openCompose}>
       <Icon src={Plus} class="w-5 h-5" />
       <span>Compose</span>
@@ -66,7 +66,7 @@
           <span>{folder.name}</span>
           {#if selectedFolder === folder.name}
             <div
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500">
+              class="absolute right-2 top-1/2 w-1.5 h-1.5 bg-indigo-500 rounded-full -translate-y-1/2">
             </div>
           {/if}
         </button>

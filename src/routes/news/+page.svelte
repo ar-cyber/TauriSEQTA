@@ -167,20 +167,20 @@
   });
 </script>
 
-<div class="container px-4 py-8 mx-auto">
+<div class="container px-6 py-7 mx-auto">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">News</h1>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">News</h1>
     <div class="relative">
       <button
         id="source-button"
-        class="px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 transition-colors dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500"
+        class="px-4 py-2 bg-white rounded-lg border transition-colors text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500"
         on:click={() => (showSourceSelector = !showSourceSelector)}>
         {selectedSource.toUpperCase()}
       </button>
       {#if showSourceSelector}
         <div
           id="source-dropdown"
-          class="absolute right-0 z-10 mt-2 w-48 text-slate-900 bg-white rounded-lg border border-slate-300 shadow-xl dark:bg-slate-800 dark:text-white dark:border-slate-700"
+          class="absolute right-0 z-10 mt-2 w-48 bg-white rounded-lg border shadow-xl text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700"
           transition:fade>
           {#each Object.keys(rssFeedsByCountry) as country}
             <button
@@ -190,7 +190,7 @@
             </button>
           {/each}
           <button
-            class="px-4 py-2 w-full text-left border-t border-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-700"
+            class="px-4 py-2 w-full text-left border-t transition-colors border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-700"
             on:click={() => handleSourceChange('australia')}>
             AUSTRALIA
           </button>

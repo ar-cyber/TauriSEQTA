@@ -275,7 +275,7 @@
                   bind:checked={weatherEnabled} />
                 <label
                   for="weather-enabled"
-                  class="text-sm font-medium text-slate-800 cursor-pointer sm:text-base dark:text-slate-200"
+                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
                   >Show Weather Widget</label>
               </div>
               <div class="flex gap-4 items-center">
@@ -286,7 +286,7 @@
                   bind:checked={forceUseLocation} />
                 <label
                   for="force-use-location"
-                  class="text-sm font-medium text-slate-800 cursor-pointer sm:text-base dark:text-slate-200"
+                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
                   >Only use Fallback Location for Weather</label>
                 <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
                   Useful if you use a VPN or want to choose the location, though the system
@@ -304,7 +304,7 @@
                   >Fallback City:</label>
                 <input
                   id="weather-city"
-                  class="px-3 py-2 w-full text-slate-900 bg-white rounded border transition sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Perth"
                   bind:value={weatherCity} />
               </div>
@@ -324,7 +324,7 @@
                   class="text-xs text-blue-400 hover:underline">If unsure, visit countrycode.org</a>
                 <input
                   id="weather-country"
-                  class="px-3 py-2 w-full text-slate-900 bg-white rounded border transition sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="AU"
                   bind:value={weatherCountry} />
               </div>
@@ -363,10 +363,10 @@
                   <input
                     type="text"
                     bind:value={$accentColor}
-                    class="flex-1 px-3 py-2 text-slate-900 bg-white rounded border transition dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="flex-1 px-3 py-2 bg-white rounded border transition text-slate-900 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="#3b82f6" />
                   <button
-                    class="px-3 py-2 text-slate-800 bg-slate-200 rounded transition dark:bg-slate-700/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500"
+                    class="px-3 py-2 rounded transition text-slate-800 bg-slate-200 dark:bg-slate-700/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600/50 focus:ring-2 focus:ring-blue-500"
                     onclick={() => accentColor.set('#3b82f6')}>
                     Reset
                   </button>
@@ -449,7 +449,7 @@
                 bind:checked={remindersEnabled} />
               <label
                 for="reminders-enabled"
-                class="text-sm font-medium text-slate-800 cursor-pointer sm:text-base dark:text-slate-200"
+                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
                 >Enable assessment reminder notifications</label>
             </div>
             <button
@@ -495,24 +495,24 @@
                       <div class="flex gap-2 items-center mb-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <span
-                          class="text-sm font-medium text-slate-800 truncate dark:text-slate-200">
+                          class="text-sm font-medium truncate text-slate-800 dark:text-slate-200">
                           {feed.url ? new URL(feed.url).hostname : 'New Feed'}
                         </span>
                       </div>
                       <input
-                        class="px-3 py-2 w-full text-slate-900 bg-white rounded border transition dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="https://example.com/feed.xml"
                         bind:value={feed.url} />
                     </div>
                     <div class="flex gap-2 items-center">
                       <button
-                        class="p-2 text-slate-600 rounded-lg transition-colors dark:text-slate-400 hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700/50"
+                        class="p-2 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700/50"
                         title="Test Feed"
                         onclick={() => testFeed(feed.url)}>
                         <Icon src={ArrowPath} class="w-5 h-5" />
                       </button>
                       <button
-                        class="p-2 text-slate-600 rounded-lg transition-colors dark:text-slate-400 hover:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-700/50"
+                        class="p-2 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-700/50"
                         title="Remove Feed"
                         onclick={() => removeFeed(idx)}>
                         <Icon src={Trash} class="w-5 h-5" />

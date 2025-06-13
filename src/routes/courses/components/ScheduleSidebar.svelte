@@ -168,11 +168,11 @@
         class="overflow-hidden px-4 py-3 w-full text-left border-l-2 border-transparent transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
         onclick={onSelectOverview}>
         <div
-          class="text-sm font-medium text-slate-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
+          class="text-sm font-medium transition-all duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
           📚 Course Overview
         </div>
         <div
-          class="mt-1 text-xs text-slate-600 transition-all duration-300 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
+          class="mt-1 text-xs transition-all duration-300 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
           Main course content and resources
         </div>
       </button>
@@ -183,11 +183,11 @@
           class="overflow-hidden px-4 py-3 w-full text-left border-l-2 border-transparent transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
           onclick={jumpToToday}>
           <div
-            class="text-sm font-medium text-slate-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
+            class="text-sm font-medium transition-all duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
             🕐 {buttonText.title}
           </div>
           <div
-            class="mt-1 text-xs text-slate-600 transition-all duration-300 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
+            class="mt-1 text-xs transition-all duration-300 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
             {buttonText.subtitle}
           </div>
         </button>
@@ -209,12 +209,12 @@
               : ''}"
             onclick={() => onSelectLesson({ termSchedule, lesson, lessonIndex })}>
             <div
-              class="text-sm font-medium text-slate-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
+              class="text-sm font-medium transition-all duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">
               {lesson.p}
               {formatLessonDate(lesson.d)}
             </div>
             <div
-              class="mt-1 text-xs text-slate-600 transition-all duration-300 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
+              class="mt-1 text-xs transition-all duration-300 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
               {#if currentLessonContent?.t}
                 {currentLessonContent.t}
               {:else}

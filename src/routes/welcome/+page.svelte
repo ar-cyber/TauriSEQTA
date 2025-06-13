@@ -32,14 +32,14 @@
 
 <div class="flex flex-col w-full h-full">
   {#if loading}
-    <div class="flex flex-col items-center justify-center h-full">
+    <div class="flex flex-col justify-center items-center h-full">
       <div
         class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500">
       </div>
       <p class="mt-4 text-slate-400">Loading welcome page...</p>
     </div>
   {:else if error}
-    <div class="flex flex-col items-center justify-center h-full">
+    <div class="flex flex-col justify-center items-center h-full">
       <div
         class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-3xl shadow-[0_0_20px_rgba(239,68,68,0.3)] animate-gradient">
         ⚠️

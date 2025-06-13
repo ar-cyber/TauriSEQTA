@@ -246,7 +246,7 @@
 </script>
 
 <div class="flex flex-col w-full h-full text-slate-900 dark:text-slate-50">
-  <div class="flex justify-between items-center px-4 py-2 bg-slate-100 shadow dark:bg-slate-800">
+  <div class="flex justify-between items-center px-4 py-2 shadow bg-slate-100 dark:bg-slate-800">
     <div class="flex gap-2 items-center">
       <button
         class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -272,13 +272,13 @@
           transition:fly={{ y: -8, duration: 200, opacity: 0 }}>
           <div class="p-2">
             <button
-              class="flex gap-3 items-center px-4 py-3 w-full text-left text-slate-700 rounded-xl transition-all duration-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900/50 group"
+              class="flex gap-3 items-center px-4 py-3 w-full text-left rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900/50 group"
               onclick={() => {
                 showExportMenu = false;
                 exportTimetableCSV();
               }}>
               <div
-                class="flex justify-center items-center w-8 h-8 bg-slate-100 rounded-lg transition-colors group-hover:bg-slate-200 dark:bg-slate-700/50 dark:group-hover:bg-slate-700">
+                class="flex justify-center items-center w-8 h-8 rounded-lg transition-colors bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-700/50 dark:group-hover:bg-slate-700">
                 <Icon src={TableCells} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
               </div>
               <div class="flex-1">
@@ -288,13 +288,13 @@
             </button>
 
             <button
-              class="flex gap-3 items-center px-4 py-3 w-full text-left text-slate-700 rounded-xl transition-all duration-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900/50 group"
+              class="flex gap-3 items-center px-4 py-3 w-full text-left rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900/50 group"
               onclick={() => {
                 showExportMenu = false;
                 exportTimetablePDF();
               }}>
               <div
-                class="flex justify-center items-center w-8 h-8 bg-slate-100 rounded-lg transition-colors group-hover:bg-slate-200 dark:bg-slate-700/50 dark:group-hover:bg-slate-700">
+                class="flex justify-center items-center w-8 h-8 rounded-lg transition-colors bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-700/50 dark:group-hover:bg-slate-700">
                 <Icon src={DocumentText} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
               </div>
               <div class="flex-1">
@@ -403,12 +403,12 @@
                       border-color: {lesson.colour};
                     ">
                       <span class="text-sm font-bold truncate">{lesson.description}</span>
-                      <span class="text-xs text-slate-600 truncate dark:text-slate-400"
+                      <span class="text-xs truncate text-slate-600 dark:text-slate-400"
                         >{lesson.staff}</span>
-                      <span class="text-xs text-slate-600 truncate dark:text-slate-400"
+                      <span class="text-xs truncate text-slate-600 dark:text-slate-400"
                         >{lesson.room}</span>
                       {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                        <span class="text-xs italic text-slate-600 truncate dark:text-slate-400"
+                        <span class="text-xs italic truncate text-slate-600 dark:text-slate-400"
                           >{lesson.attendanceTitle}</span>
                       {/if}
                       <span class="mt-1 font-mono text-xs">{lesson.from} - {lesson.until}</span>
@@ -448,7 +448,7 @@
     ariaLabel="Timetable PDF Viewer">
     <div class="absolute top-6 right-6 z-10 pr-12 pointer-events-none">
       <button
-        class="flex justify-center items-center w-10 h-10 bg-slate-100 rounded-xl transition-all duration-200 pointer-events-auto hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+        class="flex justify-center items-center w-10 h-10 rounded-xl transition-all duration-200 pointer-events-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
         onclick={() => {
           if (pdfUrl) {
             saveAs(pdfUrl, 'timetable.pdf');

@@ -50,9 +50,9 @@
 </script>
 
 <section
-  class="w-full xl:w-[28rem] h-full border-r border-slate-300/50 dark:border-slate-800/50 flex flex-col bg-slate-100/10 dark:bg-slate-900/10 backdrop-blur-sm">
+  class="w-full xl:w-[28rem] h-full border-r border-slate-300/50 dark:border-slate-800/50 flex flex-col bg-slate-100/10 dark:bg-slate-900 backdrop-blur-sm">
   <div
-    class="flex items-center p-4 text-base font-semibold text-slate-900 border-b sm:text-lg border-slate-300/50 dark:border-slate-800/50 dark:text-white">
+    class="flex items-center p-4 text-base font-semibold border-b text-slate-900 sm:text-lg border-slate-300/50 dark:border-slate-800/50 dark:text-white">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="mr-2 w-5 h-5"

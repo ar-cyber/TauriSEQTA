@@ -197,12 +197,12 @@
       <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <!-- Left Column: Homework and Todo List -->
       <div class="space-y-8">
         <!-- Homework Section -->
         <div
-          class="bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 dark:border-slate-800">
+          class="rounded-xl border shadow-lg backdrop-blur-sm bg-white/80 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
           <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">Homework</h2>
           </div>
@@ -212,24 +212,24 @@
                 <p class="text-slate-600 dark:text-slate-400">Loading homework data…</p>
               </div>
             {:else if error}
-              <div class="bg-red-100 text-red-700 rounded-lg px-6 py-4 mb-4 border border-red-200">
+              <div class="px-6 py-4 mb-4 text-red-700 bg-red-100 rounded-lg border border-red-200">
                 <p>Error: {error}</p>
               </div>
             {:else if homeworkData}
               <div class="flex flex-col gap-6">
                 {#each homeworkData.payload as homework}
                   <div
-                    class="bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg border-l-8"
+                    class="rounded-xl border-l-8 shadow-lg backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/50"
                     style="border-color: var(--accent);">
                     <div class="px-6 pt-5 pb-3">
-                      <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white">
+                      <h3 class="mb-2 text-lg font-bold text-slate-900 dark:text-white">
                         {homework.title}
                       </h3>
                       <div class="flex flex-col gap-3">
                         {#each homework.items as item}
                           <div
-                            class="flex gap-2 items-start bg-slate-200/80 dark:bg-slate-700/50 backdrop-blur-sm rounded-lg px-4 py-3 border border-slate-300 dark:border-slate-600">
-                            <span class="text-xl accent-text mt-1">•</span>
+                            class="flex gap-2 items-start px-4 py-3 rounded-lg border backdrop-blur-sm bg-slate-200/80 dark:bg-slate-700/50 border-slate-300 dark:border-slate-600">
+                            <span class="mt-1 text-xl accent-text">•</span>
                             <span class="text-slate-800 dark:text-slate-50">{item}</span>
                           </div>
                         {/each}
@@ -248,7 +248,7 @@
 
         <!-- Todo List Section -->
         <div
-          class="bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 dark:border-slate-800">
+          class="rounded-xl border shadow-lg backdrop-blur-sm bg-white/80 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
           <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">Todo List</h2>
           </div>
@@ -260,22 +260,22 @@
               }}
               class="mb-6">
               <div
-                class="flex flex-col gap-6 p-4 bg-slate-100/60 dark:bg-slate-800/40 rounded-lg border border-slate-300 dark:border-slate-700">
+                class="flex flex-col gap-6 p-4 rounded-lg border bg-slate-100/60 dark:bg-slate-800/40 border-slate-300 dark:border-slate-700">
                 <!-- Main Task -->
-                <div class="flex flex-col sm:flex-row gap-4 items-stretch">
+                <div class="flex flex-col gap-4 items-stretch sm:flex-row">
                   <input
                     type="text"
                     bind:value={newTodoText}
                     placeholder="Add a new task..."
-                    class="flex-1 px-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent shadow-sm" />
+                    class="flex-1 px-4 py-2 bg-white rounded-lg border shadow-sm dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
                   <input
                     type="date"
                     bind:value={newTodoDueDate}
-                    class="px-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent shadow-sm" />
+                    class="px-4 py-2 bg-white rounded-lg border shadow-sm dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
                 </div>
                 <!-- Details -->
-                <div class="flex flex-col sm:flex-row gap-4 items-stretch">
-                  <div class="relative flex items-center flex-1">
+                <div class="flex flex-col gap-4 items-stretch sm:flex-row">
+                  <div class="flex relative flex-1 items-center">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2">
                       <svg
                         width="16"
@@ -291,13 +291,13 @@
                     </span>
                     <select
                       bind:value={newTodoPriority}
-                      class="pl-8 pr-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 w-full">
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700">
                       <option value="low">Low Priority</option>
                       <option value="medium">Medium Priority</option>
                       <option value="high">High Priority</option>
                     </select>
                   </div>
-                  <div class="relative flex items-center flex-1">
+                  <div class="flex relative flex-1 items-center">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2">
                       <svg
                         width="16"
@@ -317,9 +317,9 @@
                       type="text"
                       bind:value={newTodoTags}
                       placeholder="Tags (comma separated, e.g. school,math)"
-                      class="pl-8 pr-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 w-full" />
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700" />
                   </div>
-                  <div class="relative flex items-center flex-1">
+                  <div class="flex relative flex-1 items-center">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2">
                       <svg
                         width="16"
@@ -340,7 +340,7 @@
                     </span>
                     <select
                       bind:value={newTodoRecurring}
-                      class="pl-8 pr-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 w-full">
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700">
                       <option value="none">No Repeat</option>
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -349,8 +349,8 @@
                   </div>
                 </div>
                 <!-- Subtasks -->
-                <div class="bg-slate-200/60 dark:bg-slate-900/40 rounded-lg p-3">
-                  <div class="flex gap-2 mb-2 items-center">
+                <div class="p-3 rounded-lg bg-slate-200/60 dark:bg-slate-900/40">
+                  <div class="flex gap-2 items-center mb-2">
                     <svg
                       width="18"
                       height="18"
@@ -362,22 +362,22 @@
                       type="text"
                       bind:value={newSubtaskText}
                       placeholder="Add subtask (e.g. Read chapter 1)"
-                      class="flex-1 px-4 py-2 rounded-lg bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700" />
+                      class="flex-1 px-4 py-2 bg-white rounded-lg border dark:bg-slate-900/60 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700" />
                     <button
                       type="button"
                       onclick={addSubtask}
-                      class="px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors shadow"
+                      class="px-4 py-2 text-white rounded-lg shadow transition-colors bg-accent hover:bg-accent/90"
                       >Add Subtask</button>
                   </div>
                   <div class="flex flex-wrap gap-2">
                     {#each newSubtasks as st (st.id)}
                       <span
-                        class="bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm">
+                        class="flex gap-2 items-center px-3 py-1 rounded-lg shadow-sm bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-white">
                         {st.text}
                         <button
                           type="button"
                           onclick={() => removeSubtask(st.id)}
-                          class="text-red-400 ml-2 hover:text-red-600">×</button>
+                          class="ml-2 text-red-400 hover:text-red-600">×</button>
                       </span>
                     {/each}
                   </div>
@@ -385,7 +385,7 @@
                 <div class="flex justify-end">
                   <button
                     type="submit"
-                    class="px-8 py-2 rounded-lg bg-accent text-white font-semibold hover:bg-accent/90 transition-colors shadow-lg">
+                    class="px-8 py-2 font-semibold text-white rounded-lg shadow-lg transition-colors bg-accent hover:bg-accent/90">
                     Add Task
                   </button>
                 </div>
@@ -395,15 +395,15 @@
             <div class="space-y-4">
               {#each todos as todo (todo.id)}
                 <div
-                  class="flex flex-col gap-2 p-4 bg-white/80 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow group">
-                  <div class="flex items-center gap-3">
+                  class="flex flex-col gap-2 p-4 rounded-xl border backdrop-blur-sm transition-shadow bg-white/80 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:shadow-lg group">
+                  <div class="flex gap-3 items-center">
                     <input
                       type="checkbox"
                       checked={todo.completed}
                       onchange={() => toggleTodo(todo.id)}
                       class="w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-accent focus:ring-accent accent-bg" />
                     <div class="flex-1">
-                      <div class="flex items-center gap-2">
+                      <div class="flex gap-2 items-center">
                         <p
                           class="text-slate-900 dark:text-white {todo.completed
                             ? 'line-through text-slate-500 dark:text-slate-400'
@@ -425,7 +425,7 @@
                           <span class="flex gap-1 ml-2">
                             {#each todo.tags as tag}
                               <span
-                                class="bg-blue-700/80 text-blue-100 px-2 py-0.5 rounded-full text-xs"
+                                class="px-2 py-0.5 text-xs text-blue-100 rounded-full bg-blue-700/80"
                                 >#{tag}</span>
                             {/each}
                           </span>
@@ -437,14 +437,14 @@
                         {/if}
                       </div>
                       {#if todo.dueDate}
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
                           Due: {new Date(todo.dueDate).toLocaleDateString()}
                         </p>
                       {/if}
                     </div>
                     <button
                       onclick={() => deleteTodo(todo.id)}
-                      class="p-2 text-slate-600 dark:text-slate-400 hover:text-red-500 transition-colors hover:scale-125 focus:outline-none"
+                      class="p-2 transition-colors text-slate-600 dark:text-slate-400 hover:text-red-500 hover:scale-125 focus:outline-none"
                       title="Delete task">
                       <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
                         ><path
@@ -456,9 +456,9 @@
                   </div>
                   {#if todo.subtasks && todo.subtasks.length}
                     <div
-                      class="ml-8 flex flex-col gap-1 mt-2 bg-slate-200/60 dark:bg-slate-900/40 rounded-lg p-2">
+                      class="flex flex-col gap-1 p-2 mt-2 ml-8 rounded-lg bg-slate-200/60 dark:bg-slate-900/40">
                       {#each todo.subtasks as st (st.id)}
-                        <div class="flex items-center gap-2">
+                        <div class="flex gap-2 items-center">
                           <input
                             type="checkbox"
                             checked={st.completed}
@@ -481,40 +481,40 @@
 
       <!-- Right Column: Timer -->
       <div
-        class="bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 dark:border-slate-800">
+        class="rounded-xl border shadow-lg backdrop-blur-sm bg-white/80 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
         <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <h2 class="text-xl font-bold text-slate-900 dark:text-white">Focus Timer</h2>
         </div>
         <div class="p-6">
           <div class="flex flex-col items-center">
-            <div class="text-7xl font-bold text-slate-900 dark:text-white mb-8 font-mono">
+            <div class="mb-8 font-mono text-7xl font-bold text-slate-900 dark:text-white">
               {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
             </div>
-            <div class="flex justify-center gap-4 mt-6">
+            <div class="flex gap-4 justify-center mt-6">
               <button
                 onclick={startTimer}
-                class="px-6 py-3 rounded-lg text-white font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg accent-bg">
+                class="px-6 py-3 font-semibold text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg accent-bg">
                 Start Timer
               </button>
               <button
                 onclick={stopTimer}
                 disabled={!isTimerRunning}
-                class="px-8 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-8 py-3 text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
                 Stop
               </button>
               <button
                 onclick={resetTimer}
-                class="px-8 py-3 rounded-lg bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors">
+                class="px-8 py-3 rounded-lg transition-colors bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600">
                 > Reset
               </button>
             </div>
-            <div class="mt-8 grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-4 mt-8">
               <button
                 onclick={() => {
                   timerMinutes = 25;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 rounded-lg bg-slate-200/80 dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 25m
               </button>
               <button
@@ -522,7 +522,7 @@
                   timerMinutes = 45;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 rounded-lg bg-slate-200/80 dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 45m
               </button>
               <button
@@ -530,30 +530,30 @@
                   timerMinutes = 60;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 rounded-lg bg-slate-200/80 dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 60m
               </button>
             </div>
-            <div class="mt-8 flex flex-col items-center gap-4">
+            <div class="flex flex-col gap-4 items-center mt-8">
               <div class="flex gap-4 items-center">
                 <input
                   type="number"
                   bind:value={customMinutes}
                   placeholder="Minutes"
                   min="0"
-                  class="w-28 px-4 py-3 rounded-lg bg-white dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
-                <span class="text-slate-900 dark:text-white text-2xl">:</span>
+                  class="px-4 py-3 w-28 bg-white rounded-lg border backdrop-blur-sm dark:bg-slate-800/50 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                <span class="text-2xl text-slate-900 dark:text-white">:</span>
                 <input
                   type="number"
                   bind:value={customSeconds}
                   placeholder="Seconds"
                   min="0"
                   max="59"
-                  class="w-28 px-4 py-3 rounded-lg bg-white dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                  class="px-4 py-3 w-28 bg-white rounded-lg border backdrop-blur-sm dark:bg-slate-800/50 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
               </div>
               <button
                 onclick={setCustomTime}
-                class="px-8 py-3 rounded-lg bg-slate-200/80 dark:bg-slate-800/50 backdrop-blur-sm text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+                class="px-8 py-3 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 Set Custom Time
               </button>
             </div>

@@ -186,11 +186,11 @@
                     >{getFileIcon(resource.mimetype)}</span>
                   <div class="flex-1 min-w-0">
                     <div
-                      class="font-semibold text-slate-900 truncate transition-colors duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                      class="font-semibold truncate transition-colors duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                       {resource.t}
                     </div>
                     <div
-                      class="text-xs text-slate-600 transition-colors duration-300 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300">
+                      class="text-xs transition-colors duration-300 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300">
                       {formatFileSize(resource.size)}
                     </div>
                   </div>
@@ -277,7 +277,7 @@
                           <div class="flex items-center mb-2">
                             <span class="mr-3 text-2xl">{getFileIcon(fileDetails.mimetype)}</span>
                             <div class="flex-1 min-w-0">
-                              <div class="font-semibold text-slate-900 truncate dark:text-white">
+                              <div class="font-semibold truncate text-slate-900 dark:text-white">
                                 {fileDetails.filename}
                               </div>
                               <div class="text-xs text-slate-600 dark:text-slate-400">

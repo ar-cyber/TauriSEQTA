@@ -370,7 +370,7 @@
         <div
           class="flex justify-between items-center p-4 border-b border-slate-300/50 dark:border-slate-800/50">
           <button
-            class="flex gap-2 items-center text-slate-700 transition-colors dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+            class="flex gap-2 items-center transition-colors text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
             onclick={() => (selectedMessage = null)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

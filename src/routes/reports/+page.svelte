@@ -54,7 +54,7 @@
   onMount(loadReports);
 </script>
 
-<div class="p-8 min-h-scree">
+<div class="p-8 min-h-screen">
   <h1 class="mb-8 text-3xl font-bold text-slate-900 dark:text-white">Reports</h1>
   {#if loading}
     <div class="flex flex-col justify-center items-center py-24">
@@ -94,7 +94,7 @@
           </div>
           <div class="px-6 pb-6">
             <div
-              class="text-xs font-semibold text-center text-slate-900 opacity-80 dark:text-white animate-fade-in">
+              class="text-xs font-semibold text-center opacity-80 text-slate-900 dark:text-white animate-fade-in">
               {formatDate(report.created_date)}
             </div>
           </div>

@@ -163,7 +163,7 @@
                     </div>
                     <button
                       disabled
-                      class="px-3 py-1 text-sm font-medium text-slate-300 bg-slate-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-slate-500">
+                      class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
                       Download
                     </button>
                   </div>
@@ -232,7 +232,7 @@
                       </div>
                       <button
                         disabled
-                        class="px-3 py-1 text-sm font-medium text-slate-300 bg-slate-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-slate-500">
+                        class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
                         Download
                       </button>
                     </div>
@@ -270,7 +270,7 @@
                     </div>
                     <button
                       disabled
-                      class="px-3 py-1 text-sm font-medium text-slate-300 bg-slate-600 rounded-lg transition-all duration-200 cursor-not-allowed hover:bg-slate-500">
+                      class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
                       Download
                     </button>
                   </div>

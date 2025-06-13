@@ -599,7 +599,7 @@
           href={shortcut.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex relative flex-col justify-center items-center p-6 rounded-2xl border border-slate-200 shadow-sm transition-all duration-200 cursor-pointer group bg-white/80 dark:bg-slate-900/60 dark:border-slate-800 hover:accent-bg hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
+          class="flex relative flex-col justify-center items-center p-6 rounded-2xl border shadow-sm transition-all duration-200 cursor-pointer border-slate-200 group bg-white/80 dark:bg-slate-900/60 dark:border-slate-800 hover:accent-bg hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring"
           tabindex="0"
           aria-label={shortcut.name}>
           <div
@@ -607,7 +607,7 @@
             {shortcut.icon}
           </div>
           <span
-            class="relative mt-1 text-base font-semibold text-center text-slate-900 transition-colors dark:text-white"
+            class="relative mt-1 text-base font-semibold text-center transition-colors text-slate-900 dark:text-white"
             >{shortcut.name}</span>
         </a>
       {/each}
@@ -623,12 +623,12 @@
         <div class="flex gap-3">
           <button
             onclick={prevDay}
-            class="flex justify-center items-center w-9 h-9 text-slate-600 rounded-full border transition-all duration-300 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
+            class="flex justify-center items-center w-9 h-9 rounded-full border transition-all duration-300 text-slate-600 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
             <Icon src={ChevronLeft} class="w-5 h-5" />
           </button>
           <button
             onclick={nextDay}
-            class="flex justify-center items-center w-9 h-9 text-slate-600 rounded-full border transition-all duration-300 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
+            class="flex justify-center items-center w-9 h-9 rounded-full border transition-all duration-300 text-slate-600 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
             <Icon src={ChevronRight} class="w-5 h-5" />
           </button>
         </div>
@@ -666,7 +666,7 @@
               <div class="flex relative flex-col flex-1 gap-2 p-3 backdrop-blur-sm sm:p-4">
                 <div class="flex justify-between items-center">
                   <span
-                    class="text-base font-bold text-slate-900 truncate sm:text-lg dark:text-white"
+                    class="text-base font-bold truncate text-slate-900 sm:text-lg dark:text-white"
                     >{lesson.description}</span>
                   {#if lesson.active}
                     <span
@@ -702,14 +702,14 @@
                 {#if lesson.programmeID !== 0}
                   <div class="flex gap-3">
                     <button
-                      class="flex justify-center items-center w-9 h-9 text-slate-700 rounded-lg border transition-all duration-300 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
+                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 text-slate-700 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
                       aria-label="View Assessment"
                       onclick={() =>
                         (location.href = `/assessments?code=${lesson.code}&date=${lesson.date}`)}>
                       <Icon src={DocumentText} class="w-5 h-5" />
                     </button>
                     <button
-                      class="flex justify-center items-center w-9 h-9 text-slate-700 rounded-lg border transition-all duration-300 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
+                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 text-slate-700 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
                       aria-label="View Course"
                       onclick={() =>
                         (location.href = `/courses?code=${lesson.code}&date=${lesson.date}`)}>
@@ -856,10 +856,10 @@
                   </div>
                   <div class="mt-1">
                     <span
-                      class="block text-xs font-semibold text-slate-600 uppercase dark:text-slate-400"
+                      class="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-400"
                       >{a.subject}</span>
                     <span
-                      class="block text-sm font-semibold text-slate-900 truncate dark:text-white sm:text-base"
+                      class="block text-sm font-semibold truncate text-slate-900 dark:text-white sm:text-base"
                       >{a.title}</span>
                   </div>
                 </div>
@@ -948,7 +948,7 @@
                       <div class="flex flex-col gap-3">
                         {#each homework.items as item}
                           <div
-                            class="flex gap-2 items-start px-4 py-3 rounded-lg border border-slate-300 backdrop-blur-sm bg-slate-200/80 dark:bg-slate-700/50 dark:border-slate-600">
+                            class="flex gap-2 items-start px-4 py-3 rounded-lg border backdrop-blur-sm border-slate-300 bg-slate-200/80 dark:bg-slate-700/50 dark:border-slate-600">
                             <span class="mt-1 text-xl accent-text">•</span>
                             <span class="text-slate-800 dark:text-slate-50">{item}</span>
                           </div>
@@ -988,11 +988,11 @@
                     type="text"
                     bind:value={newTodoText}
                     placeholder="Add a new task..."
-                    class="flex-1 px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 shadow-sm dark:bg-slate-900/60 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                    class="flex-1 px-4 py-2 bg-white rounded-lg border shadow-sm text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
                   <input
                     type="date"
                     bind:value={newTodoDueDate}
-                    class="px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 shadow-sm dark:bg-slate-900/60 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                    class="px-4 py-2 bg-white rounded-lg border shadow-sm text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
                 </div>
                 <!-- Details -->
                 <div class="flex flex-col gap-4 items-stretch sm:flex-row">
@@ -1012,7 +1012,7 @@
                     </span>
                     <select
                       bind:value={newTodoPriority}
-                      class="py-2 pr-4 pl-8 w-full text-slate-900 bg-white rounded-lg border border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700">
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700">
                       <option value="low">Low Priority</option>
                       <option value="medium">Medium Priority</option>
                       <option value="high">High Priority</option>
@@ -1038,7 +1038,7 @@
                       type="text"
                       bind:value={newTodoTags}
                       placeholder="Tags (comma separated, e.g. school,math)"
-                      class="py-2 pr-4 pl-8 w-full text-slate-900 bg-white rounded-lg border border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700" />
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700" />
                   </div>
                   <div class="flex relative flex-1 items-center">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2">
@@ -1061,7 +1061,7 @@
                     </span>
                     <select
                       bind:value={newTodoRecurring}
-                      class="py-2 pr-4 pl-8 w-full text-slate-900 bg-white rounded-lg border border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700">
+                      class="py-2 pr-4 pl-8 w-full bg-white rounded-lg border text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700">
                       <option value="none">No Repeat</option>
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -1083,7 +1083,7 @@
                       type="text"
                       bind:value={newSubtaskText}
                       placeholder="Add subtask (e.g. Read chapter 1)"
-                      class="flex-1 px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700" />
+                      class="flex-1 px-4 py-2 bg-white rounded-lg border text-slate-900 border-slate-300 dark:bg-slate-900/60 dark:text-white dark:border-slate-700" />
                     <button
                       type="button"
                       onclick={addSubtask}
@@ -1093,7 +1093,7 @@
                   <div class="flex flex-wrap gap-2">
                     {#each newSubtasks as st (st.id)}
                       <span
-                        class="flex gap-2 items-center px-3 py-1 text-slate-800 bg-slate-300 rounded-lg shadow-sm dark:bg-slate-700 dark:text-white">
+                        class="flex gap-2 items-center px-3 py-1 rounded-lg shadow-sm text-slate-800 bg-slate-300 dark:bg-slate-700 dark:text-white">
                         {st.text}
                         <button
                           type="button"
@@ -1116,7 +1116,7 @@
             <div class="space-y-4">
               {#each todos as todo (todo.id)}
                 <div
-                  class="flex flex-col gap-2 p-4 rounded-xl border border-slate-200 backdrop-blur-sm transition-shadow bg-white/80 dark:bg-slate-800/60 dark:border-slate-700 hover:shadow-lg group">
+                  class="flex flex-col gap-2 p-4 rounded-xl border backdrop-blur-sm transition-shadow border-slate-200 bg-white/80 dark:bg-slate-800/60 dark:border-slate-700 hover:shadow-lg group">
                   <div class="flex gap-3 items-center">
                     <input
                       type="checkbox"
@@ -1165,7 +1165,7 @@
                     </div>
                     <button
                       onclick={() => deleteTodo(todo.id)}
-                      class="p-2 text-slate-600 transition-colors dark:text-slate-400 hover:text-red-500 hover:scale-125 focus:outline-none"
+                      class="p-2 transition-colors text-slate-600 dark:text-slate-400 hover:text-red-500 hover:scale-125 focus:outline-none"
                       title="Delete task">
                       <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
                         ><path
@@ -1226,7 +1226,7 @@
               </button>
               <button
                 onclick={resetTimer}
-                class="px-8 py-3 text-slate-900 bg-slate-300 rounded-lg transition-colors dark:bg-slate-700 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600">
+                class="px-8 py-3 rounded-lg transition-colors text-slate-900 bg-slate-300 dark:bg-slate-700 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600">
                 > Reset
               </button>
             </div>
@@ -1236,7 +1236,7 @@
                   timerMinutes = 25;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 text-slate-900 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors text-slate-900 bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 25m
               </button>
               <button
@@ -1244,7 +1244,7 @@
                   timerMinutes = 45;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 text-slate-900 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors text-slate-900 bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 45m
               </button>
               <button
@@ -1252,7 +1252,7 @@
                   timerMinutes = 60;
                   timerSeconds = 0;
                 }}
-                class="px-6 py-3 text-slate-900 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
+                class="px-6 py-3 rounded-lg backdrop-blur-sm transition-colors text-slate-900 bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 60m
               </button>
             </div>
@@ -1263,7 +1263,7 @@
                   bind:value={customMinutes}
                   placeholder="Minutes"
                   min="0"
-                  class="px-4 py-3 w-28 text-slate-900 bg-white rounded-lg border border-slate-300 backdrop-blur-sm dark:bg-slate-800/50 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                  class="px-4 py-3 w-28 bg-white rounded-lg border backdrop-blur-sm text-slate-900 border-slate-300 dark:bg-slate-800/50 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
                 <span class="text-2xl text-slate-900 dark:text-white">:</span>
                 <input
                   type="number"
@@ -1271,11 +1271,11 @@
                   placeholder="Seconds"
                   min="0"
                   max="59"
-                  class="px-4 py-3 w-28 text-slate-900 bg-white rounded-lg border border-slate-300 backdrop-blur-sm dark:bg-slate-800/50 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
+                  class="px-4 py-3 w-28 bg-white rounded-lg border backdrop-blur-sm text-slate-900 border-slate-300 dark:bg-slate-800/50 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent" />
               </div>
               <button
                 onclick={setCustomTime}
-                class="px-8 py-3 text-slate-900 rounded-lg backdrop-blur-sm transition-colors bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
+                class="px-8 py-3 rounded-lg backdrop-blur-sm transition-colors text-slate-900 bg-slate-200/80 dark:bg-slate-800/50 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700">
                 Set Custom Time
               </button>
             </div>

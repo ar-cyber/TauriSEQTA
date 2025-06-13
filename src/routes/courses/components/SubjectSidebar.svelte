@@ -25,10 +25,10 @@
       <input
         type="text"
         placeholder="Search subjects..."
-        class="px-4 py-2 w-full bg-white rounded-lg border border-slate-300 transition-all duration-200 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+        class="px-4 py-2 w-full bg-white rounded-lg border transition-all duration-200 border-slate-300 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
         bind:value={search} />
       <svg
-        class="absolute right-3 top-1/2 w-5 h-5 text-slate-400 transform -translate-y-1/2 dark:text-slate-500"
+        class="absolute right-3 top-1/2 w-5 h-5 transform -translate-y-1/2 text-slate-400 dark:text-slate-500"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24">
@@ -49,7 +49,7 @@
           <div class="space-y-2">
             {#each activeSubjects.filter(subjectMatches) as subject}
               <button
-                class="overflow-hidden p-3 w-full text-left bg-white rounded-lg border border-slate-200 transition-all duration-200 dark:bg-slate-800 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 group hover:shadow-lg"
+                class="overflow-hidden p-3 w-full text-left bg-white rounded-lg border transition-all duration-200 border-slate-200 dark:bg-slate-800 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 group hover:shadow-lg"
                 onclick={() => {
                   dispatch('selectSubject', subject);
                   search = '';
@@ -58,11 +58,11 @@
                   class="flex items-center transition-all duration-300 group-hover:translate-x-1">
                   <div>
                     <h4
-                      class="font-medium text-slate-900 transition-colors duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                      class="font-medium transition-colors duration-300 text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                       {subject.title}
                     </h4>
                     <p
-                      class="text-sm text-slate-500 transition-colors duration-300 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300">
+                      class="text-sm transition-colors duration-300 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-300">
                       {subject.description}
                     </p>
                   </div>
@@ -104,12 +104,12 @@
       {#each otherFolders.filter(folderMatches) as folder}
         <div>
           <button
-            class="flex overflow-hidden justify-between items-center px-6 py-3 w-full text-slate-900 border-l-2 border-transparent transition-all duration-200 cursor-pointer dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
+            class="flex overflow-hidden justify-between items-center px-6 py-3 w-full border-l-2 border-transparent transition-all duration-200 cursor-pointer text-slate-900 dark:text-white hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
             onclick={() => dispatch('toggleFolder', folder.code)}>
             <span class="text-base font-bold transition-all duration-300 group-hover:translate-x-1"
               >{folder.code}</span>
             <svg
-              class="ml-2 w-4 h-4 text-slate-600 transition-transform duration-300 dark:text-slate-400"
+              class="ml-2 w-4 h-4 transition-transform duration-300 text-slate-600 dark:text-slate-400"
               fill="none"
               stroke="currentColor"
               stroke-width="2"

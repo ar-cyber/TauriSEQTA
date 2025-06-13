@@ -115,11 +115,11 @@
   onMount(loadPlugins);
 </script>
 
-<div class="max-w-4xl mx-auto p-8">
+<div class="p-8 mx-auto max-w-4xl">
   <!-- Notice Banner -->
   <div
-    class="mb-8 p-4 bg-yellow-900 border border-yellow-700 rounded-lg text-yellow-200 animate-fade-in">
-    <div class="flex items-center gap-2">
+    class="p-4 mb-8 text-yellow-200 bg-yellow-900 rounded-lg border border-yellow-700 animate-fade-in">
+    <div class="flex gap-2 items-center">
       <span class="text-xl">⚠️</span>
       <div>
         <h3 class="font-semibold">Plugin Store Coming Soon</h3>
@@ -140,30 +140,30 @@
       <p class="text-slate-600 dark:text-slate-400">Loading plugins...</p>
     </div>
   {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
       {#each plugins as plugin}
         <div
-          class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up cursor-pointer"
+          class="overflow-hidden bg-white rounded-2xl border shadow-xl transition-all duration-300 cursor-pointer dark:bg-slate-900 border-slate-300 dark:border-slate-800 hover:shadow-2xl hover:border-blue-700 animate-fade-in-up"
           on:click={() => openPluginDetails(plugin)}>
-          <div class="relative h-32 overflow-hidden">
+          <div class="overflow-hidden relative h-32">
             <img
               src={plugin.banner.dark}
               alt={`${plugin.name} banner`}
-              class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+              class="object-cover w-full h-full" />
+            <div class="absolute inset-0 bg-gradient-to-t to-transparent from-slate-900"></div>
           </div>
           <div class="p-6">
-            <div class="flex items-start gap-4">
+            <div class="flex gap-4 items-start">
               <div class="text-4xl">{plugin.icon}</div>
               <div class="flex-1">
                 <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
                   {plugin.name}
                 </h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   {plugin.description}
                 </p>
                 <div
-                  class="flex items-center gap-2 mt-2 text-sm text-slate-500 dark:text-slate-500">
+                  class="flex gap-2 items-center mt-2 text-sm text-slate-500 dark:text-slate-500">
                   <span>v{plugin.version}</span>
                   <span>•</span>
                   <span>by {plugin.author}</span>
@@ -173,7 +173,7 @@
                 <div class="flex flex-wrap gap-2 mt-2">
                   {#each plugin.tags as tag}
                     <span
-                      class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                      class="px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200">
                       {tag}
                     </span>
                   {/each}
@@ -188,27 +188,27 @@
 </div>
 
 {#if selectedPlugin}
-  <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 animate-fade-in">
-    <div class="fixed inset-0 overflow-y-auto">
-      <div class="min-h-screen flex items-center justify-center p-4">
+  <div class="fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in">
+    <div class="overflow-y-auto fixed inset-0">
+      <div class="flex justify-center items-center p-4 min-h-screen">
         <div
           class="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in-up">
           <!-- Plugin Header with Banner -->
-          <div class="relative h-48 overflow-hidden">
+          <div class="overflow-hidden relative h-48">
             <img
               src={selectedPlugin.banner.dark}
               alt={`${selectedPlugin.name} banner`}
-              class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <div class="flex items-start justify-between">
-                <div class="flex items-start gap-4">
+              class="object-cover w-full h-full" />
+            <div class="absolute inset-0 bg-gradient-to-t to-transparent from-slate-900"></div>
+            <div class="absolute right-0 bottom-0 left-0 p-6">
+              <div class="flex justify-between items-start">
+                <div class="flex gap-4 items-start">
                   <div class="text-5xl">{selectedPlugin.icon}</div>
                   <div>
                     <h2 class="text-2xl font-bold text-white">
                       {selectedPlugin.name}
                     </h2>
-                    <div class="flex items-center gap-2 mt-1 text-blue-100">
+                    <div class="flex gap-2 items-center mt-1 text-blue-100">
                       <span>v{selectedPlugin.version}</span>
                       <span>•</span>
                       <span>by {selectedPlugin.author}</span>
@@ -220,7 +220,7 @@
                   </div>
                 </div>
                 <button
-                  class="text-white hover:text-blue-100 transition-colors"
+                  class="text-white transition-colors hover:text-blue-100"
                   on:click={closePluginDetails}>
                   ✕
                 </button>
@@ -234,7 +234,7 @@
               <!-- Tags -->
               <div class="flex flex-wrap gap-2">
                 {#each selectedPlugin.tags as tag}
-                  <span class="px-3 py-1 text-sm rounded-full bg-blue-900 text-blue-200">
+                  <span class="px-3 py-1 text-sm text-blue-200 bg-blue-900 rounded-full">
                     {tag}
                   </span>
                 {/each}
@@ -242,8 +242,8 @@
 
               <!-- Description -->
               <div>
-                <h3 class="text-lg font-semibold mb-2">Description</h3>
-                <div class="prose prose-invert max-w-none">
+                <h3 class="mb-2 text-lg font-semibold">Description</h3>
+                <div class="max-w-none prose prose-invert">
                   {@html marked(selectedPlugin.readme)}
                 </div>
               </div>
@@ -251,7 +251,7 @@
               <!-- Screenshots -->
               {#if selectedPlugin.screenshots.length > 0}
                 <div>
-                  <h3 class="text-lg font-semibold mb-2">Screenshots</h3>
+                  <h3 class="mb-2 text-lg font-semibold">Screenshots</h3>
                   <div class="grid grid-cols-2 gap-4">
                     {#each selectedPlugin.screenshots as screenshot}
                       <img src={screenshot} alt="Plugin screenshot" class="rounded-lg shadow-lg" />
@@ -262,8 +262,8 @@
 
               <!-- Features -->
               <div>
-                <h3 class="text-lg font-semibold mb-2">Features</h3>
-                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                <h3 class="mb-2 text-lg font-semibold">Features</h3>
+                <ul class="space-y-1 list-disc list-inside text-slate-300">
                   {#each selectedPlugin.features as feature}
                     <li>{feature}</li>
                   {/each}
@@ -272,8 +272,8 @@
 
               <!-- Requirements -->
               <div>
-                <h3 class="text-lg font-semibold mb-2">Requirements</h3>
-                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                <h3 class="mb-2 text-lg font-semibold">Requirements</h3>
+                <ul class="space-y-1 list-disc list-inside text-slate-300">
                   {#each selectedPlugin.requirements as requirement}
                     <li>{requirement}</li>
                   {/each}
@@ -282,15 +282,15 @@
 
               <!-- Changelog -->
               <div>
-                <h3 class="text-lg font-semibold mb-2">Changelog</h3>
+                <h3 class="mb-2 text-lg font-semibold">Changelog</h3>
                 <div class="space-y-4">
                   {#each selectedPlugin.changelog as entry}
-                    <div class="bg-slate-800 rounded-lg p-4">
-                      <div class="flex items-center justify-between mb-2">
+                    <div class="p-4 rounded-lg bg-slate-800">
+                      <div class="flex justify-between items-center mb-2">
                         <span class="font-semibold">v{entry.version}</span>
                         <span class="text-sm text-slate-400">{entry.date}</span>
                       </div>
-                      <ul class="list-disc list-inside space-y-1 text-slate-300">
+                      <ul class="space-y-1 list-disc list-inside text-slate-300">
                         {#each entry.changes as change}
                           <li>{change}</li>
                         {/each}
@@ -323,16 +323,16 @@
           </div>
 
           <!-- Plugin Footer -->
-          <div class="p-6 bg-slate-800 border-t border-slate-700">
+          <div class="p-6 border-t bg-slate-800 border-slate-700">
             {#if selectedPlugin.installed}
               <button
-                class="w-full px-6 py-3 rounded bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow"
+                class="px-6 py-3 w-full text-white bg-red-600 rounded shadow transition-transform duration-200 hover:bg-red-700 focus:ring-2 focus:ring-red-400 active:scale-95 hover:scale-105"
                 on:click={() => selectedPlugin && uninstallPlugin(selectedPlugin.id)}>
                 Uninstall Plugin
               </button>
             {:else}
               <button
-                class="w-full px-6 py-3 rounded bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-transform duration-200 active:scale-95 hover:scale-105 shadow"
+                class="px-6 py-3 w-full text-white bg-blue-600 rounded shadow transition-transform duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 active:scale-95 hover:scale-105"
                 on:click={() => selectedPlugin && installPlugin(selectedPlugin.id)}>
                 Install Plugin
               </button>

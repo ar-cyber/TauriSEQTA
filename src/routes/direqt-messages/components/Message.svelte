@@ -146,12 +146,12 @@
     <div class="mx-auto w-full max-w-4xl animate-fadeIn">
       <div
         class="overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm border-slate-300/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40">
-        <div class="p-4 sm:p-6 pb-3 border-b border-slate-300/50 dark:border-slate-800/50">
-          <div class="mb-4 text-xl sm:text-2xl font-bold text-indigo-400">
+        <div class="p-4 pb-3 border-b sm:p-6 border-slate-300/50 dark:border-slate-800/50">
+          <div class="mb-4 text-xl font-bold text-indigo-400 sm:text-2xl">
             {selectedMessage.subject}
           </div>
 
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+          <div class="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-end">
             <div class="space-y-1">
               <div class="text-sm sm:text-base text-slate-700 dark:text-slate-200">
                 <span class="font-medium">{selectedMessage.sender}</span>
@@ -162,7 +162,7 @@
               </div>
             </div>
 
-            <div class="flex gap-2 sm:gap-3 items-center">
+            <div class="flex gap-2 items-center sm:gap-3">
               {#if selectedFolder === 'Trash'}
                 <button
                   class="flex flex-col justify-center items-center p-1.5 rounded-lg transition-all duration-200 hover:bg-green-400/20 focus:bg-green-400/30 focus:ring-2 focus:ring-green-400/30 focus:outline-none"
@@ -176,11 +176,11 @@
                   {:else}
                     <Icon src={ArrowUturnLeft} class="mb-0.5 w-4 h-4 text-green-400" />
                   {/if}
-                  <span class="text-xs sm:text-sm font-medium text-green-400">Restore</span>
+                  <span class="text-xs font-medium text-green-400 sm:text-sm">Restore</span>
                 </button>
               {:else if selectedFolder === 'Starred'}
                 <button
-                  class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  class="flex justify-center items-center w-8 h-8 rounded-full transition-all duration-200 sm:w-9 sm:h-9 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
                   title="Unstar"
                   onclick={() => selectedMessage && starMessage(selectedMessage)}
                   disabled={starring || !selectedMessage.starred}>
@@ -194,7 +194,7 @@
                 </button>
               {:else}
                 <button
-                  class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                  class="flex justify-center items-center w-8 h-8 rounded-full transition-all duration-200 sm:w-9 sm:h-9 hover:bg-yellow-400/20 focus:bg-yellow-400/30 focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
                   title="Star"
                   onclick={() => selectedMessage && starMessage(selectedMessage)}
                   disabled={starring || selectedMessage.starred}>
@@ -209,7 +209,7 @@
               {/if}
 
               <button
-                class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-red-400/20 focus:bg-red-400/30 focus:ring-2 focus:ring-red-400/30 focus:outline-none"
+                class="flex justify-center items-center w-8 h-8 rounded-full transition-all duration-200 sm:w-9 sm:h-9 hover:bg-red-400/20 focus:bg-red-400/30 focus:ring-2 focus:ring-red-400/30 focus:outline-none"
                 title="Delete"
                 onclick={() => selectedMessage && deleteMessage(selectedMessage)}
                 disabled={deleting}>
@@ -223,7 +223,7 @@
               </button>
 
               <button
-                class="flex justify-center items-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:bg-indigo-400/20 focus:bg-indigo-400/30 focus:ring-2 focus:ring-indigo-400/30 focus:outline-none"
+                class="flex justify-center items-center w-8 h-8 rounded-full transition-all duration-200 sm:w-9 sm:h-9 hover:bg-indigo-400/20 focus:bg-indigo-400/30 focus:ring-2 focus:ring-indigo-400/30 focus:outline-none"
                 title="Reply"
                 onclick={openCompose}>
                 <Icon src={PencilSquare} class="w-5 h-5 text-indigo-400" />
@@ -236,7 +236,7 @@
           {#if detailLoading}
             <div class="flex justify-center items-center py-12">
               <div
-                class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500">
+                class="w-8 h-8 rounded-full border-4 animate-spin sm:w-10 sm:h-10 border-indigo-500/30 border-t-indigo-500">
               </div>
             </div>
           {:else if detailError}
