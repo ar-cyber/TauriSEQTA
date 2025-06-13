@@ -486,13 +486,13 @@
         {#each menu as item}
           <a
             href={item.path}
-            class="flex gap-4 items-center text-md px-3 py-3 font-medium rounded-xl transition-all duration-200 hover:accent-bg hover:text-white focus:outline-none {(
+            class="flex gap-4 items-center text-md px-3 py-3 font-medium rounded-xl transition-all duration-200 hover:bg-accent-100 hover:text-slate-900 dark:hover:bg-accent-600 dark:hover:text-white focus:outline-none {(
               item.path === '/'
                 ? $page.url.pathname === '/'
                 : $page.url.pathname.startsWith(item.path)
             )
-              ? 'accent-bg text-white'
-              : 'text-slate-700 dark:text-slate-300'}">
+              ? 'bg-accent text-white'
+              : 'text-slate-900 dark:text-slate-300'}">
             <Icon
               src={item.icon}
               class="w-6 h-6 {(
