@@ -6,6 +6,24 @@ export default {
   theme: {
     extend: {
       colors: {
+        accent: {
+          DEFAULT: 'var(--accent-color-value)',
+          text: 'var(--accent-color-value)',
+          bg: 'var(--accent-color-value)',
+          border: 'var(--accent-color-value)',
+          ring: 'var(--accent-color-value)',
+          50: 'color-mix(in srgb, var(--accent-color-value) 10%, white)',
+          100: 'color-mix(in srgb, var(--accent-color-value) 20%, white)',
+          200: 'color-mix(in srgb, var(--accent-color-value) 30%, white)',
+          300: 'color-mix(in srgb, var(--accent-color-value) 40%, white)',
+          400: 'color-mix(in srgb, var(--accent-color-value) 50%, white)',
+          500: 'var(--accent-color-value)',
+          600: 'color-mix(in srgb, var(--accent-color-value) 80%, black)',
+          700: 'color-mix(in srgb, var(--accent-color-value) 60%, black)',
+          800: 'color-mix(in srgb, var(--accent-color-value) 40%, black)',
+          900: 'color-mix(in srgb, var(--accent-color-value) 20%, black)',
+          950: 'color-mix(in srgb, var(--accent-color-value) 10%, black)',
+        },
         slate: {
           50: '#f8fafc',   // Very light gray (for light mode text or elements if needed)
           100: '#f1f5f9',  // Light gray (primary text on dark bg)

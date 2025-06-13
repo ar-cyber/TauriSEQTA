@@ -861,7 +861,7 @@
               class="overflow-hidden mb-4 rounded-xl border border-slate-200 dark:border-slate-700"
               in:slide={{ duration: 350 }}>
               <button
-                class="w-full flex items-center justify-between px-6 py-3 accent-bg transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg"
+                class="w-full flex items-center justify-between px-6 py-3 bg-accent-600 text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg"
                 on:click={() => toggleSubject(subject)}>
                 <span class="flex gap-2 items-center">
                   {#if expandedSubjects[subject]}
