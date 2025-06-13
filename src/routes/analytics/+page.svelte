@@ -5,6 +5,7 @@
 	import { seqtaFetch } from '../../utils/netUtil';
 	import { Icon, ChevronDown, ChevronRight } from 'svelte-hero-icons';
 	import { fade, slide, scale } from 'svelte/transition';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let analyticsData: AnalyticsData | null = null;
 	let loading = true;
@@ -418,41 +419,41 @@
 	}
 </script>
 
-<div class="container mx-auto px-4 py-8">
-	<h1 class="text-3xl font-bold mb-8">Analytics Dashboard</h1>
+<div class="container mx-auto">
+	<h1 class="mb-8 text-3xl font-bold">Analytics Dashboard</h1>
 
 	{#if loading}
-		<div class="flex items-center justify-center h-64">
-			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+		<div class="flex justify-center items-center h-64">
+			<div class="w-12 h-12 rounded-full border-b-2 border-indigo-600 animate-spin"></div>
 		</div>
 	{:else if showGrabData}
-		<div class="flex flex-col items-center justify-center h-96 gap-6">
-			<div class="bg-white/90 dark:bg-slate-900/90 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700 max-w-lg w-full flex flex-col items-center animate-fade-in-up">
-				<svg class="w-12 h-12 mb-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-				<h2 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">No Analytics Data</h2>
-				<p class="text-gray-600 dark:text-gray-300 mb-4 text-center">
+		<div class="flex flex-col gap-6 justify-center items-center h-96">
+			<div class="flex flex-col items-center p-8 w-full max-w-lg rounded-2xl border border-gray-200 shadow-xl bg-white/90 dark:bg-slate-900/90 dark:border-slate-700 animate-fade-in-up">
+				<svg class="mb-4 w-12 h-12 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+				<h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">No Analytics Data</h2>
+				<p class="mb-4 text-center text-gray-600 dark:text-gray-300">
 					To get started, click <span class="font-semibold text-indigo-600 dark:text-indigo-400">Grab Data</span> below.<br />
 					This will securely fetch and save your assessment data <span class="font-semibold">locally</span> on your device.<br />
 					<strong>Your data never leaves your computer</strong>—everything is processed and stored privately for your own analytics.
 				</p>
-				<button class="mt-2 px-6 py-3 bg-indigo-600 text-white rounded-lg shadow transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-indigo-700 text-lg font-semibold" on:click={grabData}>
+				<button class="px-6 py-3 mt-2 text-lg font-semibold text-white bg-indigo-600 rounded-lg shadow transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-indigo-700" on:click={grabData}>
 					Grab Data
 				</button>
 				{#if error}
-					<div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg w-full text-center">{error}</div>
+					<div class="px-4 py-3 mt-4 w-full text-center text-red-700 bg-red-50 rounded-lg border border-red-200">{error}</div>
 				{/if}
 			</div>
 		</div>
 	{:else if analyticsData}
 		<div class="flex justify-end mb-4">
-			<button class="px-4 py-2 bg-red-600 text-white rounded transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-red-700" on:click={openDeleteModal}>
+			<button class="px-4 py-2 text-white bg-red-600 rounded transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring hover:bg-red-700" on:click={openDeleteModal}>
 				Delete Data
 			</button>
 		</div>
-		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-slate-700 flex flex-col lg:flex-row gap-8" in:fade={{ duration: 400 }}>
+		<div class="flex flex-col gap-8 p-8 mb-8 rounded-2xl border border-gray-200 shadow-xl bg-white/80 dark:bg-slate-900/80 dark:border-slate-700 lg:flex-row" in:fade={{ duration: 400 }}>
 			<div class="flex-1 min-w-[350px] max-w-[600px] flex flex-col">
-				<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-					<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
+				<h2 class="flex gap-2 items-center mb-6 text-2xl font-bold text-gray-900 dark:text-white">
+					<span class="inline-block flex justify-center items-center w-6 h-6 text-white bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full shadow">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/></svg>
 					</span>
 					Grade Distribution
@@ -475,7 +476,7 @@
 							<text
 								x={padding - 10}
 								y={height - padding - (i * (height - padding * 2) / (yLabels.length - 1))}
-								class="fill-gray-500 dark:fill-gray-400 text-xs"
+								class="text-xs fill-gray-500 dark:fill-gray-400"
 								text-anchor="end"
 								dominant-baseline="middle"
 							>
@@ -493,7 +494,7 @@
 								<text
 									x={padding + i * (barWidth + barSpacing) + barWidth / 2}
 									y={height - padding + 20}
-									class="fill-gray-500 dark:fill-gray-400 text-xs"
+									class="text-xs fill-gray-500 dark:fill-gray-400"
 									text-anchor="middle"
 								>
 									{status}% {getLetterGrade((() => { const [min] = status.split('-'); return Number(min); })())}
@@ -501,7 +502,7 @@
 								<text
 									x={padding + i * (barWidth + barSpacing) + barWidth / 2}
 									y={height - padding - count * ((height - padding * 2) / Math.max(...yLabels.map(Number), 1)) - 10}
-									class="fill-gray-900 dark:fill-gray-100 text-sm font-medium"
+									class="text-sm font-medium fill-gray-900 dark:fill-gray-100"
 									text-anchor="middle"
 								>
 									{count}
@@ -512,8 +513,8 @@
 				</div>
 			</div>
 			<div class="flex-1 min-w-[400px] max-w-[800px] flex flex-col">
-				<h3 class="text-lg font-semibold mb-2">Average Grade by Month</h3>
-				<div class="h-full flex items-center justify-center">
+				<h3 class="mb-2 text-lg font-semibold">Average Grade by Month</h3>
+				<div class="flex justify-center items-center h-full">
 					{#if analyticsData && analyticsData.length > 0}
 						<div class="flex justify-center line-graph-container" style="position:relative;">
 							<svg width={1000} height={300} viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
@@ -561,17 +562,17 @@
 			</div>
 		</div>
 
-		<div class="bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-slate-700" in:fade={{ duration: 400, delay: 100 }}>
-			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-				<span class="inline-block w-6 h-6 bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full flex items-center justify-center text-white shadow">
+		<div class="p-8 rounded-2xl border border-gray-200 shadow-xl bg-white/80 dark:bg-slate-900/80 dark:border-slate-700" in:fade={{ duration: 400, delay: 100 }}>
+			<h2 class="flex gap-2 items-center mb-6 text-2xl font-bold text-gray-900 dark:text-white">
+				<span class="inline-block flex justify-center items-center w-6 h-6 text-white bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full shadow">
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
 				</span>
 				Raw Data
 			</h2>
-			<div class="mb-6 flex flex-wrap gap-4 items-end">
+			<div class="flex flex-wrap gap-4 items-end mb-6">
 				<div>
-					<label for="filter-subject" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Subject</label>
-					<select id="filter-subject" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm" bind:value={filterSubject}>
+					<label for="filter-subject" class="block mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Subject</label>
+					<select id="filter-subject" class="px-3 py-2 text-sm bg-white rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800" bind:value={filterSubject}>
 						<option value="">All</option>
 						{#each Array.from(new Set((analyticsData || []).map(a => a.subject))) as subject}
 							<option value={subject}>{subject}</option>
@@ -579,8 +580,8 @@
 					</select>
 				</div>
 				<div>
-					<label for="filter-status" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Status</label>
-					<select id="filter-status" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm" bind:value={filterStatus}>
+					<label for="filter-status" class="block mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Status</label>
+					<select id="filter-status" class="px-3 py-2 text-sm bg-white rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800" bind:value={filterStatus}>
 						<option value="">All</option>
 						<option value="MARKS_RELEASED">Marks Released</option>
 						<option value="OVERDUE">Overdue</option>
@@ -589,24 +590,24 @@
 					</select>
 				</div>
 				<div>
-					<label for="filter-min-grade" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Min Grade</label>
-					<input id="filter-min-grade" type="number" min="0" max="100" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-20" bind:value={filterMinGrade} placeholder="0" />
+					<label for="filter-min-grade" class="block mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Min Grade</label>
+					<input id="filter-min-grade" type="number" min="0" max="100" class="px-3 py-2 w-20 text-sm bg-white rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800" bind:value={filterMinGrade} placeholder="0" />
 				</div>
 				<div>
-					<label for="filter-max-grade" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Max Grade</label>
-					<input id="filter-max-grade" type="number" min="0" max="100" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-20" bind:value={filterMaxGrade} placeholder="100" />
+					<label for="filter-max-grade" class="block mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Max Grade</label>
+					<input id="filter-max-grade" type="number" min="0" max="100" class="px-3 py-2 w-20 text-sm bg-white rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800" bind:value={filterMaxGrade} placeholder="100" />
 				</div>
 				<div class="flex-1 min-w-[160px]">
-					<label for="filter-search" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Search</label>
-					<input id="filter-search" type="text" class="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm w-full" bind:value={filterSearch} placeholder="Title or subject..." />
+					<label for="filter-search" class="block mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Search</label>
+					<input id="filter-search" type="text" class="px-3 py-2 w-full text-sm bg-white rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800" bind:value={filterSearch} placeholder="Title or subject..." />
 				</div>
 				{#if hasActiveFilters()}
-					<button class="ml-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring text-sm font-semibold" on:click={() => { filterSubject = ''; filterStatus = ''; filterMinGrade = null; filterMaxGrade = null; filterSearch = ''; }}>
+					<button class="px-4 py-2 ml-2 text-sm font-semibold text-gray-800 bg-gray-200 rounded-lg transition-all duration-200 transform dark:bg-slate-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={() => { filterSubject = ''; filterStatus = ''; filterMinGrade = null; filterMaxGrade = null; filterSearch = ''; }}>
 						Clear Filters
 					</button>
 				{/if}
 			</div>
-			<div class="mb-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+			<div class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
 				Showing {hasActiveFilters() ? getFilteredAssessments(analyticsData).length : (analyticsData ? analyticsData.length : 0)} entr{(hasActiveFilters() ? getFilteredAssessments(analyticsData).length : (analyticsData ? analyticsData.length : 0)) === 1 ? 'y' : 'ies'}
 			</div>
 			<div class="overflow-x-auto">
@@ -614,18 +615,18 @@
 					<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 						<thead>
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subject</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+								<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Subject</th>
+								<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Title</th>
+								<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Grade</th>
+								<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Due Date</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 							{#each getFilteredAssessments(analyticsData) as assessment}
 								<tr>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.subject}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm">
+									<td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100">{assessment.subject}</td>
+									<td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100">{assessment.title}</td>
+									<td class="px-6 py-4 text-sm whitespace-nowrap">
 										{#if assessment.finalGrade !== undefined}
 											<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
 												? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -638,16 +639,16 @@
 											<span class="text-gray-500">Not graded</span>
 										{/if}
 									</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+									<td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
 								</tr>
 							{/each}
 						</tbody>
 					</table>
 				{:else}
 					{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
-						<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden" in:slide={{ duration: 350 }}>
+						<div class="overflow-hidden mb-4 rounded-xl border border-gray-200 dark:border-slate-700" in:slide={{ duration: 350 }}>
 							<button class="w-full flex items-center justify-between px-6 py-3 accent-bg transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
-								<span class="flex items-center gap-2">
+								<span class="flex gap-2 items-center">
 									{#if expandedSubjects[subject]}
 										<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
 									{:else}
@@ -661,16 +662,16 @@
 									<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 										<thead>
 											<tr>
-												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grade</th>
-												<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+												<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Title</th>
+												<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Grade</th>
+												<th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-400">Due Date</th>
 											</tr>
 										</thead>
 										<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 											{#each assessments as assessment}
 												<tr>
-													<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{assessment.title}</td>
-													<td class="px-6 py-4 whitespace-nowrap text-sm">
+													<td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100">{assessment.title}</td>
+													<td class="px-6 py-4 text-sm whitespace-nowrap">
 														{#if assessment.finalGrade !== undefined}
 															<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >= 80
 																? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -683,7 +684,7 @@
 															<span class="text-gray-500">Not graded</span>
 														{/if}
 													</td>
-													<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
+													<td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap dark:text-gray-100">{new Date(assessment.due).toLocaleDateString()}</td>
 												</tr>
 											{/each}
 										</tbody>
@@ -701,26 +702,31 @@
 		</div>
 	{/if}
 
-	{#if showDeleteModal}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-			<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 w-full max-w-md border border-gray-200 dark:border-slate-700 animate-fade-in-up relative">
-				<h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Delete Analytics Data?</h3>
-				<p class="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete all analytics data?</p>
-				{#if deleteError}
-					<div class="mb-4 text-red-600 dark:text-red-400">{deleteError}</div>
+<Modal 
+	bind:open={showDeleteModal} 
+	onclose={closeDeleteModal}
+	maxWidth="max-w-md" 
+	customClasses="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-2xl"
+	showCloseButton={false}
+	ariaLabel="Delete Analytics Data"
+>
+	<div class="p-8">
+		<h3 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Delete Analytics Data?</h3>
+		<p class="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete all analytics data?</p>
+		{#if deleteError}
+			<div class="mb-4 text-red-600 dark:text-red-400">{deleteError}</div>
+		{/if}
+		<div class="flex gap-3 justify-end">
+			<button class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg transition-all duration-200 transform dark:bg-slate-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={closeDeleteModal} disabled={deleteLoading}>Cancel</button>
+			<button class="px-4 py-2 text-white bg-red-600 rounded-lg transition-all duration-200 transform hover:bg-red-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={confirmDeleteAnalytics} disabled={deleteLoading}>
+				{#if deleteLoading}
+					<span class="inline-block w-5 h-5 align-middle rounded-full border-2 border-white animate-spin border-t-transparent"></span>
 				{/if}
-				<div class="flex justify-end gap-3">
-					<button class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={closeDeleteModal} disabled={deleteLoading}>Cancel</button>
-					<button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 accent-ring" on:click={confirmDeleteAnalytics} disabled={deleteLoading}>
-						{#if deleteLoading}
-							<span class="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full align-middle"></span>
-						{/if}
-						Delete
-					</button>
-				</div>
-			</div>
+				Delete
+			</button>
 		</div>
-	{/if}
+	</div>
+</Modal>
 </div>
 
 <style>

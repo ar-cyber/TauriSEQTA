@@ -219,7 +219,7 @@ onMount(async () => {
 });
 </script>
 
-<div class="flex w-full h-full bg-gray-50 dark:bg-slate-800/50">
+<div class="flex w-full h-full">
   <!-- Subject Selection Sidebar -->
   <SubjectSidebar
     bind:search
@@ -240,11 +240,11 @@ onMount(async () => {
     {#if selectedSubject}
       {#if loadingCourse}
         <div class="flex justify-center items-center w-full">
-          <div class="text-gray-600 dark:text-slate-400 text-lg">Loading course content...</div>
+          <div class="text-lg text-gray-600 dark:text-slate-400">Loading course content...</div>
         </div>
       {:else if courseError}
         <div class="flex justify-center items-center w-full">
-          <div class="text-red-500 dark:text-red-400 text-lg">Error loading course: {courseError}</div>
+          <div class="text-lg text-red-500 dark:text-red-400">Error loading course: {courseError}</div>
         </div>
       {:else if coursePayload}
         <!-- Schedule Navigation -->
@@ -266,12 +266,12 @@ onMount(async () => {
         />
       {:else}
         <div class="flex justify-center items-center w-full">
-          <div class="text-gray-600 dark:text-slate-400 text-lg">No course content available</div>
+          <div class="text-lg text-gray-600 dark:text-slate-400">No course content available</div>
         </div>
       {/if}
     {:else}
       <div class="flex justify-center items-center w-full">
-        <div class="text-gray-600 dark:text-slate-400 text-lg">Select a subject to view course content</div>
+        <div class="text-lg text-gray-600 dark:text-slate-400">Select a subject to view course content</div>
       </div>
     {/if}
   </div>

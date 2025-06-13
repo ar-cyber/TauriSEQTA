@@ -9,6 +9,7 @@
   import MessageList from './components/MessageList.svelte';
   import MessageDetail from './components/Message.svelte';
   import ComposeModal from './components/ComposeModal.svelte';
+  import Modal from '$lib/components/Modal.svelte';
 
   // External Libraries
   import dayjs from 'dayjs';
@@ -34,6 +35,9 @@
   let starring = $state(false);
   let deleting = $state(false);
   let restoring = $state(false);
+  
+  // Derived state for mobile modal
+  let showMobileModal = $derived(!!selectedMessage);
 
   async function fetchMessages(folderLabel: string = 'inbox', rssname: string = "") {
     loading = true;
@@ -375,11 +379,20 @@
   </div>
   
 
-  <!-- Mobile message detail view -->
-  {#if selectedMessage}
-    <div class="fixed inset-0 z-50 backdrop-blur-sm xl:hidden bg-white/95 dark:bg-slate-900/95">
+  <!-- Mobile message detail modal -->
+  <div class="xl:hidden">
+    <Modal 
+      open={showMobileModal}
+      onclose={() => selectedMessage = null}
+      maxWidth="w-full" 
+      maxHeight="h-full"
+      customClasses="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-none"
+      showCloseButton={false}
+      closeOnBackdrop={false}
+      ariaLabel="Message Detail"
+    >
       <div class="flex flex-col h-full">
-                  <div class="flex justify-between items-center p-4 border-b border-gray-300/50 dark:border-slate-800/50">
+        <div class="flex justify-between items-center p-4 border-b border-gray-300/50 dark:border-slate-800/50">
           <button
             class="flex gap-2 items-center text-gray-700 transition-colors dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
             onclick={() => selectedMessage = null}
@@ -409,8 +422,8 @@
           />
         </div>
       </div>
-    </div>
-  {/if}
+    </Modal>
+  </div>
 </div>
 
 <ComposeModal

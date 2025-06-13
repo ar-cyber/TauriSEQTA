@@ -4,6 +4,7 @@
   import Editor from "../../../components/Editor/Editor.svelte";
   import { onMount } from "svelte";
   import { seqtaFetch } from "../../../utils/netUtil";
+  import Modal from "$lib/components/Modal.svelte";
 
   type Student = {
     campus: string;
@@ -224,23 +225,17 @@
     };
   });
 
-  function handleEscapeKey(e: KeyboardEvent) {
-    if (e.key === "Escape") {
-      closeModal();
-    }
-  }
 </script>
 
-{#if showComposeModal}
-  <div
-    class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-60 animate-fade-in"
-    onkeydown={handleEscapeKey}
-    role="dialog"
-    tabindex="0"
-  >
-    <div
-      class="bg-white dark:bg-slate-900 rounded-xl w-[80%] h-[85vh] max-w-6xl shadow-2xl flex flex-col border border-gray-300 dark:border-slate-800 overflow-hidden"
-    >
+<Modal 
+  bind:open={showComposeModal} 
+  onclose={closeModal}
+  maxWidth="w-[80%]" 
+  maxHeight="h-[85vh]" 
+  customClasses="bg-white dark:bg-slate-900 rounded-xl max-w-6xl shadow-2xl flex flex-col border border-gray-300 dark:border-slate-800 overflow-hidden"
+  showCloseButton={false}
+  ariaLabel="Compose message"
+>
       <!-- Header -->
       <div
         class="flex justify-between items-center p-4 bg-white rounded-t-xl border-b border-gray-300 dark:border-slate-800 dark:bg-slate-900"
@@ -271,13 +266,13 @@
           {/if}
 
           <!-- Subject -->
-          <div class="p-4 border-b border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <div class="p-4 bg-white border-b border-gray-300 dark:border-slate-800 dark:bg-slate-900">
             <input
               id="subject"
               type="text"
               placeholder="Subject..."
               bind:value={composeSubject}
-                              class="px-4 py-3 w-full rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              class="px-4 py-3 w-full placeholder-gray-500 text-gray-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -298,12 +293,12 @@
               placeholder="Search students..."
               bind:value={studentSearchQuery}
               onfocus={() => (showStudentDropdown = true)}
-              class="px-4 py-2 w-full rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="px-4 py-2 w-full placeholder-gray-500 text-gray-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {#if showStudentDropdown}
               <div
                 id="student-dropdown"
-                class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 rounded-lg border shadow-lg bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700"
+                class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-gray-300 shadow-lg dark:bg-slate-800 dark:border-slate-700"
               >
                 {#if loadingStudents}
                   <div class="p-3 text-center text-gray-600 dark:text-slate-400">
@@ -342,12 +337,12 @@
                 placeholder="Search staff..."
                 bind:value={staffSearchQuery}
                 onfocus={() => (showStaffDropdown = true)}
-                class="px-4 py-2 w-full rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="px-4 py-2 w-full placeholder-gray-500 text-gray-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             {#if showStaffDropdown}
               <div
                 id="staff-dropdown"
-                class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 rounded-lg border shadow-lg bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700"
+                class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-gray-300 shadow-lg dark:bg-slate-800 dark:border-slate-700"
               >
                 {#if loadingStaff}
                   <div class="p-3 text-center text-gray-600 dark:text-slate-400">
@@ -380,7 +375,7 @@
               <input
                 type="checkbox"
                 bind:checked={useBCC}
-                class="text-blue-500 rounded focus:ring-blue-500 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700"
+                class="text-blue-500 bg-white rounded border-gray-300 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-700"
               />
               <span>Keep recipient list private (BCC)</span>
             </label>
@@ -389,11 +384,11 @@
           <!-- Selected recipients -->
           <div>
             <div
-              class="flex flex-wrap gap-2 p-3 rounded-lg min-h-12 bg-gray-100 dark:bg-slate-800"
+              class="flex flex-wrap gap-2 p-3 bg-gray-100 rounded-lg min-h-12 dark:bg-slate-800"
             >
               {#each selectedRecipients as recipient, i}
                 <div
-                  class="flex gap-1 items-center px-2 py-1 text-sm rounded-md bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white"
+                  class="flex gap-1 items-center px-2 py-1 text-sm text-gray-900 bg-gray-200 rounded-md dark:bg-slate-700 dark:text-white"
                 >
                   <span>{recipient.name}</span>
                                       <span class="text-xs text-gray-600 dark:text-slate-400"
@@ -419,11 +414,11 @@
 
       <!-- Footer with actions -->
       <div
-        class="flex justify-between items-center p-4 border-t border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900"
+        class="flex justify-between items-center p-4 bg-white border-t border-gray-300 dark:border-slate-800 dark:bg-slate-900"
       >
         <div>
           <button
-            class="flex gap-2 items-center px-4 py-2 text-sm rounded-lg text-gray-900 dark:text-white bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700"
+            class="flex gap-2 items-center px-4 py-2 text-sm text-gray-900 bg-gray-200 rounded-lg dark:text-white dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700"
           >
             <span>Add files</span>
             <svg
@@ -442,7 +437,7 @@
         </div>
         <div class="flex gap-3">
           <button
-            class="px-4 py-2 rounded-lg transition-colors text-gray-900 dark:text-white bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-slate-600"
+            class="px-4 py-2 text-gray-900 bg-gray-200 rounded-lg transition-colors dark:text-white dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-slate-600"
             onclick={closeModal}
           >
             Cancel
@@ -459,9 +454,7 @@
           </button>
         </div>
       </div>
-    </div>
-  </div>
-{/if}
+</Modal>
 
 <style>
   @keyframes fade-in {

@@ -102,3 +102,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   --accent-color-light: color-mix(in srgb, var(--accent-color-value) 20%, white);
   --accent-color-dark: color-mix(in srgb, var(--accent-color-value) 90%, black);
 }
+
+/* prevent overscrolling on safari based browsers */
+html {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow: auto;
+}

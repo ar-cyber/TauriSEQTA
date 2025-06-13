@@ -144,15 +144,15 @@ function getJumpButtonText(target: any) {
 
 <aside class="flex flex-col w-64 h-[calc(100vh-4rem)] border-r bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border-gray-300/50 dark:border-slate-700/50">
   <div class="px-4 py-3 border-b border-gray-300/50 dark:border-slate-700/50 shrink-0">
-    <h3 class="text-lg font-bold text-gray-900 dark:text-white animate-fade-in">Course Content</h3>
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Course Content</h3>
   </div>
   <div class="overflow-y-auto flex-1 min-h-0">
-    <div class="sticky top-0 z-10 bg-white/90 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-300/50 dark:border-slate-700/50">
+    <div class="z-10 border-b bg-white/90 dark:bg-slate-800/80 border-gray-300/50 dark:border-slate-700/50">
     <button 
-        class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
+        class="overflow-hidden px-4 py-3 w-full text-left border-l-2 border-transparent transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
       onclick={onSelectOverview}>
-        <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">📚 Course Overview</div>
-        <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
+        <div class="text-sm font-medium text-gray-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">📚 Course Overview</div>
+        <div class="mt-1 text-xs text-gray-600 transition-all duration-300 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
         Main course content and resources
       </div>
     </button>
@@ -160,11 +160,10 @@ function getJumpButtonText(target: any) {
     {#if jumpTarget}
       {@const buttonText = getJumpButtonText(jumpTarget)}
       <button 
-          class="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group"
-        style="animation-delay: 0.1s;"
+          class="overflow-hidden px-4 py-3 w-full text-left border-l-2 border-transparent transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:accent-border group"
         onclick={jumpToToday}>
-          <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">🕐 {buttonText.title}</div>
-          <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
+          <div class="text-sm font-medium text-gray-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">🕐 {buttonText.title}</div>
+          <div class="mt-1 text-xs text-gray-600 transition-all duration-300 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
           {buttonText.subtitle}
         </div>
       </button>
@@ -172,18 +171,17 @@ function getJumpButtonText(target: any) {
     </div>
 
     {#each filteredSchedule as termSchedule, i}
-      <div class="mb-4 animate-slide-in" style="animation-delay: {0.2 + i * 0.1}s;">
-        <div class="px-4 py-2 accent-bg backdrop-blur-sm text-sm font-semibold text-white border border-gray-300/50 dark:border-slate-700/50 group-hover:brightness-110 transition-all duration-300">
+      <div class="mb-4">
+        <div class="px-4 py-2 text-sm font-semibold text-white border backdrop-blur-sm transition-all duration-300 accent-bg border-gray-300/50 dark:border-slate-700/50 group-hover:brightness-110">
           Term {termSchedule.t} - Week {termSchedule.w}
         </div>
         {#each termSchedule.l as lesson, lessonIndex}
           {@const currentLessonContent = coursePayload?.w?.[termSchedule.n]?.[lessonIndex]}
           <button
-            class="w-full px-4 py-2 text-left text-sm hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 hover:translate-x-1 active:scale-95 animate-slide-in group {selectedLesson === lesson && !showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
-            style="animation-delay: {0.3 + lessonIndex * 0.05}s;"
+            class="w-full px-4 py-2 text-left text-sm hover:bg-white/50 dark:hover:bg-slate-800/50 border-l-2 border-transparent hover:accent-border transition-all duration-200 overflow-hidden group {selectedLesson === lesson && !showingOverview ? 'bg-white/50 dark:bg-slate-800/50 accent-border' : ''}"
             onclick={() => onSelectLesson({ termSchedule, lesson, lessonIndex })}>
-            <div class="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">{lesson.p} {formatLessonDate(lesson.d)}</div>
-            <div class="text-xs text-gray-600 dark:text-slate-400 mt-1 group-hover:text-gray-900 dark:group-hover:text-slate-300 transition-colors duration-300">
+            <div class="text-sm font-medium text-gray-900 transition-all duration-300 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1">{lesson.p} {formatLessonDate(lesson.d)}</div>
+            <div class="mt-1 text-xs text-gray-600 transition-all duration-300 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-slate-300 group-hover:translate-x-1">
               {#if currentLessonContent?.t}
                 {currentLessonContent.t}
               {:else}
@@ -196,55 +194,10 @@ function getJumpButtonText(target: any) {
     {/each}
     
     {#if filteredSchedule.length === 0}
-      <div class="px-4 py-8 text-center text-gray-600 dark:text-slate-400 text-sm animate-fade-in">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-accent/30 border-t-accent animate-spin"></div>
+      <div class="px-4 py-8 text-sm text-center text-gray-600 dark:text-slate-400">
+        <div class="mx-auto mb-4 w-16 h-16 rounded-full border-4 animate-spin border-accent/30 border-t-accent"></div>
         No released lessons available
       </div>
     {/if}
   </div>
 </aside> 
-
-<style>
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-fade-in {
-    opacity: 0;
-    animation: fadeIn 0.3s ease-out forwards;
-  }
-
-  .animate-slide-in {
-    opacity: 0;
-    animation: slideIn 0.3s ease-out forwards;
-  }
-
-  .animate-bounce {
-    animation: bounce 0.8s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-5px);
-    }
-  }
-</style> 
