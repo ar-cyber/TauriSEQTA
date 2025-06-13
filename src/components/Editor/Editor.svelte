@@ -1,17 +1,17 @@
 <script lang="ts">
   import Placeholder from '@tiptap/extension-placeholder';
   import Commands from './Plugins/Commands/command';
-  import { Dropcursor } from "@tiptap/extension-dropcursor";
+  import { Dropcursor } from '@tiptap/extension-dropcursor';
   import BubbleMenu from '@tiptap/extension-bubble-menu';
   import Typography from '@tiptap/extension-typography';
   import TaskList from '@tiptap/extension-task-list';
   import TaskItem from '@tiptap/extension-task-item';
   import StarterKit from '@tiptap/starter-kit';
   import Link from '@tiptap/extension-link';
-  
+
   import { browser } from '$app/environment';
   import { Editor } from '@tiptap/core';
-  
+
   import CommandList from './Plugins/Commands/CommandList.svelte';
   import suggestion from './Plugins/Commands/suggestion';
   import { slashVisible } from './Plugins/Commands/stores';
@@ -22,11 +22,11 @@
   import { onMount, onDestroy } from 'svelte';
   import './EditorStyles.css';
   import './EditorOverrideStyles.css';
-  import './userHTML.css'
+  import './userHTML.css';
 
   // Make htmlContent bindable from parent components
   let { content = $bindable('') } = $props<{ content: string }>();
-  
+
   let commandListInstance = $state<any>(null);
 
   let element = $state<HTMLElement | null>(null);
@@ -39,7 +39,7 @@
         element: element!,
         editorProps: {
           attributes: {
-            class: 'focus:outline-none px-3 md:px-0'
+            class: 'focus:outline-none px-3 md:px-0',
           },
           handleKeyDown: (view, event) => {
             // Handle keyboard events when slash menu is visible
@@ -52,18 +52,18 @@
               }
             }
             return false; // Let TipTap handle other events
-          }
+          },
         },
         extensions: [
           StarterKit,
           Placeholder.configure({
             placeholder: ({ node }: { node: any }) => {
               if (node.type.name === 'heading') {
-                return 'Heading'
+                return 'Heading';
               } else if (node.type.name === 'paragraph') {
-                return "Type '/' for commands"
+                return "Type '/' for commands";
               }
-                
+
               return 'Type something...';
             },
           }),
@@ -72,12 +72,12 @@
           Link,
           Typography,
           Commands.configure({
-            suggestion
+            suggestion,
           }),
           BubbleMenu.configure({
             element: document.querySelector('.menu') as HTMLElement,
           }),
-          Dropcursor.configure({ width: 5, color: "#ddeeff" }),
+          Dropcursor.configure({ width: 5, color: '#ddeeff' }),
         ],
         onTransaction: () => {
           // force re-render so `editor.isActive` works as expected
@@ -87,7 +87,7 @@
           // Update the htmlContent with the editor's HTML plus CSS
           const editorHTML = editor.getHTML();
           content = `<div class="editor-prose">${editorHTML}<${''}style>${EditorStyles}</${''}style></div>`;
-        }
+        },
       });
     }
   });
@@ -97,7 +97,7 @@
       editor.destroy();
     }
   });
-  
+
   function handleKeydownCapture(event: KeyboardEvent) {
     if (commandListInstance && editor && get(slashVisible)) {
       if (event.key === 'Escape') {
@@ -111,13 +111,13 @@
 </script>
 
 <div class="h-full editor-prose" bind:clientWidth={w}>
-  <div 
-    class="w-full min-h-full" 
-    bind:this={element} 
+  <div
+    class="w-full min-h-full"
+    bind:this={element}
     onkeydown={handleKeydownCapture}
     role="textbox"
-    tabindex="-1"
-  ></div>
+    tabindex="-1">
+  </div>
 </div>
 
 <CommandList bind:this={commandListInstance} />

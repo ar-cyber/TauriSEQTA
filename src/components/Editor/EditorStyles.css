@@ -15,7 +15,7 @@
   width: 1.5px;
   background-color: #e5e7eb7e;
   transform-origin: top;
-  animation: expandDown 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation: expandDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark .editor-prose li > *:not(:first-child)::before {
@@ -44,19 +44,29 @@
   }
 }
 
-
 /* Placeholders for editor-only */
-.editor-prose p::before, .editor-prose h1::before, .editor-prose h2::before, .editor-prose h3::before, .editor-prose h4::before, .editor-prose h5::before, .editor-prose h6::before {
+.editor-prose p::before,
+.editor-prose h1::before,
+.editor-prose h2::before,
+.editor-prose h3::before,
+.editor-prose h4::before,
+.editor-prose h5::before,
+.editor-prose h6::before {
   content: attr(data-placeholder);
   color: #9ca3af;
   float: left;
   height: 0;
 }
 
-.dark .editor-prose p::before, .dark .editor-prose h1::before, .dark .editor-prose h2::before, .dark .editor-prose h3::before, .dark .editor-prose h4::before, .dark .editor-prose h5::before, .dark .editor-prose h6::before {
+.dark .editor-prose p::before,
+.dark .editor-prose h1::before,
+.dark .editor-prose h2::before,
+.dark .editor-prose h3::before,
+.dark .editor-prose h4::before,
+.dark .editor-prose h5::before,
+.dark .editor-prose h6::before {
   color: #6b7280;
 }
-
 
 .bnEditor {
   outline: none;
@@ -106,9 +116,21 @@ Tippy popups that are appended to document.body directly
 .defaultStyles {
   font-size: 16px;
   font-weight: normal;
-  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
-    "Open Sans", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -130,19 +152,25 @@ Tippy popups that are appended to document.body directly
 }
 
 /* Animate headers only */
-.editor-prose h1, .editor-prose h2, .editor-prose h3, .editor-prose h4, .editor-prose h5, .editor-prose h6 {
-  animation: fadeInScale 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+.editor-prose h1,
+.editor-prose h2,
+.editor-prose h3,
+.editor-prose h4,
+.editor-prose h5,
+.editor-prose h6 {
+  animation: fadeInScale 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left center;
 }
 
 /* Smooth transitions for all interactive elements */
 .editor-prose {
-  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Bold and italic transitions */
-.editor-prose strong, .editor-prose em {
-  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+.editor-prose strong,
+.editor-prose em {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Selected node styling (Notion-like) */
@@ -150,7 +178,7 @@ Tippy popups that are appended to document.body directly
   box-shadow: 0 0 0 4px #3b82f6;
   border-radius: 4px;
   background-color: rgba(59, 130, 246, 0.05);
-  transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 

@@ -28,17 +28,17 @@ export interface FileItem {
 }
 
 export interface Lesson {
-  p: string;    // Period
-  s: string;    // Start time
-  d: string;    // Date
-  e: string;    // End time
+  p: string; // Period
+  s: string; // Start time
+  d: string; // Date
+  e: string; // End time
 }
 
 export interface TermSchedule {
-  t: number;    // Term number
-  w: number;    // Week number
-  l: Lesson[];  // Lessons
-  n: number;    // Index
+  t: number; // Term number
+  w: number; // Week number
+  l: Lesson[]; // Lessons
+  n: number; // Index
 }
 
 export interface DraftJSBlock {
@@ -153,13 +153,13 @@ export interface WeeklyLessonContent {
 }
 
 export interface CoursePayload {
-  c: string;                    // Course code
-  cf: FileItem[];              // Course files
-  t: string;                   // Title
-  im: string;                  // Image UUID
-  d: TermSchedule[];           // Schedule
-  u: string;                   // Unique ID
-  document: string;            // JSON string for main content
+  c: string; // Course code
+  cf: FileItem[]; // Course files
+  t: string; // Title
+  im: string; // Image UUID
+  d: TermSchedule[]; // Schedule
+  u: string; // Unique ID
+  document: string; // JSON string for main content
   w: WeeklyLessonContent[][]; // Weekly lesson content
 }
 
@@ -170,4 +170,4 @@ export interface LinkPreview {
   url: string;
   imageWidth?: number;
   imageHeight?: number;
-} 
+}

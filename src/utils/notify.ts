@@ -16,9 +16,7 @@ export interface UniversalNotificationOptions extends NotificationOptions {
  * Sends a native notification using Tauri, with customizable options and sensible defaults.
  * Automatically requests permission if needed.
  */
-export async function notify(
-  options: Partial<UniversalNotificationOptions> = {}
-) {
+export async function notify(options: Partial<UniversalNotificationOptions> = {}) {
   // Sensible defaults
   const defaultOptions: NotificationOptions = {
     title: 'Notification',
@@ -50,4 +48,4 @@ export async function notify(
     // Optionally handle denied permission
     console.warn('Notification permission not granted.');
   }
-} 
+}

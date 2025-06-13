@@ -8,28 +8,28 @@ export default {
         subtitle: 'Create a to do list with checkboxes',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).toggleTaskList().run();
-        }
+        },
       },
       {
         title: 'Heading 1',
         subtitle: 'BIG heading',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
-        }
+        },
       },
       {
         title: 'Heading 2',
         subtitle: 'Less Big heading',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
-        }
+        },
       },
       {
         title: 'Heading 3',
         subtitle: 'Medium big heading',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
-        }
+        },
       },
       {
         title: 'Bullet List',
@@ -37,7 +37,7 @@ export default {
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleBulletList();
-        }
+        },
       },
       {
         title: 'Numbered List',
@@ -45,35 +45,35 @@ export default {
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleOrderedList();
-        }
+        },
       },
       {
         title: 'Text',
         subtitle: 'Just plain text paragraph',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setNode('paragraph').run();
-        }
+        },
       },
       {
         title: 'Quote',
         subtitle: 'Capture important quotes',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).toggleBlockquote().run();
-        }
+        },
       },
       {
         title: 'Code Block',
         subtitle: 'Formatted code snippet',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
-        }
+        },
       },
       {
         title: 'Divider',
         subtitle: 'Add a horizontal line',
         command: ({ editor, range }: any) => {
           editor.chain().focus().deleteRange(range).setHorizontalRule().run();
-        }
+        },
       },
       {
         title: 'Bold Text',
@@ -81,7 +81,7 @@ export default {
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleBold();
-        }
+        },
       },
       {
         title: 'Italic Text',
@@ -89,7 +89,7 @@ export default {
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleItalic();
-        }
+        },
       },
       {
         title: 'Link',
@@ -97,9 +97,15 @@ export default {
         command: ({ editor, range }: any) => {
           const url = prompt('Enter the URL:');
           if (url) {
-            editor.chain().focus().deleteRange(range).setLink({ href: url }).insertContent('Link text').run();
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .setLink({ href: url })
+              .insertContent('Link text')
+              .run();
           }
-        }
+        },
       },
       {
         title: 'Inline Code',
@@ -107,8 +113,8 @@ export default {
         command: ({ editor, range }: any) => {
           editor.commands.deleteRange(range);
           editor.commands.toggleCode();
-        }
-      }
+        },
+      },
     ]
       .filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase()))
       .slice(0, 10);
@@ -122,7 +128,11 @@ export default {
         let location = props.clientRect();
         slashProps.set({ editor, range });
         slashVisible.set(true);
-        slashLocation.set({ x: location.x, y: location.y, height: location.height });
+        slashLocation.set({
+          x: location.x,
+          y: location.y,
+          height: location.height,
+        });
         slashItems.set(props.items);
         selectedIndex.set(0);
       },
@@ -141,7 +151,7 @@ export default {
       onExit() {
         slashVisible.set(false);
         selectedIndex.set(0);
-      }
+      },
     };
-  }
+  },
 };

@@ -31,8 +31,15 @@ type Location = {
 // For now we'll keep using stores until we can fully convert to runes in all components
 export const slashItems: Writable<SlashItems> = writable([]);
 export const slashVisible: Writable<boolean> = writable(false);
-export const slashLocation: Writable<Location> = writable({ x: 0, y: 0, height: 0 });
-export const slashProps: Writable<EditorProps> = writable({ editor: null, range: null });
+export const slashLocation: Writable<Location> = writable({
+  x: 0,
+  y: 0,
+  height: 0,
+});
+export const slashProps: Writable<EditorProps> = writable({
+  editor: null,
+  range: null,
+});
 export const desktopMenu: Writable<boolean> = writable(true);
 export const components: Writable<Components> = writable([]);
 export const editorWidth: Writable<number> = writable(0);

@@ -10,10 +10,10 @@ class Cache {
 
   // Common TTL presets in minutes
   static readonly TTL = {
-    SHORT: 5,      // 5 minutes
-    MEDIUM: 15,    // 15 minutes
-    LONG: 60,      // 1 hour
-    VERY_LONG: 1440 // 24 hours
+    SHORT: 5, // 5 minutes
+    MEDIUM: 15, // 15 minutes
+    LONG: 60, // 1 hour
+    VERY_LONG: 1440, // 24 hours
   };
 
   private constructor() {
@@ -36,7 +36,7 @@ class Cache {
   public set<T>(key: string, data: T, ttlMinutes: number = this.defaultTTL): void {
     this.cache.set(key, {
       data,
-      timestamp: Date.now() + (ttlMinutes * 60 * 1000) // Convert minutes to milliseconds
+      timestamp: Date.now() + ttlMinutes * 60 * 1000, // Convert minutes to milliseconds
     });
   }
 
@@ -80,12 +80,12 @@ class Cache {
   public has(key: string): boolean {
     const item = this.cache.get(key);
     if (!item) return false;
-    
+
     if (Date.now() > item.timestamp) {
       this.cache.delete(key);
       return false;
     }
-    
+
     return true;
   }
 
@@ -98,4 +98,4 @@ class Cache {
   }
 }
 
-export const cache = Cache.getInstance(); 
+export const cache = Cache.getInstance();

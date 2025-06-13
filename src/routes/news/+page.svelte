@@ -19,52 +19,49 @@
 
   const rssFeedsByCountry: Record<string, string[]> = {
     usa: [
-      "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-      "https://www.huffpost.com/section/front-page/feed",
-      "https://www.npr.org/rss/rss.php",
+      'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+      'https://www.huffpost.com/section/front-page/feed',
+      'https://www.npr.org/rss/rss.php',
     ],
     taiwan: [
-      "https://news.ltn.com.tw/rss/all.xml",
-      "https://www.taipeitimes.com/xml/index.rss",
-      "https://international.thenewslens.com/rss",
+      'https://news.ltn.com.tw/rss/all.xml',
+      'https://www.taipeitimes.com/xml/index.rss',
+      'https://international.thenewslens.com/rss',
     ],
     hong_kong: [
-      "https://rthk9.rthk.hk/rthk/news/rss/e_expressnews_elocal.xml",
-      "https://www.scmp.com/rss/91/feed",
+      'https://rthk9.rthk.hk/rthk/news/rss/e_expressnews_elocal.xml',
+      'https://www.scmp.com/rss/91/feed',
     ],
     panama: [
-      "https://critica.com.pa/rss.xml",
-      "https://www.panamaamerica.com.pa/rss.xml",
-      "https://noticiassin.com/feed/",
-      "https://elcapitalfinanciero.com/feed/",
+      'https://critica.com.pa/rss.xml',
+      'https://www.panamaamerica.com.pa/rss.xml',
+      'https://noticiassin.com/feed/',
+      'https://elcapitalfinanciero.com/feed/',
     ],
     canada: [
-      "https://www.cbc.ca/cmlink/rss-topstories",
-      "https://calgaryherald.com/feed",
-      "https://ottawacitizen.com/feed",
-      "https://www.montrealgazette.com/feed",
+      'https://www.cbc.ca/cmlink/rss-topstories',
+      'https://calgaryherald.com/feed',
+      'https://ottawacitizen.com/feed',
+      'https://www.montrealgazette.com/feed',
     ],
     singapore: [
-      "https://www.straitstimes.com/news/singapore/rss.xml",
-      "https://www.channelnewsasia.com/rssfeeds/8395986",
+      'https://www.straitstimes.com/news/singapore/rss.xml',
+      'https://www.channelnewsasia.com/rssfeeds/8395986',
     ],
-    uk: [
-      "http://feeds.bbci.co.uk/news/rss.xml",
-      "https://www.theguardian.com/uk/rss",
-    ],
+    uk: ['http://feeds.bbci.co.uk/news/rss.xml', 'https://www.theguardian.com/uk/rss'],
     japan: [
-      "https://www3.nhk.or.jp/nhkworld/en/news/feeds/",
-      "https://news.livedoor.com/topics/rss/int.xml",
+      'https://www3.nhk.or.jp/nhkworld/en/news/feeds/',
+      'https://news.livedoor.com/topics/rss/int.xml',
     ],
-    netherlands: ["https://www.dutchnews.nl/feed/", "https://www.nrc.nl/rss/"],
+    netherlands: ['https://www.dutchnews.nl/feed/', 'https://www.nrc.nl/rss/'],
   };
 
   const fetchAustraliaNews = async (url: string) => {
     try {
       const result = await fetch(url);
       const response = await result.json();
-      if (response.code === "rateLimited") {
-        return fetchAustraliaNews(url + "%00");
+      if (response.code === 'rateLimited') {
+        return fetchAustraliaNews(url + '%00');
       }
       return response;
     } catch (error) {
@@ -83,7 +80,7 @@
         return;
       }
 
-      if (source === "australia") {
+      if (source === 'australia') {
         const date = new Date();
         const from = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - 5}`;
         const url = `https://newsapi.org/v2/everything?domains=abc.net.au&from=${from}&apiKey=17c0da766ba347c89d094449504e3080`;
@@ -94,10 +91,10 @@
 
         if (rssFeedsByCountry[source.toLowerCase()]) {
           feeds = rssFeedsByCountry[source.toLowerCase()];
-        } else if (source.startsWith("http")) {
+        } else if (source.startsWith('http')) {
           feeds = [source];
         } else {
-          throw new Error("Invalid source. Provide a country code or a valid RSS feed URL.");
+          throw new Error('Invalid source. Provide a country code or a valid RSS feed URL.');
         }
 
         const articlesPromises = feeds.map(async (feedUrl) => {
@@ -108,8 +105,8 @@
               return [];
             }
             return feed.items.map((item: any) => ({
-              title: item.title || "No Title",
-              description: item.description || item.contentSnippet || "No description available",
+              title: item.title || 'No Title',
+              description: item.description || item.contentSnippet || 'No description available',
               url: item.link || feedUrl,
               urlToImage: null,
             }));
@@ -120,10 +117,10 @@
         });
 
         const articlesArray = await Promise.all(articlesPromises);
-        news = articlesArray.flat().filter(article => article.title !== "No Title");
+        news = articlesArray.flat().filter((article) => article.title !== 'No Title');
 
         if (news.length === 0) {
-          error = "No articles could be loaded from the selected sources.";
+          error = 'No articles could be loaded from the selected sources.';
         }
       }
 
@@ -172,33 +169,29 @@
 
 <div class="container px-4 py-8 mx-auto">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">News</h1>
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">News</h1>
     <div class="relative">
       <button
         id="source-button"
-                  class="px-4 py-2 text-gray-900 bg-white rounded-lg border border-gray-300 transition-colors dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500"
-        on:click={() => showSourceSelector = !showSourceSelector}
-      >
+        class="px-4 py-2 text-slate-900 bg-white rounded-lg border border-slate-300 transition-colors dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500"
+        on:click={() => (showSourceSelector = !showSourceSelector)}>
         {selectedSource.toUpperCase()}
       </button>
       {#if showSourceSelector}
         <div
           id="source-dropdown"
-          class="absolute right-0 z-10 mt-2 w-48 text-gray-900 bg-white rounded-lg border border-gray-300 shadow-xl dark:bg-slate-800 dark:text-white dark:border-slate-700"
-          transition:fade
-        >
+          class="absolute right-0 z-10 mt-2 w-48 text-slate-900 bg-white rounded-lg border border-slate-300 shadow-xl dark:bg-slate-800 dark:text-white dark:border-slate-700"
+          transition:fade>
           {#each Object.keys(rssFeedsByCountry) as country}
             <button
-              class="px-4 py-2 w-full text-left transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 first:rounded-t-lg last:rounded-b-lg"
-              on:click={() => handleSourceChange(country)}
-            >
+              class="px-4 py-2 w-full text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 first:rounded-t-lg last:rounded-b-lg"
+              on:click={() => handleSourceChange(country)}>
               {country.toUpperCase()}
             </button>
           {/each}
           <button
-                          class="px-4 py-2 w-full text-left border-t border-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 dark:border-slate-700"
-            on:click={() => handleSourceChange('australia')}
-          >
+            class="px-4 py-2 w-full text-left border-t border-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-700"
+            on:click={() => handleSourceChange('australia')}>
             AUSTRALIA
           </button>
         </div>
@@ -215,8 +208,7 @@
       <p class="mb-4 text-red-400">{error}</p>
       <button
         class="px-4 py-2 text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700"
-        on:click={() => fetchNews(selectedSource)}
-      >
+        on:click={() => fetchNews(selectedSource)}>
         Retry
       </button>
     </div>
@@ -232,15 +224,13 @@
           target="_blank"
           rel="noopener noreferrer"
           class="group block dark:bg-slate-900 bg-slate-100 border dark:border-slate-800 border-slate-200 rounded-xl shadow-2xl hover:scale-[1.025] hover:shadow-blue-900/30 transition-all duration-200 overflow-hidden focus:ring-2 focus:ring-blue-500"
-          transition:fade
-        >
+          transition:fade>
           <div class="relative">
             {#if article.urlToImage}
               <img
                 src={article.urlToImage}
                 alt={article.title}
-                class="object-cover w-full h-48 rounded-t-xl"
-              />
+                class="object-cover w-full h-48 rounded-t-xl" />
             {/if}
           </div>
           <div class="p-5">
@@ -271,4 +261,4 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-</style> 
+</style>
