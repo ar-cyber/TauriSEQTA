@@ -35,6 +35,15 @@
 	let filterMaxGrade: number | null = null;
 	let filterSearch = '';
 
+	// For the line graph
+	const graphWidth = 800;
+	const graphHeight = 200;
+	const graphPadding = 50;
+	const yTicks = [0, 20, 40, 60, 80, 100];
+
+	// Tooltip state for the line graph
+	let tooltip = { show: false, x: 0, y: 0, month: '', avg: 0 };
+
 	function isValidDate(dateStr: string): boolean {
 		const date = new Date(dateStr);
 		return date instanceof Date && !isNaN(date.getTime());
@@ -330,6 +339,83 @@
 	function hasActiveFilters() {
 		return !!(filterSubject || filterStatus || filterMinGrade !== null || filterMaxGrade !== null || filterSearch);
 	}
+
+	function calculateMonthlyAverages(data: any[]): Record<string, number> {
+		const monthlyGrades: Record<string, { sum: number; count: number }> = {};
+		data.forEach((assessment: any) => {
+			const date = new Date(assessment.due);
+			const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+			if (!monthlyGrades[monthKey]) {
+				monthlyGrades[monthKey] = { sum: 0, count: 0 };
+			}
+			monthlyGrades[monthKey].sum += assessment.finalGrade;
+			monthlyGrades[monthKey].count += 1;
+		});
+		const averages: Record<string, number> = {};
+		Object.entries(monthlyGrades).forEach(([month, { sum, count }]) => {
+			averages[month] = count > 0 ? sum / count : 0;
+		});
+		// Fill in missing months with the previous month's average
+		const monthMap: Record<string, number> = {
+			January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
+			July: 6, August: 7, September: 8, October: 9, November: 10, December: 11
+		};
+		const months = Object.keys(averages).sort((a, b) => {
+			const [monthA, yearA] = a.split(' ');
+			const [monthB, yearB] = b.split(' ');
+			const dateA = new Date(Number(yearA), monthMap[monthA], 1);
+			const dateB = new Date(Number(yearB), monthMap[monthB], 1);
+			return dateA.getTime() - dateB.getTime();
+		});
+		let lastAvg = 0;
+		for (let i = 0; i < months.length; i++) {
+			if (averages[months[i]] === undefined || isNaN(averages[months[i]])) {
+				averages[months[i]] = lastAvg;
+			} else {
+				lastAvg = averages[months[i]];
+			}
+		}
+		return averages;
+	}
+
+	$: monthlyAverages = analyticsData && analyticsData.length > 0 ? calculateMonthlyAverages(analyticsData) : {};
+	$: monthlyPoints = (() => {
+		const monthMap: Record<string, number> = {
+			January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
+			July: 6, August: 7, September: 8, October: 9, November: 10, December: 11
+		};
+		const monthsSorted = Object.keys(monthlyAverages).sort((a, b) => {
+			const [monthA, yearA] = a.split(' ');
+			const [monthB, yearB] = b.split(' ');
+			const dateA = new Date(Number(yearA), monthMap[monthA], 1);
+			const dateB = new Date(Number(yearB), monthMap[monthB], 1);
+			return dateA.getTime() - dateB.getTime();
+		});
+		return monthsSorted.map((month, i, array) => {
+			const avg = monthlyAverages[month];
+			const x = graphPadding + (i / Math.max(array.length - 1, 1)) * (graphWidth - 2 * graphPadding);
+			const y = graphHeight - graphPadding - (avg / 100) * (graphHeight - 2 * graphPadding);
+			return { month, avg, x, y };
+		});
+	})();
+	$: showMonthEvery = Math.ceil(monthlyPoints.length / 10);
+
+	function showTooltip(event: MouseEvent, point: { x: number; y: number; month: string; avg: number }) {
+		const svgRect = (event.target as SVGCircleElement).ownerSVGElement?.getBoundingClientRect();
+		if (svgRect) {
+			tooltip = {
+				show: true,
+				x: event.clientX - svgRect.left,
+				y: event.clientY - svgRect.top - 10,
+				month: point.month,
+				avg: point.avg
+			};
+		}
+	}
+
+	function hideTooltip() {
+		tooltip.show = false;
+	}
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -424,6 +510,55 @@
 						</g>
 					{/each}
 				</svg>
+			</div>
+		</div>
+
+		<div class="mb-6">
+			<h3 class="text-lg font-semibold mb-2">Average Grade by Month</h3>
+			<div class="bg-white dark:bg-slate-800 rounded-lg shadow p-4">
+				{#if analyticsData && analyticsData.length > 0}
+					<div class="flex justify-center line-graph-container" style="position:relative;">
+						<svg width={graphWidth} height={graphHeight} viewBox={`0 0 ${graphWidth} ${graphHeight}`} xmlns="http://www.w3.org/2000/svg">
+							<!-- Y-axis -->
+							<line x1={graphPadding} y1={graphPadding} x2={graphPadding} y2={graphHeight - graphPadding} stroke="#fff" stroke-width="2" />
+							<!-- X-axis -->
+							<line x1={graphPadding} y1={graphHeight - graphPadding} x2={graphWidth - graphPadding} y2={graphHeight - graphPadding} stroke="#fff" stroke-width="2" />
+							<!-- Y-axis ticks and labels -->
+							{#each yTicks as tick}
+								<line x1={graphPadding - 5} y1={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding)} x2={graphPadding} y2={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding)} stroke="#fff" stroke-width="2" />
+								<text x={graphPadding - 10} y={graphHeight - graphPadding - (tick / 100) * (graphHeight - 2 * graphPadding) + 4} text-anchor="end" font-size="12" fill="#fff">{tick}</text>
+							{/each}
+							<!-- X-axis month labels -->
+							{#each monthlyPoints as point, i}
+								{#if i % showMonthEvery === 0 || i === monthlyPoints.length - 1}
+									<text x={point.x} y={graphHeight - graphPadding + 18} text-anchor="middle" font-size="12" fill="#fff" transform={`rotate(-35,${point.x},${graphHeight - graphPadding + 18})`}>{point.month}</text>
+								{/if}
+							{/each}
+							<!-- Line path -->
+							{#if monthlyPoints.length > 1}
+								<polyline fill="none" stroke="blue" stroke-width="2" points={monthlyPoints.map(p => `${p.x},${p.y}`).join(' ')} />
+							{/if}
+							<!-- Points -->
+							{#each monthlyPoints as point}
+								<circle cx={point.x} cy={point.y} r="4" fill="blue"
+									on:mouseover={(e) => showTooltip(e, point)}
+									on:mouseout={hideTooltip}
+									style="cursor:pointer" />
+							{/each}
+						</svg>
+						<!-- Tooltip overlay is rendered here -->
+						{#if tooltip.show}
+							<div style="position:absolute; left:0; top:0; pointer-events:none; z-index:10; width:{graphWidth}px; height:{graphHeight}px;">
+								<div style="position:absolute; left:{tooltip.x}px; top:{tooltip.y}px; background:rgba(30,41,59,0.95); color:white; padding:8px 12px; border-radius:8px; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.2); white-space:nowrap; transform:translate(-50%,-100%);">
+									<div><strong>{tooltip.month}</strong></div>
+									<div>Avg: {tooltip.avg.toFixed(1)}%</div>
+								</div>
+							</div>
+						{/if}
+					</div>
+				{:else}
+					<p class="text-gray-500 dark:text-gray-400">No data available</p>
+				{/if}
 			</div>
 		</div>
 
@@ -587,4 +722,9 @@
 			</div>
 		</div>
 	{/if}
-</div> 
+</div>
+
+<style>
+	/* Ensure the tooltip overlay is positioned relative to the graph container */
+	.line-graph-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
+</style> 
