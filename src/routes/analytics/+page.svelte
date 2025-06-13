@@ -7,6 +7,7 @@
   import { fade, slide, scale } from 'svelte/transition';
   import Modal from '$lib/components/Modal.svelte';
   import RawDataTable from '$lib/components/RawDataTable.svelte';
+  import GradeDistribution from '$lib/components/GradeDistribution.svelte';
 
   let analyticsData: AnalyticsData | null = null;
   let loading = true;
@@ -518,75 +519,7 @@
     <div
       class="flex flex-col gap-8 p-8 mb-8 rounded-2xl border shadow-xl border-slate-200 bg-white/80 dark:bg-slate-900/80 dark:border-slate-700 lg:flex-row"
       in:fade={{ duration: 400 }}>
-      <div class="flex-1 min-w-[350px] max-w-[600px] flex flex-col">
-        <h2 class="flex gap-2 items-center mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-          <span
-            class="inline-block flex justify-center items-center w-6 h-6 text-white bg-gradient-to-tr from-indigo-500 to-blue-400 rounded-full shadow">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6" /></svg>
-          </span>
-          Grade Distribution
-        </h2>
-        <div class="overflow-x-auto">
-          <svg {width} {height} class="min-w-[350px] max-w-[600px]">
-            <!-- Grid lines -->
-            {#each yLabels as _, i}
-              <line
-                x1={padding}
-                y1={height - padding - (i * (height - padding * 2)) / (yLabels.length - 1)}
-                x2={width - padding}
-                y2={height - padding - (i * (height - padding * 2)) / (yLabels.length - 1)}
-                class="stroke-slate-200 dark:stroke-slate-700"
-                stroke-width="1" />
-            {/each}
-            <!-- Y-axis labels -->
-            {#each yLabels as label, i}
-              <text
-                x={padding - 10}
-                y={height - padding - (i * (height - padding * 2)) / (yLabels.length - 1)}
-                class="text-xs fill-slate-500 dark:fill-slate-400"
-                text-anchor="end"
-                dominant-baseline="middle">
-                {label}
-              </text>
-            {/each}
-            <!-- Bars -->
-            {#each barPaths as { path, count, status }, i}
-              <g
-                class="transition-all duration-300 hover:opacity-80"
-                in:scale={{ duration: 350, delay: i * 60 }}>
-                <path d={path} fill={getStatusColor(status)} class="transition-all duration-300" />
-                <text
-                  x={padding + i * (barWidth + barSpacing) + barWidth / 2}
-                  y={height - padding + 20}
-                  class="text-xs fill-slate-500 dark:fill-slate-400"
-                  text-anchor="middle">
-                  {status}% {getLetterGrade(
-                    (() => {
-                      const [min] = status.split('-');
-                      return Number(min);
-                    })(),
-                  )}
-                </text>
-                <text
-                  x={padding + i * (barWidth + barSpacing) + barWidth / 2}
-                  y={height -
-                    padding -
-                    count * ((height - padding * 2) / Math.max(...yLabels.map(Number), 1)) -
-                    10}
-                  class="text-sm font-medium fill-slate-900 dark:fill-slate-100"
-                  text-anchor="middle">
-                  {count}
-                </text>
-              </g>
-            {/each}
-          </svg>
-        </div>
-      </div>
+      <GradeDistribution data={analyticsData || []} />
       <div class="flex-1 min-w-[400px] max-w-[800px] flex flex-col">
         <h3 class="mb-2 text-lg font-semibold">Average Grade by Month</h3>
         <div class="flex justify-center items-center h-full">
