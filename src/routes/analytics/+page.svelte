@@ -580,7 +580,7 @@
                 {#if monthlyPoints.length > 1}
                   <polyline
                     fill="none"
-                    stroke="blue"
+                    stroke="var(--accent-color-value)"
                     stroke-width="2.5"
                     points={monthlyPoints
                       .map(
@@ -596,7 +596,8 @@
                       (i / Math.max(monthlyPoints.length - 1, 1)) * (1000 - 2 * graphPadding)}
                     cy={300 - graphPadding - (point.avg / 100) * (300 - 2 * graphPadding)}
                     r="5"
-                    fill="blue"
+                    fill="var(--accent-color-value)"
+                    class="transition-all duration-200 hover:fill-accent-300"
                     on:mouseover={(e) =>
                       showTooltip(e, {
                         ...point,

@@ -300,7 +300,7 @@
 
       <!-- Right Column: Timer -->
       <FocusTimer />
-    </div>
+        </div>
   </div>
 </div>
 
