@@ -125,12 +125,12 @@
     <div class="flex overflow-x-scroll gap-2" id="upcoming-filters">
       {#each activeSubjects as subj}
         <label
-          class="flex items-center px-2.5 py-1.5 text-xs rounded-full border transition-all duration-300 cursor-pointer sm:px-3 sm:text-sm bg-slate-200/70 dark:bg-slate-800/70 border-slate-300/50 dark:border-slate-700/50 hover:border-indigo-500/50">
+          class="flex items-center px-2.5 py-1.5 text-xs rounded-lg border transition-all duration-200 cursor-pointer sm:px-3 sm:text-sm bg-white/60 dark:bg-slate-800/60 border-slate-200/40 dark:border-slate-700/40 hover:accent-bg hover:text-white">
           <input
             type="checkbox"
             bind:checked={subjectFilters[subj.code]}
-            class="mr-2 w-3.5 h-3.5 text-indigo-500 rounded border-slate-300 sm:w-4 sm:h-4 form-checkbox dark:border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900" />
-          <span style="color: {subj.colour}">{subj.code}</span>
+            class="mr-2 w-3.5 h-3.5 text-slate-600 dark:text-slate-400 rounded border-slate-300 sm:w-4 sm:h-4 form-checkbox dark:border-slate-700 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900" />
+          <span class="transition-colors duration-200" style="color: {subj.colour}">{subj.code}</span>
         </label>
       {/each}
     </div>
@@ -139,7 +139,7 @@
   {#if loadingAssessments}
     <div class="flex flex-col justify-center items-center py-12 sm:py-16">
       <div
-        class="w-12 h-12 rounded-full border-4 animate-spin sm:w-16 sm:h-16 border-indigo-500/30 border-t-indigo-500">
+        class="w-12 h-12 rounded-full border-4 animate-spin sm:w-16 sm:h-16 border-accent/30 border-t-accent">
       </div>
       <p class="mt-4 text-sm text-slate-600 sm:text-base dark:text-slate-400">
         Loading assessments...
@@ -148,7 +148,7 @@
   {:else if filteredAssessments.length === 0}
     <div class="flex flex-col justify-center items-center py-12 sm:py-16">
       <div
-        class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
+        class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-600 text-2xl sm:text-3xl shadow-[0_0_20px_rgba(var(--accent-color-value),0.3)] animate-gradient">
         🎉
       </div>
       <p class="mt-4 text-lg text-slate-700 sm:text-xl dark:text-slate-300">
@@ -159,7 +159,7 @@
     <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 sm:p-6">
       {#each filteredAssessments as a}
         <div
-          class="flex flex-col gap-4 p-4 sm:p-5 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] relative group">
+          class="flex flex-col gap-4 p-4 sm:p-5 rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(var(--accent-color-value),0.2)] relative group">
           <div
             class="absolute inset-0 bg-gradient-to-br rounded-xl opacity-30 animate-gradient"
             style="background: linear-gradient(135deg, {a.colour}20, {a.colour}05);">
@@ -171,7 +171,7 @@
 
           <div class="flex relative z-10 gap-4 items-center">
             <div
-              class="flex justify-center items-center w-12 h-12 bg-gradient-to-br rounded-xl shadow-lg sm:h-14 sm:w-14 animate-gradient"
+              class="flex justify-center items-center w-12 h-12 bg-gradient-to-br rounded-xl shadow-lg sm:h-14 sm:w-14 animate-gradient transition-all duration-200 hover:scale-105"
               style="background: linear-gradient(135deg, {a.colour}, {a.colour}dd);">
               <Icon src={DocumentText} class="w-6 h-6 text-white" />
             </div>
@@ -186,7 +186,7 @@
                   })}
                 </div>
                 <span
-                  class="px-2 py-0.5 rounded-full text-xs font-medium text-white shadow-sm {getStatusBadge(
+                  class="px-2 py-0.5 rounded-lg text-xs font-medium text-white shadow-sm transition-all duration-200 {getStatusBadge(
                     a.status,
                     a.due,
                   ).color}">
