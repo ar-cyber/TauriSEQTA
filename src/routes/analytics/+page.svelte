@@ -645,8 +645,8 @@
 					</table>
 				{:else}
 					{#each Object.entries(groupBySubject(analyticsData)) as [subject, assessments]}
-						<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-gray-50/80 dark:bg-slate-800/80" in:slide={{ duration: 350 }}>
-							<button class="w-full flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
+						<div class="mb-4 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden" in:slide={{ duration: 350 }}>
+							<button class="w-full flex items-center justify-between px-6 py-3 accent-bg transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg" on:click={() => toggleSubject(subject)}>
 								<span class="flex items-center gap-2">
 									{#if expandedSubjects[subject]}
 										<Icon src={ChevronDown} class="w-5 h-5 text-indigo-500" />
