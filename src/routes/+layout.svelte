@@ -482,7 +482,7 @@
       class="overflow-hidden transition-all duration-300 ease-in-out"
       class:w-64={sidebarOpen}
       class:w-0={!sidebarOpen}>
-      <nav class="p-4 py-[1px] space-y-2 w-64 min-w-64">
+      <nav class="p-3 py-[1px] space-y-2 w-64 min-w-64">
         {#each menu as item}
           <a
             href={item.path}
