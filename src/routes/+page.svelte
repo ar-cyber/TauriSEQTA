@@ -16,6 +16,7 @@
     XMark,
   } from 'svelte-hero-icons';
   import Modal from '$lib/components/Modal.svelte';
+  import TodaySchedule from '$lib/components/TodaySchedule.svelte';
 
   const studentId = 69; //! literally changes nothing but was used in the original seqta code.
 
@@ -552,7 +553,6 @@
 
   onMount(async () => {
     await Promise.all([
-      loadLessons(),
       loadAssessments(),
       loadNotices(formatDate(new Date())),
       fetchHomepageLabels(),
@@ -613,116 +613,8 @@
       {/each}
     </div>
 
-    <!-- Today's Lessons Section -->
-    <div
-      class="overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm bg-white/80 dark:bg-slate-800/30 border-slate-300/50 dark:border-slate-700/50">
-      <div
-        class="flex flex-col gap-4 justify-between items-start px-3 py-3 bg-gradient-to-r border-b sm:flex-row sm:items-center sm:px-4 border-slate-300/50 dark:border-slate-700/50 from-slate-100/70 dark:from-slate-800/70 to-slate-100/30 dark:to-slate-800/30">
-        <span class="text-xl font-semibold text-slate-900 dark:text-white"
-          >{lessonsSubtitle()}</span>
-        <div class="flex gap-3">
-          <button
-            onclick={prevDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full border transition-all duration-300 text-slate-600 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
-            <Icon src={ChevronLeft} class="w-5 h-5" />
-          </button>
-          <button
-            onclick={nextDay}
-            class="flex justify-center items-center w-9 h-9 rounded-full border transition-all duration-300 text-slate-600 hover:accent-bg-hover dark:text-slate-400 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border hover:accent-shadow">
-            <Icon src={ChevronRight} class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {#if loadingLessons}
-        <div class="flex flex-col justify-center items-center py-16">
-          <div
-            class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500">
-          </div>
-          <p class="mt-4 text-slate-600 dark:text-slate-400">Loading your schedule...</p>
-        </div>
-      {:else if lessons.length === 0}
-        <div
-          class="flex flex-col gap-6 justify-center items-center px-4 py-16 w-full sm:flex-row sm:gap-12 sm:px-14 sm:py-20">
-          <div
-            class="flex justify-center items-center w-20 h-20 text-white rounded-full shadow-lg sm:w-28 sm:h-28 accent-bg">
-            <span class="text-4xl sm:text-6xl">📚</span>
-          </div>
-          <div class="flex flex-col items-center">
-            <p class="mb-2 text-2xl font-bold text-center text-slate-800 dark:text-white">
-              No lessons today!
-            </p>
-            <p class="text-lg text-center text-slate-600 dark:text-slate-300">
-              Enjoy your free time or check your other tasks.
-            </p>
-          </div>
-        </div>
-      {:else}
-        <div class="flex overflow-x-scroll">
-          {#each lessons as lesson, i}
-            <div
-              class="flex relative flex-col w-full max-w-xs border-t-4 group"
-              style="border-color: {lesson.colour}; box-shadow: inset 0px 10px 10px -10px {lesson.colour};">
-              <div class="flex relative flex-col flex-1 gap-2 p-3 backdrop-blur-sm sm:p-4">
-                <div class="flex justify-between items-center">
-                  <span
-                    class="text-base font-bold truncate text-slate-900 sm:text-lg dark:text-white"
-                    >{lesson.description}</span>
-                  {#if lesson.active}
-                    <span
-                      class="px-2.5 py-1 ml-2 text-xs font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-sm animate-gradient"
-                      >Now</span>
-                  {/if}
-                </div>
-                <div
-                  class="flex items-center mt-1 text-sm text-slate-700 sm:text-base dark:text-slate-300">
-                  <Icon
-                    src={AcademicCap}
-                    class="mr-1.5 w-4 h-4 text-slate-600 dark:text-slate-400" />
-                  <span class="truncate">{lesson.staff}</span>
-                </div>
-                <div
-                  class="flex items-center text-sm text-slate-700 sm:text-base dark:text-slate-300">
-                  <Icon
-                    src={BuildingOffice}
-                    class="mr-1.5 w-4 h-4 text-slate-600 dark:text-slate-400" />
-                  <span class="truncate">{lesson.room}</span>
-                </div>
-                <div
-                  class="inline-flex items-center px-3 py-1.5 mt-3 mb-auto font-mono text-sm rounded-lg bg-slate-200/50 dark:bg-slate-800/50 w-fit">
-                  <Icon src={Clock} class="mr-1.5 w-4 h-4 text-indigo-400" />
-                  {lesson.from} – {lesson.until}
-                </div>
-                {#if lesson.attendanceTitle && lesson.attendanceTitle.trim()}
-                  <div class="text-xs text-slate-600 dark:text-slate-400">
-                    {lesson.attendanceTitle}
-                  </div>
-                {/if}
-
-                {#if lesson.programmeID !== 0}
-                  <div class="flex gap-3">
-                    <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 text-slate-700 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
-                      aria-label="View Assessment"
-                      onclick={() =>
-                        (location.href = `/assessments?code=${lesson.code}&date=${lesson.date}`)}>
-                      <Icon src={DocumentText} class="w-5 h-5" />
-                    </button>
-                    <button
-                      class="flex justify-center items-center w-9 h-9 rounded-lg border transition-all duration-300 text-slate-700 bg-slate-200/70 dark:bg-slate-800/70 hover:accent-bg-hover dark:text-slate-300 hover:text-white border-slate-300/50 dark:border-slate-700/50 hover:accent-border"
-                      aria-label="View Course"
-                      onclick={() =>
-                        (location.href = `/courses?code=${lesson.code}&date=${lesson.date}`)}>
-                      <Icon src={BookOpen} class="w-5 h-5" />
-                    </button>
-                  </div>
-                {/if}
-              </div>
-            </div>
-          {/each}
-        </div>
-      {/if}
-    </div>
+    <!-- Today's Schedule Section -->
+    <TodaySchedule />
 
     <!-- Notices Widget -->
     <div
