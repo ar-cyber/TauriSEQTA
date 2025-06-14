@@ -4,7 +4,6 @@
 
 body {
   @apply antialiased;
-  background-color: transparent;
 }
 
 /* Custom Scrollbar Styles */
