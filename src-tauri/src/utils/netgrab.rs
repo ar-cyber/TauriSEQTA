@@ -4,10 +4,12 @@ use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
 use serde_json::{json, Value};
-use std::io::Cursor;
+use std::{any::Any, io::Cursor};
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use url::Url;
+
+use base64::{engine::general_purpose, Engine as _};
 // opens a file using the default program:
 
 #[path = "../utils/session.rs"]
@@ -90,6 +92,7 @@ pub async fn fetch_api_data(
     headers: Option<HashMap<String, String>>,
     body: Option<Value>,
     parameters: Option<HashMap<String, String>>,
+    is_image: bool,
 ) -> Result<String, String> {
     let client = create_client();
     let session = session::Session::load();
@@ -124,12 +127,20 @@ pub async fn fetch_api_data(
     }
 
     match request.send().await {
-        Ok(resp) => {
-            let response = resp.text().await.unwrap();
-            Ok(response)
+    Ok(resp) => {
+        if is_image == true {
+            // Get the bytes (await and ? to bubble up errors)
+            let bytes = resp.bytes().await.map_err(|e| e.to_string())?;
+            // Encode to base64
+            let base64_str = general_purpose::STANDARD.encode(&bytes);
+            Ok(base64_str)
+        } else {
+            let text = resp.text().await.map_err(|e| e.to_string())?;
+            Ok(text)
         }
-        Err(e) => Err(format!("HTTP request failed: {e}")),
     }
+    Err(e) => Err(format!("HTTP request failed: {e}")),
+}
 }
 
 #[tauri::command]
@@ -137,7 +148,7 @@ pub async fn get_api_data(
     url: &str,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters)).await
+    fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters), false).await
 }
 
 #[derive(Serialize)]
@@ -303,5 +314,5 @@ pub async fn post_api_data(
     data: Value,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters)).await
+    fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters), false).await
 }

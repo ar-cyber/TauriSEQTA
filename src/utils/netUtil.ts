@@ -5,6 +5,7 @@ export type SeqtaRequestInit = {
   headers?: Record<string, string>;
   body?: Record<string, any>;
   params?: Record<string, string>;
+  is_image?: boolean;
 };
 
 export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promise<any> {
@@ -15,6 +16,7 @@ export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promis
       headers: init?.headers || {},
       body: init?.body || {},
       parameters: init?.params || {},
+      isImage: init?.is_image || false,
     });
 
     // Convert the response to match the fetch API format

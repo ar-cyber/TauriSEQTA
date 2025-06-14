@@ -2,6 +2,9 @@
   import { invoke } from '@tauri-apps/api/core';
   import { emit, listen } from '@tauri-apps/api/event';
   import { seqtaFetch } from '../utils/netUtil';
+
+  import { Base64 } from 'js-base64';
+
   import { cache } from '../utils/cache';
   import AboutModal from '../lib/components/AboutModal.svelte';
   import Titlebar from '../lib/components/Titlebar.svelte';
@@ -40,6 +43,8 @@
   let seqtaUrl = $state<string>('');
   let userInfo = $state<UserInfo>();
   let { children } = $props();
+
+
 
   let weatherEnabled = $state(false);
   let forceUseLocation = $state(true);
@@ -157,7 +162,23 @@
     userDesc: string;
     userName: string;
     displayName?: string;
+    profilePicture?: string;
   }
+
+  function binaryStringToBase64(binaryStr: string): string {
+    let bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+      bytes[i] = binaryStr.charCodeAt(i) & 0xFF;
+    }
+
+    // Convert to binary string for btoa (this part is safe now)
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binary);
+}
 
   async function loadUserInfo() {
     try {
@@ -174,7 +195,10 @@
       });
       userInfo = JSON.parse(res).payload;
 
-      cache.set('userInfo', userInfo);
+      let profileImage = await seqtaFetch(`/seqta/student/photo/get`, { params: { uuid: userInfo!.personUUID, format: 'low' }, is_image: true });
+      userInfo!.profilePicture = `data:image/png;base64,${profileImage}`;
+
+      cache.set('userInfo', userInfo); // hi
     } catch (e) {
       console.error('Failed to load user info:', e);
     }
@@ -415,7 +439,7 @@
             aria-label="User menu"
             tabindex="0">
             <img
-              src={`https://api.dicebear.com/7.x/identicon/svg?seed=${userInfo.userName}`}
+              src={userInfo.profilePicture}
               alt=""
               class="object-cover w-8 h-8 rounded-full border-2 shadow-sm border-white/60 dark:border-slate-600/60" />
             <span class="hidden font-semibold text-slate-900 md:inline dark:text-white">
