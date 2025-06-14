@@ -4,6 +4,7 @@
   import { seqtaFetch } from '../utils/netUtil';
   import { cache } from '../utils/cache';
   import AboutModal from '../lib/components/AboutModal.svelte';
+  import Titlebar from '../lib/components/Titlebar.svelte';
 
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
@@ -344,9 +345,10 @@
   ];
 </script>
 
-<div class="flex flex-col h-screen">
+<div class="flex flex-col h-screen bg-white dark:bg-slate-950">
+  <Titlebar />
   <!-- Top Bar -->
-  <header class="flex justify-between items-center px-6 w-full h-16">
+  <header class="flex justify-between items-center px-6 w-full h-16 bg-white dark:bg-slate-950">
     <div class="flex items-center space-x-4">
       <button
         class="flex justify-center items-center w-10 h-10 rounded-xl transition-all duration-200 bg-slate-100 hover:accent-bg dark:bg-slate-800 focus:outline-none focus:ring-2 accent-ring"
