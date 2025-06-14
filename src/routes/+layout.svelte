@@ -318,7 +318,9 @@
   onMount(() => {
     const checkMobile = () => {
       isMobile = window.innerWidth < 768;
-      if (!isMobile) isMobileMenuOpen = false;
+      if (isMobile) {
+        sidebarOpen = false;
+      }
     };
 
     checkMobile();
