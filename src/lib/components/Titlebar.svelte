@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="flex justify-between items-center h-12 px-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800"
+  class="flex justify-between items-center h-12 px-4 bg-white dark:bg-slate-950"
   data-tauri-drag-region>
   <div class="flex items-center space-x-2" data-tauri-drag-region>
     <img src="/betterseqta-dark-icon.png" alt="DesQTA" class="w-6 h-6 invert dark:invert-0" />
