@@ -209,7 +209,7 @@
     class="flex justify-between items-center p-4 bg-white rounded-t-xl border-b border-slate-300 dark:border-slate-800 dark:bg-slate-900">
     <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Compose message</h2>
     <button
-      class="p-2 text-slate-900 rounded-lg transition-all duration-200 hover:bg-slate-200 dark:hover:bg-slate-800 dark:text-white"
+      class="p-2 rounded-lg transition-all duration-200 text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 dark:text-white"
       onclick={closeModal}
       aria-label="Close">
       <Icon src={XMark} class="w-6 h-6" />
@@ -232,12 +232,13 @@
 
       <!-- Subject -->
       <div class="p-4 bg-white border-b border-slate-300 dark:border-slate-800 dark:bg-slate-900">
+        <label for="subject" class="block mb-1 text-sm">Subject</label>
         <input
           id="subject"
           type="text"
           placeholder="Subject..."
           bind:value={composeSubject}
-          class="px-4 py-3 w-full placeholder-slate-500 text-slate-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-4 py-3 w-full rounded-lg border bg-slate-100/20 border-slate-300/50 dark:border-slate-700 placeholder-slate-500 text-slate-900 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
       <!-- Editor -->
@@ -258,11 +259,11 @@
           placeholder="Search students..."
           bind:value={studentSearchQuery}
           onfocus={() => (showStudentDropdown = true)}
-          class="px-4 py-2 w-full placeholder-slate-500 text-slate-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-4 py-2 w-full bg-white rounded-lg placeholder-slate-500 text-slate-900 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         {#if showStudentDropdown}
           <div
             id="student-dropdown"
-            class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-slate-300 shadow-lg dark:bg-slate-800 dark:border-slate-700">
+            class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border shadow-lg border-slate-300 dark:bg-slate-800 dark:border-slate-700">
             {#if loadingStudents}
               <div class="p-3 text-center text-slate-600 dark:text-slate-400">
                 Loading students...
@@ -296,11 +297,11 @@
           placeholder="Search staff..."
           bind:value={staffSearchQuery}
           onfocus={() => (showStaffDropdown = true)}
-          class="px-4 py-2 w-full placeholder-slate-500 text-slate-900 bg-white rounded-lg dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-4 py-2 w-full bg-white rounded-lg placeholder-slate-500 text-slate-900 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         {#if showStaffDropdown}
           <div
             id="staff-dropdown"
-            class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-slate-300 shadow-lg dark:bg-slate-800 dark:border-slate-700">
+            class="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border shadow-lg border-slate-300 dark:bg-slate-800 dark:border-slate-700">
             {#if loadingStaff}
               <div class="p-3 text-center text-slate-600 dark:text-slate-400">Loading staff...</div>
             {:else if filteredStaff.length === 0}
@@ -333,10 +334,10 @@
 
       <!-- Selected recipients -->
       <div>
-        <div class="flex flex-wrap gap-2 p-3 bg-slate-100 rounded-lg min-h-12 dark:bg-slate-800">
+        <div class="flex flex-wrap gap-2 p-3 rounded-lg bg-slate-100 min-h-12 dark:bg-slate-800">
           {#each selectedRecipients as recipient, i}
             <div
-              class="flex gap-1 items-center px-2 py-1 text-sm text-slate-900 bg-slate-200 rounded-md dark:bg-slate-700 dark:text-white">
+              class="flex gap-1 items-center px-2 py-1 text-sm rounded-md text-slate-900 bg-slate-200 dark:bg-slate-700 dark:text-white">
               <span>{recipient.name}</span>
               <span class="text-xs text-slate-600 dark:text-slate-400"
                 >{recipient.staff ? '(Staff)' : '(Student)'}</span>
@@ -361,7 +362,7 @@
     class="flex justify-between items-center p-4 bg-white border-t border-slate-300 dark:border-slate-800 dark:bg-slate-900">
     <div>
       <button
-        class="flex gap-2 items-center px-4 py-2 text-sm text-slate-900 bg-slate-200 rounded-lg dark:text-white dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700">
+        class="flex gap-2 items-center px-4 py-2 text-sm rounded-lg text-slate-900 bg-slate-200 dark:text-white dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700">
         <span>Add files</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -377,7 +378,7 @@
     </div>
     <div class="flex gap-3">
       <button
-        class="px-4 py-2 text-slate-900 bg-slate-200 rounded-lg transition-colors dark:text-white dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-600"
+        class="px-4 py-2 rounded-lg transition-colors text-slate-900 bg-slate-200 dark:text-white dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-600"
         onclick={closeModal}>
         Cancel
       </button>
