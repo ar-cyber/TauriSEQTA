@@ -1,20 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
-  import { seqtaFetch } from '../utils/netUtil';
-  import { cache } from '../utils/cache';
-  import {
-    Icon,
-    ChevronLeft,
-    ChevronRight,
-    AcademicCap,
-    Clock,
-    DocumentText,
-    BookOpen,
-    BuildingOffice,
-    ArrowTopRightOnSquare,
-    XMark,
-  } from 'svelte-hero-icons';
   import Modal from '$lib/components/Modal.svelte';
   import TodaySchedule from '$lib/components/TodaySchedule.svelte';
   import NoticesPane from '$lib/components/NoticesPane.svelte';
@@ -24,22 +10,10 @@
   import FocusTimer from '$lib/components/FocusTimer.svelte';
   import Homework from '$lib/components/Homework.svelte';
 
-  const studentId = 69; //! literally changes nothing but was used in the original seqta code.
-
   let currentSelectedDate: Date = new Date();
-
   let lessons = $state<any[]>([]);
-  let lessonColours = $state<any[]>([]);
-  let notices = $state<any[]>([]);
-
-  let loadingLessons = $state<boolean>(true);
-  let loadingNotices = $state<boolean>(true);
 
   let lessonInterval: ReturnType<typeof setInterval> | null = null;
-
-  let homepageNotices = $state<any[]>([]);
-  let homepageLabels = $state<any[]>([]);
-  let loadingHomepageNotices = $state(true);
 
   interface Shortcut {
     name: string;
@@ -53,71 +27,8 @@
     { name: 'Google', icon: '🌐', url: 'https://google.com' },
   ]);
 
-  let weatherEnabled = $state(false);
-  let weatherCity = $state('');
-  let weatherCountry = $state('');
-  let weatherData: any = $state(null);
-  let loadingWeather = $state(false);
-  let weatherError = $state('');
-
-  let selectedTab = $state<'list' | 'board'>('list');
   let showPortalModal = $state(false);
-
   let portalUrl = $state<string>('');
-  let loadingPortal = $state<boolean>(true);
-  let portalError = $state<string>('');
-
-  function formatDate(date: Date): string {
-    const y = date.getFullYear();
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const d = date.getDate().toString().padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  async function loadLessonColours() {
-    if (lessonColours.length) return lessonColours;
-    const res = await seqtaFetch('/seqta/student/load/prefs?', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: { request: 'userPrefs', asArray: true, user: studentId },
-    });
-    lessonColours = JSON.parse(res).payload;
-    return lessonColours;
-  }
-
-  async function loadLessons() {
-    loadingLessons = true;
-    const dateStr = formatDate(currentSelectedDate);
-
-    const res = await seqtaFetch('/seqta/student/load/timetable?', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: { from: dateStr, until: dateStr, student: studentId },
-    });
-
-    const colours = await loadLessonColours();
-
-    lessons = JSON.parse(res)
-      .payload.items.sort((a: any, b: any) => a.from.localeCompare(b.from))
-      .map((lesson: any) => {
-        const colourPrefName = `timetable.subject.colour.${lesson.code}`;
-        const subjectColour = colours.find((c: any) => c.name === colourPrefName);
-
-        lesson.colour = subjectColour ? `${subjectColour.value}` : `transparent`;
-
-        lesson.from = lesson.from.substring(0, 5);
-        lesson.until = lesson.until.substring(0, 5);
-
-        lesson.attendanceTitle = lesson.attendance ? lesson.attendance.label : ' ';
-        return lesson;
-      });
-
-    loadingLessons = false;
-
-    if (lessonInterval) clearInterval(lessonInterval);
-    checkCurrentLessons();
-    lessonInterval = setInterval(checkCurrentLessons, 60_000);
-  }
 
   function checkCurrentLessons() {
     const now = new Date();
@@ -136,33 +47,6 @@
     });
   }
 
-  async function fetchHomepageLabels() {
-    const response = await seqtaFetch('/seqta/student/load/notices?', {
-      method: 'POST',
-      body: { mode: 'labels' },
-    });
-    const data = typeof response === 'string' ? JSON.parse(response) : response;
-    homepageLabels = Array.isArray(data?.payload) ? data.payload : [];
-  }
-
-  async function fetchHomepageNotices() {
-    loadingHomepageNotices = true;
-    const response = await seqtaFetch('/seqta/student/load/notices?', {
-      method: 'POST',
-      body: { date: formatDate(new Date()) },
-    });
-    const data = typeof response === 'string' ? JSON.parse(response) : response;
-    homepageNotices = Array.isArray(data?.payload) ? data.payload.slice(0, 50) : [];
-    loadingHomepageNotices = false;
-  }
-
-  function getHomepageLabelColor(labelId: number): string {
-    return homepageLabels.find((l) => l.id === labelId)?.colour || '#910048';
-  }
-  function getHomepageLabelTitle(labelId: number): string {
-    return homepageLabels.find((l) => l.id === labelId)?.title || '';
-  }
-
   async function loadHomepageShortcuts() {
     try {
       const settings = await invoke<{ shortcuts: Shortcut[] }>('get_settings');
@@ -172,90 +56,16 @@
     } catch (e) {}
   }
 
-  async function loadWeatherSettings() {
-    try {
-      const settings = await invoke<{
-        weather_enabled: boolean;
-        weather_city: string;
-        weather_country: string;
-      }>('get_settings');
-      weatherEnabled = settings.weather_enabled ?? false;
-      weatherCity = settings.weather_city ?? '';
-      weatherCountry = settings.weather_country ?? '';
-    } catch (e) {
-      weatherEnabled = false;
-      weatherCity = '';
-      weatherCountry = '';
-    }
-  }
-
-  async function fetchWeather() {
-    if (!weatherEnabled || !weatherCity || !weatherCountry) {
-      weatherData = null;
-      return;
-    }
-    loadingWeather = true;
-    weatherError = '';
-    try {
-      const geoRes = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=10&language=en&format=json`,
-      );
-      const geoJson = await geoRes.json();
-      if (!geoJson.results || !geoJson.results.length) throw new Error(`Location not found, url = https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=10&language=en&format=json`);
-      const { latitude, longitude, name, country } = geoJson.results[0];
-
-      const weatherRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`,
-      );
-      const weatherJson = await weatherRes.json();
-
-      if (!weatherJson.current_weather) throw new Error('Weather data not available');
-
-      weatherData = {
-        ...weatherJson.current_weather,
-        location: name,
-        country,
-      };
-    } catch (e) {
-      weatherError = 'Failed to load weather.';
-      weatherData = null;
-    } finally {
-      loadingWeather = false;
-    }
-  }
-
   function closeModal() {
     showPortalModal = false;
   }
 
   onMount(async () => {
-    await Promise.all([
-      loadHomepageShortcuts(),
-      loadWeatherSettings(),
-    ]);
-    if (weatherEnabled && weatherCity && weatherCountry) fetchWeather();
+    await loadHomepageShortcuts();
   });
 
   onDestroy(() => {
     if (lessonInterval) clearInterval(lessonInterval);
-  });
-
-  function lessonsSubtitle() {
-    const today = new Date();
-    const diff = ~~((today.getTime() - currentSelectedDate.getTime()) / 86_400_000);
-    if (diff === 0) return "Today's Lessons";
-    if (diff === -1) return "Tomorrow's Lessons";
-    if (diff === 1) return "Yesterday's Lessons";
-    return currentSelectedDate.toLocaleDateString('en-AU', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    });
-  }
-
-  $effect(() => {
-    if (weatherEnabled && weatherCity && weatherCountry) fetchWeather();
   });
 </script>
 
@@ -282,32 +92,18 @@
       {/each}
     </div>
 
-    <!-- Today's Schedule Section -->
     <TodaySchedule />
-
-    <!-- Notices Section -->
     <NoticesPane />
-
-    <!-- Upcoming Assessments -->
     <UpcomingAssessments />
-
-    <!-- Welcome Portal Window -->
     <WelcomePortal />
 
-    <!-- Dashboard Grid -->
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <!-- Left Column: Homework and Todo List -->
       <div class="space-y-8">
-        <!-- Homework Section -->
         <Homework />
-
-        <!-- Todo List Section -->
         <TodoList />
       </div>
-
-      <!-- Right Column: Timer -->
       <FocusTimer />
-        </div>
+    </div>
   </div>
 </div>
 
@@ -323,48 +119,3 @@
     ></iframe>
   {/if}
 </Modal>
-
-<style>
-  @keyframes gradient-shift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient-shift 8s ease infinite;
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.2s ease-out;
-  }
-
-  .animate-fade-out {
-    animation: fade-out 0.2s ease-out;
-  }
-</style>
