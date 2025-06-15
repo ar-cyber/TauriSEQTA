@@ -15,7 +15,7 @@
 
   const studentId = 69;
 
-  let weekStart: Date = getMonday(new Date());
+  let weekStart = $state(getMonday(new Date()));
   let lessons = $state<any[]>([]);
   let lessonColours = $state<any[]>([]);
   let loadingLessons = $state<boolean>(true);
