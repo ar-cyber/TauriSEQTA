@@ -8,7 +8,13 @@
   let error = $state('');
 
   function formatDate(dateStr: string) {
-    const date = new Date(dateStr.replace(' ', 'T'));
+    let isoDate = dateStr.replace(' ', 'T');
+
+    if (!(isoDate.charAt(isoDate.length-3) == ':')) {
+      isoDate = "".concat(dateStr.replace(' ', 'T'), ':00')
+    }
+    const date = new Date(isoDate);
+    
     return date
       .toLocaleDateString('en-AU', {
         weekday: 'long',
