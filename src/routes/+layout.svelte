@@ -1,13 +1,11 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/core';
-  import { emit, listen } from '@tauri-apps/api/event';
+  import { listen } from '@tauri-apps/api/event';
+  import { Window } from '@tauri-apps/api/window';
   import { seqtaFetch } from '../utils/netUtil';
-
-  import { Base64 } from 'js-base64';
 
   import { cache } from '../utils/cache';
   import AboutModal from '../lib/components/AboutModal.svelte';
-  import Titlebar from '../lib/components/Titlebar.svelte';
 
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
@@ -17,25 +15,22 @@
     Icon,
     Home,
     Newspaper,
-    UserGroup,
     ClipboardDocumentList,
     BookOpen,
-    Squares2x2,
     ChatBubbleLeftRight,
     DocumentText,
     AcademicCap,
     Bell,
-    RectangleStack,
-    ArrowLeftStartOnRectangle,
     ChartBar,
     Cog6Tooth,
     CalendarDays,
-    GlobeAlt,
     ArrowRightOnRectangle,
     Bars3,
     XMark,
+    Minus,
+    Square2Stack,
   } from 'svelte-hero-icons';
-  import { fly, fade, scale } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
 
   import { writable } from 'svelte/store';
   export const needsSetup = writable(false);
@@ -133,6 +128,9 @@
       await checkSession();
     }
   }
+
+  // Window controls
+  const appWindow = Window.getCurrent();
 
   interface UserInfo {
     clientIP: string;
@@ -371,10 +369,9 @@
   ];
 </script>
 
-<div class="flex flex-col h-screen bg-white dark:bg-slate-950">
-  <Titlebar />
-  <!-- Top Bar -->
-  <header class="flex justify-between items-center px-6 w-full h-16 bg-white dark:bg-slate-950">
+<div class="flex flex-col h-screen">
+  <!-- Top Bar with integrated window controls -->
+  <header class="flex justify-between items-center px-3 pr-2 w-full h-16 bg-white dark:bg-slate-950 relative z-[999999]" data-tauri-drag-region>
     <div class="flex items-center space-x-4">
       <button
         class="flex justify-center items-center w-10 h-10 rounded-xl transition-all duration-200 bg-slate-100 hover:accent-bg dark:bg-slate-800 focus:outline-none focus:ring-2 accent-ring"
@@ -501,6 +498,28 @@
           {/if}
         </div>
       {/if}
+
+      <!-- Window Controls -->
+      <div class="flex items-center ml-4 space-x-2">
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 accent-ring"
+          onclick={() => appWindow.minimize()}
+          aria-label="Minimize">
+          <Icon src={Minus} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        </button>
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 accent-ring"
+          onclick={() => appWindow.toggleMaximize()}
+          aria-label="Maximize">
+          <Icon src={Square2Stack} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        </button>
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 group hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          onclick={() => appWindow.close()}
+          aria-label="Close">
+          <Icon src={XMark} class="w-4 h-4 transition duration-200 text-slate-600 dark:text-slate-400 group-hover:text-white" />
+        </button>
+      </div>
     </div>
   </header>
 
@@ -647,18 +666,3 @@
 
 <!-- About Modal -->
 <AboutModal bind:open={showAboutModal} onclose={() => (showAboutModal = false)} />
-
-<style>
-  .konami-mode {
-    animation: rainbow 5s linear infinite;
-  }
-
-  @keyframes rainbow {
-    0% {
-      filter: hue-rotate(0deg);
-    }
-    100% {
-      filter: hue-rotate(360deg);
-    }
-  }
-</style>

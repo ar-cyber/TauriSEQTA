@@ -52,12 +52,13 @@
 
 {#if open}
   <div
-    class="flex fixed inset-0 z-50 justify-center items-center p-6"
+    class="flex fixed right-0 bottom-0 left-0 top-16 z-50 justify-center items-center p-6"
+    style="background-color: transparent;"
     role="dialog"
     aria-modal="true"
     aria-label={ariaLabel}>
     <div
-      class="fixed inset-0 backdrop-blur-md bg-black/40"
+      class="fixed right-0 bottom-0 left-0 top-16 backdrop-blur-md bg-black/40"
       onclick={handleBackdropClick}
       onkeydown={handleKeydown}
       role="button"
@@ -76,7 +77,7 @@
       {#if showCloseButton}
         <div class="absolute top-6 right-6 z-10">
           <button
-            class="flex justify-center items-center w-10 h-10 bg-slate-100 rounded-xl transition-all duration-200 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+            class="flex justify-center items-center w-10 h-10 rounded-xl transition-all duration-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
             onclick={closeModal}
             aria-label="Close modal">
             <Icon src={XMark} class="w-5 h-5 text-slate-700 dark:text-slate-300" />

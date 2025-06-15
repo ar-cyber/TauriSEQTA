@@ -113,28 +113,3 @@ body {
   height: 100%;
   overflow: auto;
 }
-
-/* Window background */
-:root {
-  background-color: transparent;
-}
-
-.dark {
-  background-color: transparent;
-}
-
-/* Make sure the main content area has a proper background */
-#svelte {
-  @apply bg-white dark:bg-slate-950;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Ensure the main content area fills the window */
-#svelte > div {
-  @apply bg-white dark:bg-slate-950;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}

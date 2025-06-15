@@ -15,13 +15,14 @@
         "title": "DesQTA",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "transparent": true
       }
     ],
     "security": {
       "csp": null
-    }
-
+    },
+    "macOSPrivateApi": true
   },
   "bundle": {
     "active": true,
