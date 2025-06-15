@@ -34,7 +34,30 @@
     expandedSubjects[subject] = !expandedSubjects[subject];
   }
 
-  // Helper function to group by subject
+  // Helper function to get year from due date
+  function getYearFromDue(due: string): string {
+    return new Date(due).getFullYear().toString();
+  }
+
+  // Helper function to group by year and subject
+  function groupByYearAndSubject(data: Assessment[]): Record<string, Record<string, Assessment[]>> {
+    const grouped: Record<string, Record<string, Assessment[]>> = {};
+    if (!data) return grouped;
+    
+    for (const a of data) {
+      const year = getYearFromDue(a.due);
+      if (!grouped[year]) grouped[year] = {};
+      if (!grouped[year][a.subject]) grouped[year][a.subject] = [];
+      grouped[year][a.subject].push(a);
+    }
+    
+    // Sort years in descending order
+    return Object.fromEntries(
+      Object.entries(grouped).sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
+    );
+  }
+
+  // Helper function to group by subject (keeping for backward compatibility)
   function groupBySubjectData(data: Assessment[]): Record<string, Assessment[]> {
     const grouped: Record<string, Assessment[]> = {};
     if (!data) return grouped;
@@ -231,68 +254,73 @@
         </tbody>
       </table>
     {:else if groupBySubject}
-      {#each Object.entries(groupBySubjectData(data)) as [subject, assessments]}
-        <div
-          class="overflow-hidden mb-4 rounded-xl border border-slate-200 dark:border-slate-700"
-          in:slide={{ duration: 350 }}>
-          <button
-            class="w-full flex items-center justify-between px-6 py-3 bg-accent-600 text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg"
-            on:click={() => toggleSubject(subject)}>
-            <span class="flex gap-2 items-center">
+      {#each Object.entries(groupByYearAndSubject(data)) as [year, subjects]}
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">{year}</h3>
+          {#each Object.entries(subjects) as [subject, assessments]}
+            <div
+              class="overflow-hidden mb-4 rounded-xl border border-slate-200 dark:border-slate-700"
+              in:slide={{ duration: 350 }}>
+              <button
+                class="w-full flex items-center justify-between px-6 py-3 bg-accent-600 text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 accent-ring font-semibold text-left text-lg"
+                on:click={() => toggleSubject(subject)}>
+                <span class="flex gap-2 items-center">
+                  {#if expandedSubjects[subject]}
+                    <Icon src={ChevronDown} class="w-5 h-5 text-white" />
+                  {:else}
+                    <Icon src={ChevronRight} class="w-5 h-5 text-white" />
+                  {/if}
+                  <span>{subject}</span>
+                </span>
+              </button>
               {#if expandedSubjects[subject]}
-                <Icon src={ChevronDown} class="w-5 h-5 text-white" />
-              {:else}
-                <Icon src={ChevronRight} class="w-5 h-5 text-white" />
+                <div transition:fade={{ duration: 250 }}>
+                  <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                    <thead>
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
+                          >Title</th>
+                        <th
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
+                          >Grade</th>
+                        <th
+                          class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
+                          >Due Date</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                      {#each assessments as assessment}
+                        <tr>
+                          <td
+                            class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
+                            >{assessment.title}</td>
+                          <td class="px-6 py-4 text-sm whitespace-nowrap">
+                            {#if assessment.finalGrade !== undefined}
+                              <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >=
+                                80
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                  : assessment.finalGrade >= 60
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+                                {assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
+                              </span>
+                            {:else}
+                              <span class="text-slate-500">Not graded</span>
+                            {/if}
+                          </td>
+                          <td
+                            class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
+                            >{new Date(assessment.due).toLocaleDateString()}</td>
+                        </tr>
+                      {/each}
+                    </tbody>
+                  </table>
+                </div>
               {/if}
-              <span>{subject}</span>
-            </span>
-          </button>
-          {#if expandedSubjects[subject]}
-            <div transition:fade={{ duration: 250 }}>
-              <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                <thead>
-                  <tr>
-                    <th
-                      class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
-                      >Title</th>
-                    <th
-                      class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
-                      >Grade</th>
-                    <th
-                      class="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400"
-                      >Due Date</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                  {#each assessments as assessment}
-                    <tr>
-                      <td
-                        class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
-                        >{assessment.title}</td>
-                      <td class="px-6 py-4 text-sm whitespace-nowrap">
-                        {#if assessment.finalGrade !== undefined}
-                          <span
-                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {assessment.finalGrade >=
-                            80
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : assessment.finalGrade >= 60
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
-                            {assessment.finalGrade}% {getLetterGrade(assessment.finalGrade)}
-                          </span>
-                        {:else}
-                          <span class="text-slate-500">Not graded</span>
-                        {/if}
-                      </td>
-                      <td
-                        class="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100"
-                        >{new Date(assessment.due).toLocaleDateString()}</td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
             </div>
-          {/if}
+          {/each}
         </div>
       {/each}
     {:else}
