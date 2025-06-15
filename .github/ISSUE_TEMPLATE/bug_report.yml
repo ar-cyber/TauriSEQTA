@@ -1,5 +1,5 @@
 name: Bug report
-description: Report an issue with the modpack in its unmodified state. For other issues, use Discord.
+description: Report an issue with the program in its unmodified state. For other issues, use Discord.
 labels: bug
 title: "[BUG]"
 type: "Bug"
@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before reporting an issue, [please search](https://github.com/BetterSEQTA/BetterSEQTA-Plus/issues) to make sure it has not already been reported (make sure to search closed issues as well!).
+        Before reporting an issue, [please search](https://github.com/BetterSEQTA/DesQTA/issues) to make sure it has not already been reported (make sure to search closed issues as well!).
 
   - type: textarea
     attributes:
@@ -19,24 +19,21 @@ body:
   - type: input
     attributes:
       label: Extension version
-      description: What version of the extension are you using?
-      placeholder: Find it by opening the config menu and clicking the about icon in the top right.
+      description: What version of the program are you using?
+      placeholder: (eg v1.6.2)
     validations:
       required: true
 
   - type: dropdown
     attributes:
-      label: Browser
-      description: Which Browser are you using?
+      label: OS
+      description: Which OS are you using?
       options:
-        - Chrome
-        - Firefox
-        - Brave
-        - Safari
-        - DuckDuckGO
-        - Microsoft Edge
-        - Other Chromium-Based Browser
-        - Other Non-Chromium-Based Browser
+        - Windows
+        - MacOS
+        - Ubuntu
+        - Arch
+        - Other Linux-based OS
     validations:
       required: true
 
@@ -44,7 +41,7 @@ body:
     attributes:
       label: Confirm
       options:
-        - label: This bug report is about an issue with the extension itself. I have not modified the extension nor added any unsupported plugins. If this is not the case, I know that I should post the issue to the extension's Discord support channel instead.
+        - label: This bug report is about an issue with the program itself. I have not modified the program nor added any unsupported plugins. If this is not the case, I know that I should post the issue to the extension's Discord support channel instead.
           required: true
 
   - type: textarea
