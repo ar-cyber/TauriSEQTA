@@ -54,7 +54,8 @@
   ]);
 
   let weatherEnabled = $state(false);
-  let weatherLocation = $state('');
+  let weatherCity = $state('');
+  let weatherCountry = $state('');
   let weatherData: any = $state(null);
   let loadingWeather = $state(false);
   let weatherError = $state('');
@@ -175,18 +176,21 @@
     try {
       const settings = await invoke<{
         weather_enabled: boolean;
-        weather_location: string;
+        weather_city: string;
+        weather_country: string;
       }>('get_settings');
       weatherEnabled = settings.weather_enabled ?? false;
-      weatherLocation = settings.weather_location ?? '';
+      weatherCity = settings.weather_city ?? '';
+      weatherCountry = settings.weather_country ?? '';
     } catch (e) {
       weatherEnabled = false;
-      weatherLocation = '';
+      weatherCity = '';
+      weatherCountry = '';
     }
   }
 
   async function fetchWeather() {
-    if (!weatherEnabled || !weatherLocation) {
+    if (!weatherEnabled || !weatherCity || !weatherCountry) {
       weatherData = null;
       return;
     }
@@ -194,16 +198,19 @@
     weatherError = '';
     try {
       const geoRes = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation)}&count=1&language=en&format=json`,
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=10&language=en&format=json`,
       );
       const geoJson = await geoRes.json();
-      if (!geoJson.results || !geoJson.results.length) throw new Error('Location not found');
+      if (!geoJson.results || !geoJson.results.length) throw new Error(`Location not found, url = https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&countryCode=${encodeURIComponent(weatherCountry)}&count=10&language=en&format=json`);
       const { latitude, longitude, name, country } = geoJson.results[0];
 
       const weatherRes = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`,
       );
       const weatherJson = await weatherRes.json();
+
+      if (!weatherJson.current_weather) throw new Error('Weather data not available');
+
       weatherData = {
         ...weatherJson.current_weather,
         location: name,
@@ -226,7 +233,7 @@
       loadHomepageShortcuts(),
       loadWeatherSettings(),
     ]);
-    if (weatherEnabled && weatherLocation) fetchWeather();
+    if (weatherEnabled && weatherCity && weatherCountry) fetchWeather();
   });
 
   onDestroy(() => {
@@ -248,7 +255,7 @@
   }
 
   $effect(() => {
-    if (weatherEnabled && weatherLocation) fetchWeather();
+    if (weatherEnabled && weatherCity && weatherCountry) fetchWeather();
   });
 </script>
 
