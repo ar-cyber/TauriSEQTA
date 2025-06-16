@@ -1,4 +1,4 @@
-/* Editor-specific styles (animations, transitions, editor-only features) */
+/* Editor-specific styles (animations, transitions, editor-only features) - !these are not applied to sent messages! */
 
 /* Nested content styling with animated borders */
 .editor-prose li > *:not(:first-child) {

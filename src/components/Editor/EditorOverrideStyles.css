@@ -366,15 +366,15 @@
 
   hr {
     border: none !important;
-    border-top: 2px solid #e5e7eb !important;
-    margin: 2rem 0 !important;
+    border-top: 1px solid #e5e7eb !important;
+    margin: 1rem 0 !important;
     width: 100% !important;
     background: none !important;
     height: 0 !important;
     padding: 0 !important;
 
     .dark & {
-      border-top-color: #4b5563 !important;
+      border-top-color: #3f4854 !important;
     }
   }
 
