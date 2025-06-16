@@ -12,6 +12,8 @@ mod netgrab;
 mod settings;
 #[path = "utils/analytics.rs"]
 mod analytics;
+#[path = "utils/session.rs"]
+mod session;
 
 use tauri::Manager;
 use tauri_plugin_notification;

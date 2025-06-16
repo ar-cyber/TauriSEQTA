@@ -110,14 +110,14 @@
   }
 </script>
 
-<div class="h-full editor-prose" bind:clientWidth={w}>
+<div class="relative h-full" bind:clientWidth={w}>
   <div
-    class="w-full min-h-full"
+    class="w-full min-h-full editor-prose"
     bind:this={element}
     onkeydown={handleKeydownCapture}
     role="textbox"
     tabindex="-1">
   </div>
+  <CommandList bind:this={commandListInstance} />
 </div>
 
-<CommandList bind:this={commandListInstance} />

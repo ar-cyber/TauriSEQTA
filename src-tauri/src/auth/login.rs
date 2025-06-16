@@ -2,8 +2,8 @@ use tauri::{Emitter, Manager};
 use time::OffsetDateTime;
 use url::Url;
 
-#[path = "../utils/session.rs"]
-mod session;
+use crate::netgrab;
+use crate::session;
 
 #[tauri::command]
 pub fn force_reload(app: tauri::AppHandle) {
@@ -29,8 +29,8 @@ pub fn save_session(base_url: String, jsessionid: String) -> Result<(), String> 
 }
 
 #[tauri::command]
-pub fn logout() -> bool {
-    if let Ok(_) = session::Session::clear() {
+pub async fn logout() -> bool {
+    if let Ok(_) = netgrab::clear_session().await {
         true
     } else {
         false

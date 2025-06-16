@@ -12,8 +12,7 @@ use url::Url;
 use base64::{engine::general_purpose, Engine as _};
 // opens a file using the default program:
 
-#[path = "../utils/session.rs"]
-mod session;
+use crate::session;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HomeworkItem {
@@ -315,4 +314,14 @@ pub async fn post_api_data(
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
     fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters), false).await
+}
+
+/// Clear the session data with API call and remove the session file
+#[tauri::command]
+pub async fn clear_session() -> Result<(), String> {
+    // Send logout request first
+    let _ = get_api_data("/saml2?logout", HashMap::new()).await;
+    
+    // Then clear the session file
+    session::Session::clear_file().map_err(|e| e.to_string())
 }

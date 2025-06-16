@@ -126,11 +126,12 @@ export default {
         let editor = props.editor;
         let range = props.range;
         let location = props.clientRect();
+        const editorRect = editor.view.dom.getBoundingClientRect();
         slashProps.set({ editor, range });
         slashVisible.set(true);
         slashLocation.set({
-          x: location.x,
-          y: location.y,
+          x: location.x - editorRect.left,
+          y: location.y - editorRect.top,
           height: location.height,
         });
         slashItems.set(props.items);

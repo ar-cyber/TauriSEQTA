@@ -2,8 +2,7 @@ use tauri::{Emitter, Manager};
 use time::OffsetDateTime;
 use url::Url;
 
-#[path = "../utils/session.rs"]
-mod session;
+use crate::session;
 
 #[tauri::command]
 pub fn force_reload(app: tauri::AppHandle) {
@@ -30,7 +29,7 @@ pub fn save_session(base_url: String, jsessionid: String) -> Result<(), String> 
 
 #[tauri::command]
 pub fn logout() -> bool {
-    if let Ok(_) = session::Session::clear() {
+    if let Ok(_) = session::Session::clear_file() {
         true
     } else {
         false
