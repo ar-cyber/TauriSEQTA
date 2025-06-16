@@ -5,8 +5,11 @@ use std::{
     path::PathBuf,
 };
 
+#[path = "../utils/netgrab.rs"]
+mod get_api_data;
+
 /// Location: `$DATA_DIR/DesQTA/session.json`
-fn session_file() -> PathBuf {
+pub fn session_file() -> PathBuf {
     // e.g. %APPDATA%/DesQTA on Windows, ~/.local/share/DesQTA on Linux/macOS
     let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
     dir.push("DesQTA");
@@ -66,6 +69,7 @@ impl Session {
 
     /// Clear the session data and remove the file
     pub fn clear() -> io::Result<()> {
+        get_api_data("/saml2?logout");
         let path = session_file();
         if path.exists() {
             fs::remove_file(path)?;

@@ -4,7 +4,7 @@ use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
 use serde_json::{json, Value};
-use std::{any::Any, io::Cursor};
+use std::{io::Cursor};
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use url::Url;
