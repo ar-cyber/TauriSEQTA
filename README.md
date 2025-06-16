@@ -40,6 +40,8 @@
   - Ensures a responsive and modern UI across different devices.
 
 ## Getting started
+> [!IMPORTANT]  
+> To run the scripts you **<ins>MUST</ins>** have [rust](https://www.rust-lang.org/tools/install), cargo (included with rust), and pnpm (run `npm install -g pnpm` in terminal to install globally) on your system or it will not build.
 
 Clone the repo:
 ```bash
@@ -50,7 +52,7 @@ Run the program:
 npm run start
 ```
 
-# Optionally run both commands manually:
+### Optionally run both commands manually:
 Install modules
 ```bash
 npm i # or your preferred like pnpm or yarn
@@ -62,13 +64,18 @@ npm run tauri dev
 > [!WARNING]
 > Do NOT run `npm run dev` as it starts the backend webui only; the pages loaded by DesQTA are built to be run by a framework not present in regular browsers. This is the same with `npm run build`; it will only build the webpage files, not the app.
 
-> [!IMPORTANT]  
-> To run the dev script you **<ins>MUST</ins>** have [rust, cargo (included with rust)](https://www.rust-lang.org/tools/install) and pnpm (`npm install -g pnpm`) on your system or it will not build.
+> [!important]
+> Android and iOS builds do not allow you to log in the same method as on a PC; this is an issue with Webviews on Android and iOS (they're not closable on Android [at all] or iOS [can be closed through launcher]). 
 >
-
-> [!CAUTION]
-> You should not build this - it is not stable and certain features (such as logging in) are buggy. <br><br> If you understand the risks, you can build using ```npm run tauri build```
-
+> It will require the QR code sign-in festure. PLEASE NOTE THAT THE REGULAR SEQTA LEARN APP CANNOT BE INSTALLED WHEN USING THIS:
+> 1. Access your SEQTA **website** <ins>on your main machine</ins> and head to settings (DesQTA does not currently support this)
+> 2. Press `Connect Mobile App` and an email will be sent to the email specified in the text labelled `Your email address`.
+> 3. Scan the QR code using your regular QR code scanning app. This will open a link
+> 4. You should be logged in.
+> <br>
+> Refer to the image below for the button locations <br>
+> 
+> ![image](https://github.com/user-attachments/assets/0e55a373-b6d3-4f1c-9479-3a3f1a1fb6d3)
 
 
 ## Folder Structure
