@@ -165,7 +165,7 @@
     // Check SEQTA cookie/session on app launch
     if (!($needsSetup)) {
       try {
-        const appUrl = seqtaUrl || 'https://learn.cardijn.catholic.edu.au/#?page=/home';
+        const appUrl = seqtaUrl || 'https://desqta.betterseqta.org/#?page=/home';
         const response = await seqtaFetch('/seqta/student/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
