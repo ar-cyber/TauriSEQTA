@@ -6,6 +6,8 @@
   let timerInterval: number | undefined = $state(undefined);
   let selectedDuration = $state(25); // minutes
   let isBreak = $state(false);
+  let customMinutes = $state('');
+  let customSeconds = $state('');
 
   function startTimer() {
     if (!isRunning) {
@@ -101,7 +103,7 @@
       </div>
 
       <!-- Duration Selection -->
-      <div class="flex gap-2">
+      <div class="flex gap-2 items-center">
         <button
           onclick={() => setDuration(25)}
           class="px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 {selectedDuration === 25
@@ -122,6 +124,35 @@
             ? 'accent-bg text-white'
             : 'bg-transparent accent-text border-2 accent-border hover:accent-bg/10'}">
           60m
+        </button>
+      </div>
+      <!-- Custom Timer Entry -->
+      <div class="flex gap-2 items-center justify-center mt-3">
+        <input
+          type="number"
+          min="0"
+          max="99"
+          placeholder="mm"
+          bind:value={customMinutes}
+          class="w-14 px-2 py-2 rounded-lg border-2 accent-border bg-transparent accent-text focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center"
+        />
+        <span class="text-xl font-bold text-slate-700 dark:text-slate-200">:</span>
+        <input
+          type="number"
+          min="0"
+          max="59"
+          placeholder="ss"
+          bind:value={customSeconds}
+          class="w-14 px-2 py-2 rounded-lg border-2 accent-border bg-transparent accent-text focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 text-center"
+        />
+        <button
+          onclick={() => {
+            const min = parseInt(customMinutes) || 0;
+            const sec = parseInt(customSeconds) || 0;
+            if (min > 0 || sec > 0) setDuration(min + sec / 60);
+          }}
+          class="px-3 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 accent-bg text-white ml-1">
+          Set
         </button>
       </div>
 
