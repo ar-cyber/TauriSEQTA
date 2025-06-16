@@ -45,7 +45,27 @@
   }
 
   $effect(() => {
-    elements[$selectedIndex]?.scrollIntoView({ block: 'center' });
+    const element = elements[$selectedIndex];
+    if (!element) return;
+    
+    const container = element.closest('.overflow-auto');
+    if (!container) return;
+    
+    const elementRect = element.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    const elementTop = elementRect.top - containerRect.top + container.scrollTop;
+    const elementBottom = elementTop + elementRect.height;
+    const containerHeight = containerRect.height;
+    
+    // Check if element is outside visible area
+    if (elementTop < container.scrollTop) {
+      // Element is above visible area
+      container.scrollTop = elementTop - 8;
+    } else if (elementBottom > container.scrollTop + containerHeight) {
+      // Element is below visible area
+      container.scrollTop = elementBottom - containerHeight + 8;
+    }
   });
 
   function selectItem(editor: any) {
@@ -112,7 +132,7 @@
 
 {#if $slashVisible}
   <div
-    class="absolute top-0 w-full h-screen"
+    class="fixed top-0 w-full h-screen"
     onkeydown={() => {}}
     onclick={closeSlashMenu}
     role="menu"
@@ -120,7 +140,7 @@
   </div>
   <div
     transition:fly={{ y: 10, duration: 300 }}
-    class="overflow-auto absolute w-80 max-w-full max-h-80 rounded-xl border shadow-xl backdrop-blur-lg dark:bg-slate-900/70 bg-slate-100/70 dark:border-slate-700/20 border-slate-200"
+    class="overflow-auto absolute pb-2 w-80 max-w-full max-h-80 rounded-xl border shadow-xl backdrop-blur-lg dark:bg-slate-900/70 bg-slate-100/70 dark:border-slate-700/20 border-slate-200"
     style="left: {$slashLocation.x}px; top: {$slashLocation.y + $slashLocation.height + 320 > height
       ? $slashLocation.y - $slashLocation.height - 320
       : $slashLocation.y + $slashLocation.height}px;">
