@@ -24,6 +24,7 @@
   } from 'svelte-hero-icons';
 
   import { writable } from 'svelte/store';
+  import { seqtaFetch } from '../utils/netUtil';
   export const needsSetup = writable(false);
 
   let seqtaUrl = $state<string>('');
@@ -159,6 +160,33 @@
     if (weatherEnabled) {
       if (forceUseLocation) fetchWeather();
       else fetchWeatherWithIP();
+    }
+
+    // Check SEQTA cookie/session on app launch
+    if (!($needsSetup)) {
+      try {
+        const appUrl = seqtaUrl || 'https://desqta.betterseqta.org/#?page=/home';
+        const response = await seqtaFetch('/seqta/student/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            mode: 'normal',
+            query: null,
+            redirect_url: appUrl,
+          },
+        });
+        // Debug: log the raw response
+        console.debug('SEQTA session check response:', response);
+        const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+        const foundAbbrev = responseStr.includes('site.name.abbrev');
+        console.debug('Contains site.name.abbrev:', foundAbbrev);
+        if (foundAbbrev) {
+          console.debug('Triggering handleLogout() due to detected logout');
+          await handleLogout();
+        }
+      } catch (e) {
+        console.error('SEQTA session check failed', e);
+      }
     }
   });
 
