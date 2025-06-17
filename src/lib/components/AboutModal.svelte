@@ -26,7 +26,7 @@
 <Modal bind:open onclose={closeModal} ariaLabel="About Modal">
   <!-- Easter Egg Trigger Area -->
   <div
-    class="absolute top-0 right-0 w-16 h-16 opacity-0 cursor-pointer"
+    class="absolute top-0 right-0 w-16 h-16 opacity-0 cursor-wait"
     onclick={(e) => {
       e.stopPropagation();
       const audio = new Audio('/sounds/konami.mp3');
@@ -45,7 +45,7 @@
     tabindex="0">
   </div>
 
-  <div class="p-4 sm:p-6 md:p-8 max-h-[90vh] overflow-y-auto">
+  <div class="p-4 sm:p-6 md:p-8 max-h-[90vh] overflow-y-auto cursor-default">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-8">
       <div class="flex items-center space-x-3 sm:space-x-4">
         <img src="/betterseqta-dark-icon.png" alt="DesQTA" class="invert size-10 sm:size-14 dark:invert-0" />
