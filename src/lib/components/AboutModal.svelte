@@ -26,7 +26,7 @@
 <Modal bind:open onclose={closeModal} ariaLabel="About Modal">
   <!-- Easter Egg Trigger Area -->
   <div
-    class="absolute top-0 right-0 w-16 h-16 opacity-0 cursor-wait"
+    class="absolute top-0 right-0 w-16 h-16 opacity-0 cursor-auto"
     onclick={(e) => {
       e.stopPropagation();
       const audio = new Audio('/sounds/konami.mp3');
