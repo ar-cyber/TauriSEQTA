@@ -191,3 +191,66 @@ Tippy popups that are appended to document.body directly
 .ProseMirror-selectednode {
   margin: 2px;
 }
+
+/* Drag and drop containment */
+.editor-prose {
+  position: relative;
+  overflow: hidden;
+  contain: layout style;
+}
+
+/* Image drag styling */
+.editor-prose img.tiptap-image {
+  cursor: grab;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+  max-width: 100%;
+  height: auto;
+}
+
+.editor-prose img.tiptap-image:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.editor-prose img.tiptap-image:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+/* Dropcursor styling */
+.tiptap-dropcursor {
+  pointer-events: none;
+  border-radius: 2px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Prevent drag operations outside editor */
+.editor-prose * {
+  -webkit-user-drag: auto;
+  -moz-user-drag: auto;
+  user-drag: auto;
+}
+
+/* Ensure only images within editor are draggable */
+.editor-prose img {
+  -webkit-user-drag: element;
+  -moz-user-drag: element;
+  user-drag: element;
+}
+
+/* Prevent text selection during drag */
+.editor-prose.ProseMirror-dragover * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}

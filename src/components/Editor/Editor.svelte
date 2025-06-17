@@ -2,6 +2,7 @@
   import Placeholder from '@tiptap/extension-placeholder';
   import Commands from './Plugins/Commands/command';
   import { Dropcursor } from '@tiptap/extension-dropcursor';
+  import Image from '@tiptap/extension-image'
   import BubbleMenu from '@tiptap/extension-bubble-menu';
   import Typography from '@tiptap/extension-typography';
   import TaskList from '@tiptap/extension-task-list';
@@ -18,6 +19,8 @@
   import { get } from 'svelte/store';
 
   import EditorStyles from './EditorOverrideStyles.css?raw';
+  
+  import BubbleMenuComponent from './Plugins/BubbleMenu.svelte';
 
   import { onMount, onDestroy } from 'svelte';
   import './EditorStyles.css';
@@ -78,6 +81,9 @@
             element: document.querySelector('.menu') as HTMLElement,
           }),
           Dropcursor.configure({ width: 5, color: '#ddeeff' }),
+          Image.configure({
+            allowBase64: true,
+          }),
         ],
         onTransaction: () => {
           // force re-render so `editor.isActive` works as expected
@@ -108,6 +114,30 @@
       }
     }
   }
+
+  function handleClick(event: MouseEvent) {
+    if (!editor) return;
+    
+    // Check if the click happened in empty space below content
+    const editorElement = element;
+    if (!editorElement) return;
+    
+    const clickY = event.clientY;
+    
+    // Get the last node in the editor
+    const lastNode = editorElement.lastElementChild;
+    if (lastNode) {
+      const lastNodeRect = lastNode.getBoundingClientRect();
+      
+      // If click is below the last content node, move cursor to end
+      if (clickY > lastNodeRect.bottom) {
+        const docSize = editor.state.doc.content.size;
+        editor.commands.setTextSelection(docSize);
+        editor.commands.focus();
+        event.preventDefault();
+      }
+    }
+  }
 </script>
 
 <div class="relative h-full" bind:clientWidth={w}>
@@ -115,9 +145,11 @@
     class="w-full min-h-full editor-prose"
     bind:this={element}
     onkeydown={handleKeydownCapture}
+    onclick={handleClick}
     role="textbox"
     tabindex="-1">
   </div>
   <CommandList bind:this={commandListInstance} />
 </div>
 
+<BubbleMenuComponent bind:editor />

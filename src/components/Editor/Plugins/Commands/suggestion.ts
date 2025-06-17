@@ -131,7 +131,7 @@ export default {
         slashVisible.set(true);
         slashLocation.set({
           x: location.x - editorRect.left,
-          y: location.y - editorRect.top,
+          y: location.y - editorRect.top + location.height / 2 + 4,
           height: location.height,
         });
         slashItems.set(props.items);
@@ -140,6 +140,7 @@ export default {
 
       onUpdate(props: any) {
         slashItems.set(props.items);
+        selectedIndex.set(0);
       },
 
       onKeyDown(props: any) {
