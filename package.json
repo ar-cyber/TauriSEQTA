@@ -40,7 +40,8 @@
     "jsqr": "^1.4.0",
     "marked": "^15.0.12",
     "pdfjs-dist": "^5.3.31",
-    "rss-parser": "^3.12.0"
+    "rss-parser": "^3.12.0",
+    "svelte-motion": "^0.12.2"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
@@ -49,6 +50,7 @@
     "@tauri-apps/cli": "^2.5.0",
     "@types/file-saver": "^2.0.7",
     "autoprefixer": "^10.4.21",
+    "motion-start": "^0.1.15",
     "postcss": "^8.5.3",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",

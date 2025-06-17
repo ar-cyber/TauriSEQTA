@@ -138,6 +138,7 @@
     role="menu"
     tabindex="-1">
   </div>
+  
   <div
     transition:fly={{ y: 10, duration: 300 }}
     class="overflow-auto absolute pb-2 w-80 max-w-full max-h-80 rounded-xl border shadow-xl backdrop-blur-lg dark:bg-slate-900/70 bg-slate-100/70 dark:border-slate-700/20 border-slate-200"
