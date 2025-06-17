@@ -25,6 +25,7 @@
 
   import { writable } from 'svelte/store';
   import { seqtaFetch } from '../utils/netUtil';
+  import LoadingScreen from '../lib/components/LoadingScreen.svelte';
   export const needsSetup = writable(false);
 
   let seqtaUrl = $state<string>('');
@@ -225,12 +226,7 @@
 </script>
 
 {#if isLoading}
-  <div class="flex items-center justify-center h-screen bg-slate-100 dark:bg-slate-900">
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-lg font-medium text-slate-700 dark:text-slate-300">Loading...</p>
-    </div>
-  </div>
+  <LoadingScreen />
 {:else}
   <div class="flex flex-col h-screen">
     <AppHeader
