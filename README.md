@@ -21,9 +21,9 @@
 
 - **Custom Homepage**: A personalized homepage that displays upcoming assessments, lessons, and notices with subject-specific colors.
 
-- **All SEQTA functionality kept**: Most SEQTA actions can be preformed here.
+- **All SEQTA functionality kept**: Most SEQTA actions can be performed here.
 
-- **Timetable Colors**: Integration of timetable colors for subjects to enhance visual identification throuhout the entire app.
+- **Timetable Colors**: Integration of timetable colors for subjects to enhance visual identification throughout the entire app.
 
 - **Sidebar Navigation**: A sidebar with quick navigation links to various sections like Home, News, Assessments, Courses, Dashboard, etc.
 
@@ -39,7 +39,7 @@
   - Utilizes Tailwind CSS for styling.
   - Ensures a responsive and modern UI across different devices.
 
-## Getting started
+## Getting Started
 
 Clone the repo:
 ```bash
@@ -50,7 +50,7 @@ Run the program:
 npm run start
 ```
 
-# Optionally run both commands manually:
+## Optionally run both commands manually:
 Install modules
 ```bash
 npm i # or your preferred like pnpm or yarn
