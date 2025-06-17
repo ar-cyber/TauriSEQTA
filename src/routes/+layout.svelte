@@ -49,6 +49,7 @@
 
   let showUserDropdown = $state(false);
   let showAboutModal = $state(false);
+  let isLoading = $state(true);
 
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
@@ -165,7 +166,7 @@
     // Check SEQTA cookie/session on app launch
     if (!($needsSetup)) {
       try {
-        const appUrl = seqtaUrl || 'https://desqta.betterseqta.org/#?page=/home';
+        const appUrl = seqtaUrl || 'https://learn.cardijn.catholic.edu.au/#?page=/home';
         const response = await seqtaFetch('/seqta/student/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -188,6 +189,7 @@
         console.error('SEQTA session check failed', e);
       }
     }
+    isLoading = false;
   });
 
   onMount(() => {
@@ -222,40 +224,49 @@
   ];
 </script>
 
-<div class="flex flex-col h-screen">
-  <AppHeader
-    {sidebarOpen}
-    {weatherEnabled}
-    {weatherData}
-    {userInfo}
-    {notifications}
-    {unreadNotifications}
-    {showUserDropdown}
-    onToggleSidebar={() => (sidebarOpen = !sidebarOpen)}
-    onToggleUserDropdown={() => (showUserDropdown = !showUserDropdown)}
-    onClearNotifications={() => (notifications = [])}
-    onLogout={handleLogout}
-    onShowAbout={() => (showAboutModal = true)}
-    onClickOutside={handleClickOutside}
-  />
-
-  <div class="flex flex-1 min-h-0">
-    <AppSidebar {sidebarOpen} {menu} />
-
-    <main
-      class="overflow-y-auto flex-1 rounded-tl-2xl border-t border-l border-slate-200 bg-slate-100/50 dark:border-slate-700/50 dark:bg-slate-900/50">
-      {#if $needsSetup}
-        <LoginScreen
-          {seqtaUrl}
-          onStartLogin={startLogin}
-          onUrlChange={(url) => (seqtaUrl = url)}
-        />
-      {:else}
-        {@render children()}
-      {/if}
-    </main>
+{#if isLoading}
+  <div class="flex items-center justify-center h-screen bg-slate-100 dark:bg-slate-900">
+    <div class="flex flex-col items-center gap-4">
+      <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-lg font-medium text-slate-700 dark:text-slate-300">Loading...</p>
+    </div>
   </div>
-</div>
+{:else}
+  <div class="flex flex-col h-screen">
+    <AppHeader
+      {sidebarOpen}
+      {weatherEnabled}
+      {weatherData}
+      {userInfo}
+      {notifications}
+      {unreadNotifications}
+      {showUserDropdown}
+      onToggleSidebar={() => (sidebarOpen = !sidebarOpen)}
+      onToggleUserDropdown={() => (showUserDropdown = !showUserDropdown)}
+      onClearNotifications={() => (notifications = [])}
+      onLogout={handleLogout}
+      onShowAbout={() => (showAboutModal = true)}
+      onClickOutside={handleClickOutside}
+    />
+
+    <div class="flex flex-1 min-h-0">
+      <AppSidebar {sidebarOpen} {menu} />
+
+      <main
+        class="overflow-y-auto flex-1 rounded-tl-2xl border-t border-l border-slate-200 bg-slate-100/50 dark:border-slate-700/50 dark:bg-slate-900/50">
+        {#if $needsSetup}
+          <LoginScreen
+            {seqtaUrl}
+            onStartLogin={startLogin}
+            onUrlChange={(url) => (seqtaUrl = url)}
+          />
+        {:else}
+          {@render children()}
+        {/if}
+      </main>
+    </div>
+  </div>
+{/if}
 
 <!-- Mobile Menu Overlay -->
 {#if isMobileMenuOpen}
