@@ -218,9 +218,9 @@
       </div>
     </div>
 
-      <div class="pt-10 sm:pt-4 mt-2 sm:mt-2">
-        <p class="text-center text-sm sm:text-base text-slate-600 dark:text-slate-400">
+  <div class="pt-6 sm:pt-4 mt-2 sm:mt-2">
+    <p class="text-center text-sm sm:text-base text-slate-600 dark:text-slate-400">
     © 2025 DesQTA. Licensed under MIT License.
-      </p>
-    </div>
+    </p>
+  </div>
 </Modal>
