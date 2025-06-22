@@ -27,7 +27,7 @@ dirs-next = "2.0"
 base64 = "0.22.1"
 
 rss = "2.0.12"
-reqwest = { version = "0.12", features = ["rustls-tls", "json", "native-tls-alpn"] }
+reqwest = { version = "0.12", features = ["rustls-tls", "json", "native-tls-alpn", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 time = "0.3"
 url = "2.5"
