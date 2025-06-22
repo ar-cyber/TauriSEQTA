@@ -83,13 +83,13 @@
           </div>
         </div>
         <div
-          class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl border border-slate-200/40 dark:border-slate-700/40 p-4 sm:p-6 flex-1 flex flex-col justify-between min-h-[140px] sm:min-h-[160px]">
+          class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl border border-slate-20/40 dark:border-slate-700/40 p-4 sm:p-6 flex-1 flex flex-col justify-between min-h-[140px] sm:min-h-[160px]">
           <h3 class="mb-3 sm:mb-4 text-base sm:text-lg font-semibold text-slate-900 dark:text-white">Built By</h3>
           <div class="grid grid-cols-2 gap-3 sm:gap-4">
             <div class="col-span-2 flex justify-center">
              <img
                src="https://contrib.rocks/image?repo=BetterSEQTA/DesQTA&columns=6"
-                alt="Contributors to BetterSEQTA/DesQTA"
+                alt="Contributers to DesQTA"
                 class="w-full max-w-[500px] h-auto object-contain"
                />
              </div>
