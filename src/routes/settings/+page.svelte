@@ -11,7 +11,8 @@
     updateTheme,
   } from '../../lib/stores/theme';
   import { Icon } from 'svelte-hero-icons';
-  import { Plus, ArrowPath, Trash, Rss, Sun, Moon, ComputerDesktop } from 'svelte-hero-icons';
+  import { Plus, ArrowPath, Trash, Rss, Sun, Moon, ComputerDesktop, CloudArrowUp } from 'svelte-hero-icons';
+  import CloudSyncModal from '../../lib/components/CloudSyncModal.svelte';
 
   interface Shortcut {
     name: string;
@@ -35,6 +36,7 @@
   let weatherCountry = '';
 
   let remindersEnabled = true;
+  let showCloudSyncModal = false;
 
   async function loadSettings() {
     loading = true;
@@ -168,6 +170,39 @@
         body: 'Could not fetch the RSS feed. Please check the URL and try again.',
       });
     }
+  }
+
+  function openCloudSyncModal() {
+    showCloudSyncModal = true;
+  }
+
+  function closeCloudSyncModal() {
+    showCloudSyncModal = false;
+  }
+
+  function handleSettingsUpload() {
+    notify({
+      title: 'Settings Uploaded',
+      body: 'Your settings have been successfully uploaded to the cloud.',
+    });
+  }
+
+  function handleSettingsDownload(cloudSettings: any) {
+    // Reload settings from the newly downloaded data
+    shortcuts = cloudSettings.shortcuts || [];
+    feeds = cloudSettings.feeds || [];
+    weatherEnabled = cloudSettings.weather_enabled ?? false;
+    forceUseLocation = cloudSettings.force_use_location ?? false;
+    weatherCity = cloudSettings.weather_city ?? '';
+    weatherCountry = cloudSettings.weather_country ?? '';
+    remindersEnabled = cloudSettings.reminders_enabled ?? true;
+    accentColor.set(cloudSettings.accent_color ?? '#3b82f6');
+    theme.set(cloudSettings.theme ?? 'dark');
+
+    notify({
+      title: 'Settings Downloaded',
+      body: 'Your settings have been successfully downloaded from the cloud.',
+    });
   }
 
   onMount(async () => {
@@ -533,6 +568,47 @@
         </div>
       </section>
 
+      <!-- Cloud Sync Section -->
+      <section
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Cloud Sync</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Sync your settings across devices with BetterSEQTA Plus account cloud syncing
+          </p>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <div class="flex flex-col gap-4">
+              <div>
+                <h3 class="text-sm font-semibold sm:text-base mb-2">Settings Synchronization</h3>
+                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
+                  Upload your current settings to the cloud or download settings from another device. 
+                  This includes all your shortcuts, feeds, theme preferences, and other customizations.
+                </p>
+                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
+                  <a href="https://accounts.betterseqta.org" target="_blank" rel="noopener noreferrer" 
+                     class="text-blue-600 dark:text-blue-400 hover:underline">
+                    Create a free BetterSEQTA Plus account
+                  </a> to get started with cloud syncing.
+                </p>
+              </div>
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="flex gap-2 items-center justify-center px-6 py-3 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105"
+                  onclick={openCloudSyncModal}>
+                  <Icon src={CloudArrowUp} class="w-5 h-5" />
+                  Sync Settings
+                </button>
+                <div class="text-xs text-slate-600 dark:text-slate-400 sm:self-center">
+                  Requires BetterSEQTA Plus account
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Plugins Section -->
       <section
         class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
@@ -558,6 +634,14 @@
     </div>
   {/if}
 </div>
+
+<!-- Cloud Sync Modal -->
+<CloudSyncModal
+  bind:show={showCloudSyncModal}
+  onSettingsUpload={handleSettingsUpload}
+  onSettingsDownload={handleSettingsDownload}
+  on:close={closeCloudSyncModal}
+/>
 
 <style>
   @keyframes fade-in-up {
