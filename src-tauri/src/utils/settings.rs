@@ -29,6 +29,8 @@ pub struct Settings {
     pub force_use_location: bool,
     pub accent_color: String,
     pub theme: String,
+    pub cloud_token: Option<String>,
+    pub cloud_user: Option<CloudUser>,
 }
 
 impl Default for Settings {
@@ -43,6 +45,8 @@ impl Default for Settings {
             reminders_enabled: true,
             accent_color: "#3b82f6".to_string(), // Default to blue-500
             theme: "system".to_string(), // Default to dark theme
+            cloud_token: None,
+            cloud_user: None,
         }
     }
 }
@@ -58,6 +62,19 @@ pub struct Shortcut {
 pub struct Feed {
     
     pub url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CloudUser {
+    pub id: i32,
+    pub email: String,
+    pub username: String,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    #[serde(rename = "pfpUrl")]
+    pub pfp_url: String,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
 }
 
 // Cloud API types
@@ -156,9 +173,67 @@ pub fn save_settings_from_json(json: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn upload_settings_to_cloud(token: String) -> Result<(), String> {
-    let base_url = "http://smb.adenmgb.com:100/api";
+pub async fn save_cloud_token(token: String) -> Result<CloudUser, String> {
+    let base_url = "https://accounts.betterseqta.org/api";
+    
+    // First, validate the token by fetching user details
+    let client = reqwest::Client::new();
+    
+    let response = client
+        .get(&format!("{}/auth/me", base_url))
+        .header("Authorization", format!("Bearer {}", token))
+        .send()
+        .await
+        .map_err(|e| format!("Network error: {}", e))?;
+    
+    let status = response.status();
+    if !status.is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        
+        // Try to parse as API error for better error messages
+        if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
+            return Err(format!("API Error {}: {}", api_error.statusCode, api_error.statusMessage));
+        }
+        
+        return Err(format!("Authentication failed: {} - {}", status, error_text));
+    }
+    
+    let user_text = response.text().await
+        .map_err(|e| format!("Failed to read response: {}", e))?;
+    
+    // Parse the user response
+    let user: CloudUser = serde_json::from_str(&user_text)
+        .map_err(|e| format!("Failed to parse user response: {} - Raw response: {}", e, user_text))?;
+    
+    // Save the token and user details to settings
+    let mut settings = Settings::load();
+    settings.cloud_token = Some(token);
+    settings.cloud_user = Some(user.clone());
+    settings.save().map_err(|e| e.to_string())?;
+    
+    Ok(user)
+}
+
+#[tauri::command]
+pub fn get_cloud_user() -> Option<CloudUser> {
     let settings = Settings::load();
+    settings.cloud_user
+}
+
+#[tauri::command]
+pub fn clear_cloud_token() -> Result<(), String> {
+    let mut settings = Settings::load();
+    settings.cloud_token = None;
+    settings.cloud_user = None;
+    settings.save().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn upload_settings_to_cloud() -> Result<(), String> {
+    let settings = Settings::load();
+    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
+    
+    let base_url = "https://accounts.betterseqta.org/api";
     let settings_json = settings.to_json()?;
     
     // Create a client with the auth header
@@ -188,8 +263,11 @@ pub async fn upload_settings_to_cloud(token: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn download_settings_from_cloud(token: String) -> Result<Settings, String> {
-    let base_url = "http://smb.adenmgb.com:100/api";
+pub async fn download_settings_from_cloud() -> Result<Settings, String> {
+    let settings = Settings::load();
+    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
+    
+    let base_url = "https://accounts.betterseqta.org/api";
     
     // Create a client with the auth header
     let client = reqwest::Client::new();
@@ -273,8 +351,11 @@ pub async fn download_settings_from_cloud(token: String) -> Result<Settings, Str
 }
 
 #[tauri::command]
-pub async fn check_cloud_settings(token: String) -> Result<bool, String> {
-    let base_url = "http://smb.adenmgb.com:100/api";
+pub async fn check_cloud_settings() -> Result<bool, String> {
+    let settings = Settings::load();
+    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
+    
+    let base_url = "https://accounts.betterseqta.org/api";
     
     // Create a client with the auth header
     let client = reqwest::Client::new();
@@ -309,46 +390,4 @@ pub async fn check_cloud_settings(token: String) -> Result<bool, String> {
     
     // Check if settings file exists
     Ok(!file_list.files.is_empty())
-}
-
-#[tauri::command]
-pub async fn get_current_user_id(token: String) -> Result<i32, String> {
-    let base_url = "http://smb.adenmgb.com:100/api";
-    
-    // Create a client with the auth header
-    let client = reqwest::Client::new();
-    
-    let response = client
-        .get(&format!("{}/auth/me", base_url))
-        .header("Authorization", format!("Bearer {}", token))
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
-    
-    let status = response.status();
-    if !status.is_success() {
-        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        
-        // Try to parse as API error for better error messages
-        if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
-            return Err(format!("API Error {}: {}", api_error.statusCode, api_error.statusMessage));
-        }
-        
-        return Err(format!("Get user failed: {} - {}", status, error_text));
-    }
-    
-    let user_text = response.text().await
-        .map_err(|e| format!("Failed to read response: {}", e))?;
-    
-    // Parse the user response to get the ID
-    #[derive(Debug, Serialize, Deserialize)]
-    struct User {
-        id: i32,
-        email: String,
-    }
-    
-    let user: User = serde_json::from_str(&user_text)
-        .map_err(|e| format!("Failed to parse user response: {} - Raw response: {}", e, user_text))?;
-    
-    Ok(user.id)
 }

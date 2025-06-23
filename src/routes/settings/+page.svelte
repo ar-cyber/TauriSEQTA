@@ -250,9 +250,56 @@
     </div>
   {:else}
     <div class="space-y-6 sm:space-y-8">
+      <!-- Cloud Sync Section -->
+      <section
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up relative">
+        <!-- Experimental Label -->
+        <div class="absolute -top-3 -right-3 z-10">
+          <div class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12">
+            EXPERIMENTAL
+          </div>
+        </div>
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Cloud Sync</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Sync your settings across devices with BetterSEQTA Plus account cloud syncing
+          </p>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <div class="flex flex-col gap-4">
+              <div>
+                <h3 class="text-sm font-semibold sm:text-base mb-2">Settings Synchronization</h3>
+                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
+                  Upload your current settings to the cloud or download settings from another device. 
+                  This includes all your shortcuts, feeds, theme preferences, and other customizations.
+                </p>
+                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
+                  <a href="https://accounts.betterseqta.org" target="_blank" rel="noopener noreferrer" 
+                     class="text-blue-600 dark:text-blue-400 hover:underline">
+                    Create a free BetterSEQTA Plus account
+                  </a> to get started with cloud syncing.
+                </p>
+              </div>
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="flex gap-2 items-center justify-center px-6 py-3 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105"
+                  onclick={openCloudSyncModal}>
+                  <Icon src={CloudArrowUp} class="w-5 h-5" />
+                  Sync Settings
+                </button>
+                <div class="text-xs text-slate-600 dark:text-slate-400 sm:self-center">
+                  Requires BetterSEQTA Plus account
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Homepage Settings -->
       <section
-        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
         <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
           <h2 class="text-base font-semibold sm:text-lg">Homepage</h2>
           <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
@@ -563,47 +610,6 @@
                   <p class="mt-1 text-xs">Add your first RSS feed to get started</p>
                 </div>
               {/if}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Cloud Sync Section -->
-      <section
-        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
-          <h2 class="text-base font-semibold sm:text-lg">Cloud Sync</h2>
-          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            Sync your settings across devices with BetterSEQTA Plus account cloud syncing
-          </p>
-        </div>
-        <div class="p-4 sm:p-6">
-          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
-            <div class="flex flex-col gap-4">
-              <div>
-                <h3 class="text-sm font-semibold sm:text-base mb-2">Settings Synchronization</h3>
-                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
-                  Upload your current settings to the cloud or download settings from another device. 
-                  This includes all your shortcuts, feeds, theme preferences, and other customizations.
-                </p>
-                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400 mb-4">
-                  <a href="https://accounts.betterseqta.org" target="_blank" rel="noopener noreferrer" 
-                     class="text-blue-600 dark:text-blue-400 hover:underline">
-                    Create a free BetterSEQTA Plus account
-                  </a> to get started with cloud syncing.
-                </p>
-              </div>
-              <div class="flex flex-col gap-3 sm:flex-row">
-                <button
-                  class="flex gap-2 items-center justify-center px-6 py-3 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105"
-                  onclick={openCloudSyncModal}>
-                  <Icon src={CloudArrowUp} class="w-5 h-5" />
-                  Sync Settings
-                </button>
-                <div class="text-xs text-slate-600 dark:text-slate-400 sm:self-center">
-                  Requires BetterSEQTA Plus account
-                </div>
-              </div>
             </div>
           </div>
         </div>
