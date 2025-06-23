@@ -174,7 +174,7 @@ pub fn save_settings_from_json(json: String) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn save_cloud_token(token: String) -> Result<CloudUser, String> {
-    let base_url = "http://smb.adenmgb.com:100/api";
+    let base_url = "https://accounts.betterseqta.org/api";
     
     // First, validate the token by fetching user details
     let client = reqwest::Client::new();
@@ -233,7 +233,7 @@ pub async fn upload_settings_to_cloud() -> Result<(), String> {
     let settings = Settings::load();
     let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     
-    let base_url = "http://smb.adenmgb.com:100/api";
+    let base_url = "https://accounts.betterseqta.org/api";
     let settings_json = settings.to_json()?;
     
     // Create a client with the auth header
@@ -267,7 +267,7 @@ pub async fn download_settings_from_cloud() -> Result<Settings, String> {
     let settings = Settings::load();
     let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     
-    let base_url = "http://smb.adenmgb.com:100/api";
+    let base_url = "https://accounts.betterseqta.org/api";
     
     // Create a client with the auth header
     let client = reqwest::Client::new();
@@ -355,7 +355,7 @@ pub async fn check_cloud_settings() -> Result<bool, String> {
     let settings = Settings::load();
     let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     
-    let base_url = "http://smb.adenmgb.com:100/api";
+    let base_url = "https://accounts.betterseqta.org/api";
     
     // Create a client with the auth header
     let client = reqwest::Client::new();
