@@ -7,6 +7,9 @@ use std::{
 use reqwest;
 use serde_json;
 
+#[path = "session.rs"]
+mod session;
+
 /// Location: `$DATA_DIR/DesQTA/settings.json`
 fn settings_file() -> PathBuf {
     let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
@@ -16,6 +19,48 @@ fn settings_file() -> PathBuf {
     }
     dir.push("settings.json");
     dir
+}
+
+fn cloud_token_file() -> PathBuf {
+    let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
+    dir.push("DesQTA");
+    if !dir.exists() {
+        fs::create_dir_all(&dir).expect("Unable to create data dir");
+    }
+    dir.push("cloud_token.json");
+    dir
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct CloudToken {
+    pub token: Option<String>,
+    pub user: Option<CloudUser>,
+}
+
+impl CloudToken {
+    pub fn load() -> Self {
+        let path = cloud_token_file();
+        if let Ok(mut file) = fs::File::open(path) {
+            let mut contents = String::new();
+            if file.read_to_string(&mut contents).is_ok() {
+                if let Ok(tok) = serde_json::from_str::<CloudToken>(&contents) {
+                    return tok;
+                }
+            }
+        }
+        CloudToken::default()
+    }
+    pub fn save(&self) -> io::Result<()> {
+        let path = cloud_token_file();
+        fs::write(path, serde_json::to_string(self).unwrap())
+    }
+    pub fn clear_file() -> io::Result<()> {
+        let path = cloud_token_file();
+        if path.exists() {
+            fs::remove_file(path)?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -29,8 +74,6 @@ pub struct Settings {
     pub force_use_location: bool,
     pub accent_color: String,
     pub theme: String,
-    pub cloud_token: Option<String>,
-    pub cloud_user: Option<CloudUser>,
 }
 
 impl Default for Settings {
@@ -45,8 +88,6 @@ impl Default for Settings {
             reminders_enabled: true,
             accent_color: "#3b82f6".to_string(), // Default to blue-500
             theme: "system".to_string(), // Default to dark theme
-            cloud_token: None,
-            cloud_user: None,
         }
     }
 }
@@ -175,76 +216,55 @@ pub fn save_settings_from_json(json: String) -> Result<(), String> {
 #[tauri::command]
 pub async fn save_cloud_token(token: String) -> Result<CloudUser, String> {
     let base_url = "https://accounts.betterseqta.org/api";
-    
-    // First, validate the token by fetching user details
     let client = reqwest::Client::new();
-    
     let response = client
         .get(&format!("{}/auth/me", base_url))
         .header("Authorization", format!("Bearer {}", token))
         .send()
         .await
         .map_err(|e| format!("Network error: {}", e))?;
-    
     let status = response.status();
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        
-        // Try to parse as API error for better error messages
         if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
             return Err(format!("API Error {}: {}", api_error.statusCode, api_error.statusMessage));
         }
-        
         return Err(format!("Authentication failed: {} - {}", status, error_text));
     }
-    
     let user_text = response.text().await
         .map_err(|e| format!("Failed to read response: {}", e))?;
-    
-    // Parse the user response
     let user: CloudUser = serde_json::from_str(&user_text)
         .map_err(|e| format!("Failed to parse user response: {} - Raw response: {}", e, user_text))?;
-    
-    // Save the token and user details to settings
-    let mut settings = Settings::load();
-    settings.cloud_token = Some(token);
-    settings.cloud_user = Some(user.clone());
-    settings.save().map_err(|e| e.to_string())?;
-    
+    let mut cloud_token = CloudToken::load();
+    cloud_token.token = Some(token);
+    cloud_token.user = Some(user.clone());
+    cloud_token.save().map_err(|e| e.to_string())?;
     Ok(user)
 }
 
 #[tauri::command]
 pub fn get_cloud_user() -> Option<CloudUser> {
-    let settings = Settings::load();
-    settings.cloud_user
+    let cloud_token = CloudToken::load();
+    cloud_token.user
 }
 
 #[tauri::command]
 pub fn clear_cloud_token() -> Result<(), String> {
-    let mut settings = Settings::load();
-    settings.cloud_token = None;
-    settings.cloud_user = None;
-    settings.save().map_err(|e| e.to_string())
+    CloudToken::clear_file().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub async fn upload_settings_to_cloud() -> Result<(), String> {
-    let settings = Settings::load();
-    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
-    
+    let cloud_token = CloudToken::load();
+    let token = cloud_token.token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     let base_url = "https://accounts.betterseqta.org/api";
+    let settings = Settings::load();
     let settings_json = settings.to_json()?;
-    
-    // Create a client with the auth header
     let client = reqwest::Client::new();
-    
-    // Create form data with the JSON content as a file
     let form = reqwest::multipart::Form::new()
         .part("file", reqwest::multipart::Part::text(settings_json)
             .file_name("desqta-settings.json")
             .mime_str("application/json").unwrap());
-    
     let response = client
         .post(&format!("{}/files/upload", base_url))
         .header("Authorization", format!("Bearer {}", token))
@@ -252,27 +272,20 @@ pub async fn upload_settings_to_cloud() -> Result<(), String> {
         .send()
         .await
         .map_err(|e| format!("Network error: {}", e))?;
-    
     let status = response.status();
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
         return Err(format!("Upload failed: {} - {}", status, error_text));
     }
-    
     Ok(())
 }
 
 #[tauri::command]
 pub async fn download_settings_from_cloud() -> Result<Settings, String> {
-    let settings = Settings::load();
-    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
-    
+    let cloud_token = CloudToken::load();
+    let token = cloud_token.token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     let base_url = "https://accounts.betterseqta.org/api";
-    
-    // Create a client with the auth header
     let client = reqwest::Client::new();
-    
-    // Use the fixed search parameter to find settings files
     let response = client
         .get(&format!("{}/files/list", base_url))
         .header("Authorization", format!("Bearer {}", token))
@@ -280,86 +293,57 @@ pub async fn download_settings_from_cloud() -> Result<Settings, String> {
         .send()
         .await
         .map_err(|e| format!("Network error: {}", e))?;
-    
     let status = response.status();
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        
-        // Try to parse as API error for better error messages
         if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
             return Err(format!("API Error {}: {}", api_error.statusCode, api_error.statusMessage));
         }
-        
         return Err(format!("List files failed: {} - {}", status, error_text));
     }
-    
-    // Get the raw response text for debugging
     let response_text = response.text().await
         .map_err(|e| format!("Failed to read response: {}", e))?;
-    
-    // Try to parse the JSON response
     let file_list: FileListResponse = serde_json::from_str(&response_text)
         .map_err(|e| format!("Failed to parse response: {} - Raw response: {}", e, response_text))?;
-    
-    // Find the settings file (should be only one since we're searching specifically)
     let settings_file = file_list.files.iter()
         .find(|file| file.filename == "desqta-settings.json")
         .ok_or("No settings file found in cloud")?;
-    
-    // Determine the correct download URL based on file's public status
     let download_url = if settings_file.is_public {
         format!("{}/files/public/{}", base_url, settings_file.stored_name)
     } else {
         format!("{}/files/{}", base_url, settings_file.stored_name)
     };
-    
-    // Build the request with proper headers as per documentation
     let mut request_builder = client.get(&download_url)
         .header("Accept", "*/*");
-    
-    // Add authorization header only for private files
     if !settings_file.is_public {
         request_builder = request_builder.header("Authorization", format!("Bearer {}", token));
     }
-    
     let response = request_builder
         .send()
         .await
         .map_err(|e| format!("Network error: {}", e))?;
-    
     let status = response.status();
-    
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        
-        // Try to parse as API error for better error messages
         if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
             return Err(format!("API Error {}: {} - StoredName: {}, IsPublic: {}", 
                               api_error.statusCode, api_error.statusMessage, 
                               settings_file.stored_name, settings_file.is_public));
         }
-        
         return Err(format!("Download failed: {} - {} - StoredName: {}, IsPublic: {}", 
                           status, error_text, settings_file.stored_name, settings_file.is_public));
     }
-    
     let settings_text = response.text().await
         .map_err(|e| format!("Failed to read response: {}", e))?;
-    
-    // Parse the settings
     Settings::from_json(&settings_text)
 }
 
 #[tauri::command]
 pub async fn check_cloud_settings() -> Result<bool, String> {
-    let settings = Settings::load();
-    let token = settings.cloud_token.clone().ok_or("No cloud token found. Please authenticate first.")?;
-    
+    let cloud_token = CloudToken::load();
+    let token = cloud_token.token.clone().ok_or("No cloud token found. Please authenticate first.")?;
     let base_url = "https://accounts.betterseqta.org/api";
-    
-    // Create a client with the auth header
     let client = reqwest::Client::new();
-    
     let response = client
         .get(&format!("{}/files/list", base_url))
         .header("Authorization", format!("Bearer {}", token))
@@ -367,27 +351,17 @@ pub async fn check_cloud_settings() -> Result<bool, String> {
         .send()
         .await
         .map_err(|e| format!("Network error: {}", e))?;
-    
     let status = response.status();
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        
-        // Try to parse as API error for better error messages
         if let Ok(api_error) = serde_json::from_str::<APIError>(&error_text) {
             return Err(format!("API Error {}: {}", api_error.statusCode, api_error.statusMessage));
         }
-        
         return Err(format!("Check failed: {} - {}", status, error_text));
     }
-    
-    // Get the raw response text for debugging
     let response_text = response.text().await
         .map_err(|_| "Failed to read response")?;
-    
-    // Try to parse the JSON response
     let file_list: FileListResponse = serde_json::from_str(&response_text)
         .map_err(|e| format!("Failed to parse response: {} - Raw response: {}", e, response_text))?;
-    
-    // Check if settings file exists
     Ok(!file_list.files.is_empty())
 }
