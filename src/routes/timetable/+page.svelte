@@ -247,7 +247,7 @@
   });
 </script>
 
-<div class="flex flex-col w-full h-full text-slate-900 dark:text-slate-50">
+<div class="flex flex-col w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-50 min-h-screen">
   <TimetableHeader
     {weekStart}
     {loadingLessons}

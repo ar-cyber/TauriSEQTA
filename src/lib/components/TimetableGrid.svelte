@@ -1,5 +1,7 @@
 <script lang="ts">
   import TimetableLesson from './TimetableLesson.svelte';
+  import { Icon, ChevronLeft, ChevronRight } from 'svelte-hero-icons';
+  import { onMount } from 'svelte';
 
   const {
     lessons,
@@ -18,7 +20,19 @@
   let selectedDayState = $state(selectedDay);
 
   const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const GRID_HEIGHT = 800;
+  let gridHeight = $state(800); // default fallback
+  let gridContainer: HTMLDivElement | null = null;
+
+  onMount(() => {
+    if (gridContainer) {
+      gridHeight = gridContainer.clientHeight;
+    }
+    const handleResize = () => {
+      if (gridContainer) gridHeight = gridContainer.clientHeight;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  });
 
   function getLessonsFor(dayIdx: number) {
     return lessons.filter((l: any) => l.dayIdx === dayIdx).sort((a: any, b: any) => a.from.localeCompare(b.from));
@@ -44,7 +58,7 @@
   }
 
   function timeToY(time: number, min: number, max: number): number {
-    return ((time - min) / (max - min)) * GRID_HEIGHT;
+    return ((time - min) / (max - min)) * gridHeight;
   }
 
   const timeBounds = $derived(getTimeBounds());
@@ -56,88 +70,143 @@
   function nextDay() {
     selectedDayState = selectedDayState === 5 ? 1 : selectedDayState + 1;
   }
+
+  function formatTime(time: string): string {
+    const [hour, minute] = time.split(':');
+    const hourNum = parseInt(hour);
+    const ampm = hourNum >= 12 ? 'PM' : 'AM';
+    const displayHour = hourNum % 12 || 12;
+    return `${displayHour}:${minute} ${ampm}`;
+  }
 </script>
+
+<style>
+  .timetable-header-row {
+    min-height: 36px;
+    height: 36px;
+    font-size: 0.98rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .timetable-day-label {
+    padding: 0.25rem 0.25rem 0.1rem 0.25rem;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .timetable-today-label {
+    font-size: 0.7rem;
+    color: var(--tw-prose-invert-bullets, #60a5fa);
+    margin-top: 0.1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .timetable-time-label {
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    padding: 0.1rem 0.1rem;
+    font-size: 0.92rem;
+  }
+  .timetable-grid-cols {
+    grid-template-columns: 56px repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+  .timetable-lesson-col {
+    gap: 0.25rem;
+    padding: 0.1rem 0.1rem;
+  }
+</style>
 
 <div class="flex overflow-hidden flex-1 items-stretch">
   <div class="flex flex-col flex-1 w-full min-h-0 justify-stretch">
-    <!-- Header Row -->
+    <!-- Desktop Header Row -->
     <div
-      class="grid grid-cols-[60px_repeat(5,1fr)] w-full border-b-2 border-slate-300 dark:border-slate-800">
-      <div class="w-14 bg-slate-100 dark:bg-slate-800"></div>
+      class="timetable-header-row grid timetable-grid-cols w-full border-b border-slate-300 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
+      <div class="timetable-time-label bg-slate-100 dark:bg-slate-800 border-r border-slate-300 dark:border-slate-700"></div>
       {#each dayLabels as day, index}
         <div
-          class="py-3 px-2 text-center font-semibold bg-slate-100 dark:bg-slate-800 border-l border-slate-300 dark:border-slate-900 text-base text-slate-900 dark:text-white/80 {new Date().getDay() ===
-          index + (1 % 7)
-            ? 'bg-blue-500 text-slate-800 dark:text-white font-bold'
-            : ''} hidden sm:block">
-          {day}
+          class="timetable-day-label text-center bg-slate-100 dark:bg-slate-800 border-l border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white/90 {new Date().getDay() === index + (1 % 7) ? 'bg-blue-500 text-white font-bold shadow-lg' : ''} hidden sm:block">
+          <div>{day}</div>
+          {#if new Date().getDay() === index + (1 % 7)}
+            <div class="timetable-today-label">Today</div>
+          {/if}
         </div>
       {/each}
     </div>
 
     <!-- Mobile Day Navigation -->
     <div
-      class="flex justify-between items-center px-4 py-2 border-b border-slate-300 sm:hidden bg-slate-100/50 dark:bg-slate-800/50 dark:border-slate-800">
+      class="flex justify-between items-center px-4 py-2 border-b border-slate-300 sm:hidden bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 dark:border-slate-700">
       <button
-        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 bg-white/80 hover:bg-white dark:bg-slate-700/80 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         on:click={prevDay}
-        disabled={loadingLessons}>&#60;</button>
-      <span class="text-base font-bold">{dayLabels[selectedDayState - 1].toUpperCase()}</span>
+        disabled={loadingLessons}
+        aria-label="Previous day">
+        <Icon src={ChevronLeft} class="w-4 h-4 text-slate-700 dark:text-slate-300" />
+      </button>
+      <div class="text-center">
+        <h2 class="text-base font-bold text-slate-900 dark:text-white">{dayLabels[selectedDayState - 1]}</h2>
+        <p class="text-xs text-slate-600 dark:text-slate-400">
+          {selectedDayState === Math.min(5, Math.max(1, new Date().getDay() === 0 ? 1 : new Date().getDay())) ? 'Today' : ''}
+        </p>
+      </div>
       <button
-        class="flex justify-center items-center w-8 h-8 rounded-full transition-transform duration-300 hover:bg-slate-200 dark:hover:bg-slate-950/40 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 bg-white/80 hover:bg-white dark:bg-slate-700/80 dark:hover:bg-slate-600 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         on:click={nextDay}
-        disabled={loadingLessons}>&#62;</button>
+        disabled={loadingLessons}
+        aria-label="Next day">
+        <Icon src={ChevronRight} class="w-4 h-4 text-slate-700 dark:text-slate-300" />
+      </button>
     </div>
 
     <!-- Time grid and lessons -->
     {#if error}
       <div class="flex flex-col justify-center items-center py-16">
-        <div
-          class="w-16 h-16 rounded-full border-4 animate-spin border-red-500/30 border-t-red-500">
-        </div>
-        <p class="mt-4 text-red-400">{error}</p>
+        <div class="w-20 h-20 rounded-full border-4 animate-spin border-red-500/30 border-t-red-500 mb-4"></div>
+        <h3 class="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">Failed to Load Timetable</h3>
+        <p class="text-red-500 dark:text-red-400 mb-4 text-center max-w-md">{error}</p>
         <button
-          class="px-4 py-2 mt-4 text-sm font-medium bg-red-600 rounded-lg transition-colors hover:bg-red-500"
+          class="px-6 py-3 text-sm font-semibold bg-red-600 hover:bg-red-500 dark:bg-red-500 dark:hover:bg-red-400 text-white rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500/50 shadow-md"
           on:click={onRetry}>
-          Retry
+          Try Again
         </button>
       </div>
     {:else if loadingLessons}
       <div class="flex flex-col justify-center items-center py-16">
-        <div
-          class="w-16 h-16 rounded-full border-4 animate-spin border-indigo-500/30 border-t-indigo-500">
-        </div>
-        <p class="mt-4 text-slate-600 dark:text-slate-400">Loading timetable...</p>
+        <div class="w-20 h-20 rounded-full border-4 animate-spin border-blue-500/30 border-t-blue-500 mb-4"></div>
+        <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">Loading Timetable</h3>
+        <p class="text-slate-600 dark:text-slate-400">Please wait while we fetch your schedule...</p>
       </div>
     {:else if lessons.length}
       <div class="overflow-y-auto relative flex-1 w-full min-h-0">
-        <div class="relative w-full" style="height: {GRID_HEIGHT}px;">
+        <div class="relative w-full h-full" bind:this={gridContainer}>
           <!-- Time labels -->
-          <div class="absolute top-0 left-0 z-10 w-14 h-full pointer-events-none">
+          <div class="absolute top-0 left-0 z-10 timetable-time-label h-full pointer-events-none">
             {#each getUniqueTimes() as time}
               <div
-                class="absolute left-0 w-full border-t border-slate-300 dark:border-slate-800"
+                class="absolute left-0 w-full border-t border-slate-300 dark:border-slate-700"
                 style="top: {timeToY(
                   timeToMinutes(time as string),
                   timeBounds.min,
                   timeBounds.max,
                 )}px;">
-                <span class="text-xs text-slate-600 dark:text-slate-400">{time}</span>
+                <div class="flex items-center justify-center h-5">
+                  <span class="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-1 rounded">
+                    {formatTime(time as string)}
+                  </span>
+                </div>
               </div>
             {/each}
           </div>
           <!-- Day columns -->
-          <div class="grid absolute top-0 right-0 left-14 grid-cols-1 h-full sm:grid-cols-5">
+          <div class="grid absolute top-0 right-0 left-[56px] grid-cols-1 h-full sm:grid-cols-5 gap-x-2 gap-y-1">
             {#each Array(5) as _, dayIdx}
               <div
-                class="relative h-full border-l border-slate-300 dark:border-slate-800 {dayIdx +
-                  1 !==
-                selectedDayState
-                  ? 'hidden sm:block'
-                  : ''}">
+                class="relative h-full border-l border-slate-300 dark:border-slate-700 timetable-lesson-col {dayIdx + 1 !== selectedDayState ? 'hidden sm:block' : ''}">
                 {#each getLessonsFor(dayIdx) as lesson}
                   <div
-                    class="absolute right-1 left-1"
+                    class="absolute right-0 left-0"
                     style="
                     top: {timeToY(
                       timeToMinutes(lesson.from),
@@ -162,11 +231,14 @@
     {:else}
       <div class="flex flex-col justify-center items-center py-16">
         <div
-          class="w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-gradient">
+          class="w-24 h-24 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-4xl shadow-[0_0_30px_rgba(99,102,241,0.3)] animate-pulse mb-6">
           📚
         </div>
-        <p class="mt-4 text-xl text-slate-700 dark:text-slate-300">
-          No lessons available for this week.
+        <h3 class="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">
+          No Lessons This Week
+        </h3>
+        <p class="text-slate-600 dark:text-slate-400 text-center max-w-md">
+          It looks like there are no scheduled lessons for this week. Check back later or try a different week.
         </p>
       </div>
     {/if}
