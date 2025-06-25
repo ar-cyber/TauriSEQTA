@@ -188,36 +188,50 @@
   }
 
   async function exportTimetablePDF() {
+    console.log('Starting PDF export...');
     pdfLoading = true;
-    const doc = new jsPDF();
-    const header = ['Day', 'Subject', 'Code', 'From', 'Until', 'Room', 'Teacher'];
-    const sortedLessons = [...lessons].sort(
-      (a, b) => a.dayIdx - b.dayIdx || a.from.localeCompare(b.from),
-    );
-    const rows = sortedLessons.map((l) => [
-      new Date(l.date).toLocaleDateString('en-AU', { weekday: 'long' }),
-      l.description || '',
-      l.code || '',
-      l.from,
-      l.until,
-      l.room || '',
-      l.staff || '',
-    ]);
-    doc.text('Weekly Timetable', 14, 16);
-    autoTable(doc, {
-      head: [header],
-      body: rows,
-      startY: 22,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [59, 130, 246] },
-      alternateRowStyles: { fillColor: [240, 240, 240] },
-    });
+    
+    try {
+      const doc = new jsPDF();
+      const header = ['Day', 'Subject', 'Code', 'From', 'Until', 'Room', 'Teacher'];
+      const sortedLessons = [...lessons].sort(
+        (a, b) => a.dayIdx - b.dayIdx || a.from.localeCompare(b.from),
+      );
+      const rows = sortedLessons.map((l) => [
+        new Date(l.date).toLocaleDateString('en-AU', { weekday: 'long' }),
+        l.description || '',
+        l.code || '',
+        l.from,
+        l.until,
+        l.room || '',
+        l.staff || '',
+      ]);
+      
+      console.log('Creating PDF with', rows.length, 'rows');
+      
+      doc.text('Weekly Timetable', 14, 16);
+      autoTable(doc, {
+        head: [header],
+        body: rows,
+        startY: 22,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [59, 130, 246] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+      });
 
-    const pdfBlob = doc.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    pdfUrl = url;
-    showPdfViewer = true;
-    pdfLoading = false;
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      
+      console.log('PDF created, setting URL and showing viewer');
+      pdfUrl = url;
+      showPdfViewer = true;
+      pdfLoading = false;
+      
+      console.log('PDF export completed');
+    } catch (error) {
+      console.error('Error creating PDF:', error);
+      pdfLoading = false;
+    }
   }
 
   function handlePdfViewerClose() {

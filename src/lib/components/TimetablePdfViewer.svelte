@@ -18,6 +18,10 @@
   let showPdfViewerState = $state(showPdfViewer);
 
   $effect(() => {
+    showPdfViewerState = showPdfViewer;
+  });
+
+  $effect(() => {
     if (!showPdfViewerState) {
       onClose();
     }
