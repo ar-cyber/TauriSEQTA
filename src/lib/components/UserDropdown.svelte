@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Icon, ArrowRightOnRectangle } from 'svelte-hero-icons';
   import { fly } from 'svelte/transition';
+  import { invoke } from '@tauri-apps/api/core';
 
   interface UserInfo {
     clientIP: string;
@@ -122,6 +123,35 @@
           <div class="flex-1">
             <div class="font-medium">Sign out</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-white/80">End your session</div>
+          </div>
+        </button>
+
+        <div class="my-2 border-t border-slate-200 dark:border-slate-700/40"></div>
+
+        <button
+          class="flex gap-3 items-center px-4 py-3 w-full text-left rounded-xl transition-all duration-200 text-red-600 hover:bg-red-500 hover:text-white dark:text-red-400 group"
+          onclick={() => {
+            onToggleUserDropdown();
+            // Call the quit command
+            invoke('quit');
+          }}>
+          <div
+            class="flex justify-center items-center w-8 h-8 rounded-lg transition-colors bg-red-100 group-hover:bg-red-500/20 dark:bg-red-900/30">
+            <svg
+              class="w-4 h-4 text-red-600 dark:text-red-400 group-hover:text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <div class="font-medium">Quit DesQTA</div>
+            <div class="text-xs text-red-500 dark:text-red-400 group-hover:text-white/80">Close the application</div>
           </div>
         </button>
       </div>

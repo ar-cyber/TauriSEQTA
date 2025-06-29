@@ -13,10 +13,13 @@
     "windows": [
       {
         "title": "DesQTA",
-        "width": 800,
-        "height": 600,
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1200,
+        "minHeight": 800,
         "decorations": false,
-        "transparent": true
+        "center": true,
+        "visible": true
       }
     ],
     "security": {

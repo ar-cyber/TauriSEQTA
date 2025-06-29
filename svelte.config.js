@@ -13,7 +13,11 @@ const config = {
 			fallback: 'index.html',
 			precompress: false,
 			strict: true
-		})
+		}),
+		// Optimize for single-page app
+		prerender: {
+			handleHttpError: 'warn'
+		}
 	},
 	preprocess: vitePreprocess()
 };

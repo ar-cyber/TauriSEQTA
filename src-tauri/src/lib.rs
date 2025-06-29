@@ -16,8 +16,12 @@ mod analytics;
 mod session;
 
 use tauri::Manager;
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+use tauri::tray::TrayIconBuilder;
+use tauri::{AppHandle, WindowEvent};
 use tauri_plugin_notification;
 use tauri_plugin_single_instance;
+use tauri_plugin_autostart;
 use urlencoding::decode;
 
 /// Boilerplate example command
@@ -26,12 +30,35 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[tauri::command]
+fn quit(app: AppHandle) {
+    app.exit(0);
+}
+
+fn run_on_tray<T: FnOnce() -> ()>(f: T) {
+    #[cfg(target_os = "macos")]
+    {
+        use cocoa::appkit::NSApp;
+        use cocoa::base::id;
+        use objc::{msg_send, sel, sel_impl};
+        unsafe {
+            let app: id = msg_send![NSApp(), sharedApplication];
+            let _: () = msg_send![app, setActivationPolicy: 1];
+        }
+    }
+    f();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_deep_link::init());
+        .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec!["--minimize"]),
+        ));
 
     #[cfg(not(any(target_os = "ios", target_os = "android")))]
     {
@@ -105,6 +132,7 @@ pub fn run() {
     builder
         .invoke_handler(tauri::generate_handler![
             greet,
+            quit,
             netgrab::get_api_data,
             netgrab::open_url,
             netgrab::get_rss_feed,
@@ -129,6 +157,60 @@ pub fn run() {
             analytics::load_analytics,
             analytics::delete_analytics,
         ])
+        .setup(|app| {
+            // Configure the existing main window
+            if let Some(window) = app.webview_windows().get("main") {
+                let _ = window.set_title("DesQTA");
+                let _ = window.set_min_size(Some(tauri::Size::Logical(tauri::LogicalSize::new(1200.0, 800.0))));
+                let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(1400.0, 900.0)));
+                let _ = window.set_decorations(false);
+                let _ = window.center();
+            }
+
+            // Create tray menu
+            let menu = Menu::with_items(
+                app,
+                &[
+                    &MenuItem::with_id(app, "open", "Open DesQTA", true, None::<&str>)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
+                ],
+            )?;
+
+            // Setup tray icon
+            run_on_tray(|| {
+                TrayIconBuilder::new()
+                    .icon(app.default_window_icon().unwrap().clone())
+                    .menu(&menu)
+                    .on_menu_event(move |app, event| match event.id.as_ref() {
+                        "open" => {
+                            if let Some(window) = app.webview_windows().get("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        "quit" => {
+                            app.exit(0);
+                        }
+                        _ => {
+                            println!("Menu event not handled: {:?}", event.id);
+                        }
+                    })
+                    .build(app)
+                    .expect("Error while setting up tray menu");
+            });
+
+            Ok(())
+        })
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                // Hide window instead of closing when user clicks X
+                run_on_tray(|| {
+                    window.hide().unwrap();
+                    api.prevent_close();
+                });
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
