@@ -30,7 +30,7 @@
             : $page.url.pathname.startsWith(item.path)
         )
           ? 'bg-accent text-white'
-          : 'text-slate-900 dark:text-slate-300'}">
+          : 'text-slate-900 dark:text-slate-300'} playful">
         <Icon
           src={item.icon}
           class="w-6 h-6 {(

@@ -113,3 +113,33 @@ body {
   height: 100%;
   overflow: auto;
 }
+
+/* Enhanced Animations */
+.enhanced-animations .playful {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.enhanced-animations .playful:hover {
+  transform: scale(1.05);
+}
+
+.enhanced-animations .playful:active {
+  transform: scale(0.95);
+}
+
+/* Override classes for specific elements that need different animations */
+.enhanced-animations .playful-subtle:hover {
+  transform: scale(1.02);
+}
+
+.enhanced-animations .playful-subtle:active {
+  transform: scale(0.98);
+}
+
+.enhanced-animations .playful-extra:hover {
+  transform: scale(1.1);
+}
+
+.enhanced-animations .playful-extra:active {
+  transform: scale(0.9);
+}

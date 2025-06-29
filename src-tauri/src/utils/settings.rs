@@ -75,6 +75,7 @@ pub struct Settings {
     pub accent_color: String,
     pub theme: String,
     pub disable_school_picture: bool,
+    pub enhanced_animations: bool,
 }
 
 impl Default for Settings {
@@ -90,6 +91,7 @@ impl Default for Settings {
             accent_color: "#3b82f6".to_string(), // Default to blue-500
             theme: "system".to_string(), // Default to system theme
             disable_school_picture: false,
+            enhanced_animations: true,
         }
     }
 }
@@ -247,6 +249,7 @@ impl Settings {
         default_settings.accent_color = get_string(&existing_json, "accent_color", &default_settings.accent_color);
         default_settings.theme = get_string(&existing_json, "theme", &default_settings.theme);
         default_settings.disable_school_picture = get_bool(&existing_json, "disable_school_picture", default_settings.disable_school_picture);
+        default_settings.enhanced_animations = get_bool(&existing_json, "enhanced_animations", default_settings.enhanced_animations);
 
         default_settings
     }

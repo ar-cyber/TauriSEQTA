@@ -29,6 +29,7 @@
   import { writable } from 'svelte/store';
   import { seqtaFetch } from '../utils/netUtil';
   import LoadingScreen from '../lib/components/LoadingScreen.svelte';
+  import { page } from '$app/stores';
   export const needsSetup = writable(false);
 
   let seqtaUrl = $state<string>('');
@@ -57,6 +58,8 @@
 
   let disableSchoolPicture = $state(false);
 
+  let enhancedAnimations = $state(true);
+
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
     if (!target.closest('.user-dropdown-container')) {
@@ -84,6 +87,17 @@
   onDestroy(() => {
     if (unlisten) unlisten();
   });
+
+  // Function to reload enhanced animations setting
+  async function reloadEnhancedAnimationsSetting() {
+    try {
+      const settings = await invoke<{ enhanced_animations?: boolean }>('get_settings');
+      enhancedAnimations = settings.enhanced_animations ?? true;
+      console.log('Enhanced animations setting reloaded:', enhancedAnimations);
+    } catch (e) {
+      console.error('Failed to reload enhanced animations setting:', e);
+    }
+  }
 
   async function startLogin() {
     if (!seqtaUrl) return;
@@ -177,8 +191,41 @@
     document.documentElement.style.setProperty('--accent-color-value', $accentColor);
   });
 
+  async function loadEnhancedAnimationsSetting() {
+    try {
+      const settings = await invoke<{ enhanced_animations?: boolean }>('get_settings');
+      enhancedAnimations = settings.enhanced_animations ?? true;
+      console.log('Enhanced animations setting loaded:', enhancedAnimations);
+    } catch (e) {
+      console.error('Failed to load enhanced animations setting:', e);
+      enhancedAnimations = true;
+    }
+  }
+
+  $effect(() => {
+    console.log('Enhanced animations effect triggered:', enhancedAnimations);
+    if (enhancedAnimations) {
+      document.body.classList.add('enhanced-animations');
+    } else {
+      document.body.classList.remove('enhanced-animations');
+    }
+  });
+
+  // Reload enhanced animations setting when navigating to settings
+  $effect(() => {
+    if ($page.url.pathname === '/settings') {
+      reloadEnhancedAnimationsSetting();
+    }
+  });
+
   onMount(async () => {
-    await Promise.all([checkSession(), loadWeatherSettings(), loadAccentColor(), loadTheme()]);
+    await Promise.all([
+      checkSession(),
+      loadWeatherSettings(),
+      loadAccentColor(),
+      loadTheme(),
+      loadEnhancedAnimationsSetting()
+    ]);
     if (weatherEnabled) {
       if (forceUseLocation) fetchWeather();
       else fetchWeatherWithIP();

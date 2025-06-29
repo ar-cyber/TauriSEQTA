@@ -35,6 +35,7 @@
   let feeds: Feed[] = [];
   let weatherCountry = '';
   let disableSchoolPicture = false;
+  let enhancedAnimations = true;
 
   let remindersEnabled = true;
   let showCloudSyncModal = false;
@@ -53,6 +54,7 @@
         accent_color: string;
         theme: 'light' | 'dark';
         disable_school_picture?: boolean;
+        enhanced_animations?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -62,6 +64,7 @@
       weatherCountry = settings.weather_country ?? '';
       remindersEnabled = settings.reminders_enabled ?? true;
       disableSchoolPicture = settings.disable_school_picture ?? false;
+      enhancedAnimations = settings.enhanced_animations ?? true;
       accentColor.set(settings.accent_color ?? '#3b82f6');
       theme.set(settings.theme ?? 'dark');
 
@@ -83,6 +86,7 @@
       weatherCountry = '';
       remindersEnabled = true;
       disableSchoolPicture = false;
+      enhancedAnimations = true;
       accentColor.set('#3b82f6');
       theme.set('dark');
     }
@@ -102,6 +106,7 @@
       remindersEnabled,
       forceUseLocation,
       theme: $theme,
+      enhancedAnimations,
     });
     try {
       await invoke('save_settings', {
@@ -116,6 +121,7 @@
           accent_color: $accentColor,
           theme: $theme,
           disable_school_picture: disableSchoolPicture,
+          enhanced_animations: enhancedAnimations,
         },
       });
       saveSuccess = true;
@@ -202,6 +208,7 @@
     weatherCountry = cloudSettings.weather_country ?? '';
     remindersEnabled = cloudSettings.reminders_enabled ?? true;
     disableSchoolPicture = cloudSettings.disable_school_picture ?? false;
+    enhancedAnimations = cloudSettings.enhanced_animations ?? true;
     accentColor.set(cloudSettings.accent_color ?? '#3b82f6');
     theme.set(cloudSettings.theme ?? 'dark');
 
@@ -222,7 +229,7 @@
     <h1 class="text-xl font-bold sm:text-2xl px-2 py-1 rounded-lg">Settings</h1>
     <div class="flex flex-col gap-2 items-start w-full sm:flex-row sm:items-center sm:w-auto">
       <button
-        class="px-6 py-2 w-full text-white bg-gradient-to-r from-green-600 to-green-500 rounded-lg shadow-lg transition-all duration-200 sm:w-auto hover:from-green-700 hover:to-green-600 focus:ring-2 focus:ring-green-400 active:scale-95 hover:scale-105"
+        class="px-6 py-2 w-full text-white bg-gradient-to-r from-green-600 to-green-500 rounded-lg shadow-lg transition-all duration-200 sm:w-auto hover:from-green-700 hover:to-green-600 focus:ring-2 focus:ring-green-400 active:scale-95 hover:scale-105 playful"
         onclick={saveSettings}
         disabled={saving}>
         {#if saving}
@@ -289,7 +296,7 @@
               </div>
               <div class="flex flex-col gap-3 sm:flex-row">
                 <button
-                  class="flex gap-2 items-center justify-center px-6 py-3 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105"
+                  class="flex gap-2 items-center justify-center px-6 py-3 text-white rounded-lg shadow transition-all duration-200 accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105 playful"
                   onclick={openCloudSyncModal}>
                   <Icon src={CloudArrowUp} class="w-5 h-5" />
                   Sync Settings
@@ -526,6 +533,22 @@
               class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
               >Disable school picture in user dropdown</label>
           </div>
+          <!-- Enhanced Animations Setting -->
+          <div class="flex gap-4 items-center mt-4">
+            <input
+              id="enhanced-animations"
+              type="checkbox"
+              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+              bind:checked={enhancedAnimations} />
+            <label
+              for="enhanced-animations"
+              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+              >Enhanced Animations (playful, alive UI)</label>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 ml-8">
+            When enabled, interactive elements will have playful, lively animations.<br />
+            You can override this on specific elements in code.
+          </p>
         </div>
       </section>
 
