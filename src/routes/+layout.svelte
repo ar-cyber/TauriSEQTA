@@ -11,6 +11,7 @@
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
   import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
+  import { Icon } from 'svelte-hero-icons';
   import {
     Home,
     Newspaper,
@@ -22,6 +23,7 @@
     ChartBar,
     Cog6Tooth,
     CalendarDays,
+    User,
   } from 'svelte-hero-icons';
 
   import { writable } from 'svelte/store';
@@ -237,6 +239,7 @@
     { label: 'Messages', icon: ChatBubbleLeftRight, path: '/direqt-messages' },
     { label: 'Notices', icon: DocumentText, path: '/notices' },
     { label: 'News', icon: Newspaper, path: '/news' },
+    { label: 'Directory', icon: User, path: '/directory' },
     { label: 'Reports', icon: ChartBar, path: '/reports' },
     { label: 'Settings', icon: Cog6Tooth, path: '/settings' },
     { label: 'Analytics', icon: AcademicCap, path: '/analytics' },
