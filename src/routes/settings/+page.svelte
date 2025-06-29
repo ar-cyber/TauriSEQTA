@@ -38,6 +38,7 @@
 
   let remindersEnabled = true;
   let showCloudSyncModal = false;
+  let testFeatureEnabled = false;
 
   async function loadSettings() {
     loading = true;
@@ -53,6 +54,7 @@
         accent_color: string;
         theme: 'light' | 'dark';
         disable_school_picture?: boolean;
+        test_feature_enabled?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -62,6 +64,7 @@
       weatherCountry = settings.weather_country ?? '';
       remindersEnabled = settings.reminders_enabled ?? true;
       disableSchoolPicture = settings.disable_school_picture ?? false;
+      testFeatureEnabled = settings.test_feature_enabled ?? false;
       accentColor.set(settings.accent_color ?? '#3b82f6');
       theme.set(settings.theme ?? 'dark');
 
@@ -73,6 +76,7 @@
         remindersEnabled,
         forceUseLocation,
         theme: settings.theme,
+        testFeatureEnabled,
       });
     } catch (e) {
       shortcuts = [];
@@ -83,6 +87,7 @@
       weatherCountry = '';
       remindersEnabled = true;
       disableSchoolPicture = false;
+      testFeatureEnabled = false;
       accentColor.set('#3b82f6');
       theme.set('dark');
     }
@@ -102,6 +107,7 @@
       remindersEnabled,
       forceUseLocation,
       theme: $theme,
+      testFeatureEnabled,
     });
     try {
       await invoke('save_settings', {
@@ -116,6 +122,7 @@
           accent_color: $accentColor,
           theme: $theme,
           disable_school_picture: disableSchoolPicture,
+          test_feature_enabled: testFeatureEnabled,
         },
       });
       saveSuccess = true;
@@ -202,6 +209,7 @@
     weatherCountry = cloudSettings.weather_country ?? '';
     remindersEnabled = cloudSettings.reminders_enabled ?? true;
     disableSchoolPicture = cloudSettings.disable_school_picture ?? false;
+    testFeatureEnabled = cloudSettings.test_feature_enabled ?? false;
     accentColor.set(cloudSettings.accent_color ?? '#3b82f6');
     theme.set(cloudSettings.theme ?? 'dark');
 
@@ -526,6 +534,22 @@
               class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
               >Disable school picture in user dropdown</label>
           </div>
+          
+          <!-- Test Feature Setting -->
+          <div class="flex gap-4 items-center mt-4">
+            <input
+              id="test-feature-enabled"
+              type="checkbox"
+              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+              bind:checked={testFeatureEnabled} />
+            <label
+              for="test-feature-enabled"
+              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+              >Test Feature (Smart Merge Test)</label>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 ml-8">
+            This is a test setting to verify the smart merge system works correctly when new settings are added.
+          </p>
         </div>
       </section>
 

@@ -75,6 +75,7 @@ pub struct Settings {
     pub accent_color: String,
     pub theme: String,
     pub disable_school_picture: bool,
+    pub test_feature_enabled: bool,
 }
 
 impl Default for Settings {
@@ -88,8 +89,9 @@ impl Default for Settings {
             weather_country: String::new(),
             reminders_enabled: true,
             accent_color: "#3b82f6".to_string(), // Default to blue-500
-            theme: "system".to_string(), // Default to dark theme
+            theme: "system".to_string(), // Default to system theme
             disable_school_picture: false,
+            test_feature_enabled: false,
         }
     }
 }
@@ -162,18 +164,93 @@ struct APIError {
 }
 
 impl Settings {
-    /// Load from disk; returns default if none.
+    /// Load from disk with smart merging; returns default if none.
     pub fn load() -> Self {
         let path = settings_file();
-        if let Ok(mut file) = fs::File::open(path) {
+        if let Ok(mut file) = fs::File::open(&path) {
             let mut contents = String::new();
             if file.read_to_string(&mut contents).is_ok() {
+                // Try to parse as the current Settings struct first
                 if let Ok(settings) = serde_json::from_str::<Settings>(&contents) {
                     return settings;
+                }
+                
+                // If that fails, try to merge with existing JSON
+                if let Ok(existing_json) = serde_json::from_str::<serde_json::Value>(&contents) {
+                    return Self::merge_with_existing(existing_json);
                 }
             }
         }
         Settings::default()
+    }
+
+    /// Smart merge function that preserves existing settings when new fields are added
+    fn merge_with_existing(existing_json: serde_json::Value) -> Self {
+        let mut default_settings = Settings::default();
+        
+        // Helper function to safely extract values with fallbacks
+        let get_string = |json: &serde_json::Value, key: &str, default: &str| {
+            json.get(key)
+                .and_then(|v| v.as_str())
+                .unwrap_or(default)
+                .to_string()
+        };
+        
+        let get_bool = |json: &serde_json::Value, key: &str, default: bool| {
+            json.get(key)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(default)
+        };
+        
+        let get_array = |json: &serde_json::Value, key: &str| {
+            json.get(key)
+                .and_then(|v| v.as_array())
+                .cloned()
+                .unwrap_or_default()
+        };
+
+        // Merge shortcuts
+        let shortcuts_json = get_array(&existing_json, "shortcuts");
+        let mut shortcuts = Vec::new();
+        for shortcut_json in shortcuts_json {
+            if let (Some(name), Some(icon), Some(url)) = (
+                shortcut_json.get("name").and_then(|v| v.as_str()),
+                shortcut_json.get("icon").and_then(|v| v.as_str()),
+                shortcut_json.get("url").and_then(|v| v.as_str()),
+            ) {
+                shortcuts.push(Shortcut {
+                    name: name.to_string(),
+                    icon: icon.to_string(),
+                    url: url.to_string(),
+                });
+            }
+        }
+        default_settings.shortcuts = shortcuts;
+
+        // Merge feeds
+        let feeds_json = get_array(&existing_json, "feeds");
+        let mut feeds = Vec::new();
+        for feed_json in feeds_json {
+            if let Some(url) = feed_json.get("url").and_then(|v| v.as_str()) {
+                feeds.push(Feed {
+                    url: url.to_string(),
+                });
+            }
+        }
+        default_settings.feeds = feeds;
+
+        // Merge individual settings with fallbacks to defaults
+        default_settings.weather_enabled = get_bool(&existing_json, "weather_enabled", default_settings.weather_enabled);
+        default_settings.weather_city = get_string(&existing_json, "weather_city", &default_settings.weather_city);
+        default_settings.weather_country = get_string(&existing_json, "weather_country", &default_settings.weather_country);
+        default_settings.reminders_enabled = get_bool(&existing_json, "reminders_enabled", default_settings.reminders_enabled);
+        default_settings.force_use_location = get_bool(&existing_json, "force_use_location", default_settings.force_use_location);
+        default_settings.accent_color = get_string(&existing_json, "accent_color", &default_settings.accent_color);
+        default_settings.theme = get_string(&existing_json, "theme", &default_settings.theme);
+        default_settings.disable_school_picture = get_bool(&existing_json, "disable_school_picture", default_settings.disable_school_picture);
+        default_settings.test_feature_enabled = get_bool(&existing_json, "test_feature_enabled", default_settings.test_feature_enabled);
+
+        default_settings
     }
 
     /// Persist to disk.
