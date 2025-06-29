@@ -6,6 +6,7 @@ use std::{
 };
 
 /// Location: `$DATA_DIR/DesQTA/session.json`
+#[allow(dead_code)]
 pub fn session_file() -> PathBuf {
     // e.g. %APPDATA%/DesQTA on Windows, ~/.local/share/DesQTA on Linux/macOS
     let mut dir = dirs_next::data_dir().expect("Unable to determine data dir");
@@ -33,6 +34,7 @@ pub struct Cookie {
     pub path: Option<String>,
 }
 
+#[allow(dead_code)]
 impl Session {
     /// Load from disk; returns empty/default if none.
     pub fn load() -> Self {

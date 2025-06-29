@@ -155,6 +155,7 @@ struct Pagination {
     pages: i32,
 }
 
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 struct APIError {
     statusCode: i32,

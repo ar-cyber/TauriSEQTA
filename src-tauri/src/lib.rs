@@ -18,10 +18,11 @@ mod session;
 use tauri::Manager;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
-use tauri::{AppHandle, WindowEvent};
+use tauri::{AppHandle, WindowEvent, Window};
 use tauri_plugin_notification;
 use tauri_plugin_single_instance;
 use tauri_plugin_autostart;
+use tauri_plugin_autostart::ManagerExt;
 use urlencoding::decode;
 
 /// Boilerplate example command
@@ -33,6 +34,45 @@ fn greet(name: &str) -> String {
 #[tauri::command]
 fn quit(app: AppHandle) {
     app.exit(0);
+}
+
+#[tauri::command]
+fn enable_autostart(window: Window) -> Result<(), String> {
+    #[cfg(desktop)]
+    {
+        let manager = window.app_handle().autolaunch();
+        manager.enable().map_err(|e| e.to_string())
+    }
+    #[cfg(not(desktop))]
+    {
+        Err("Autostart not supported on this platform".to_string())
+    }
+}
+
+#[tauri::command]
+fn disable_autostart(window: Window) -> Result<(), String> {
+    #[cfg(desktop)]
+    {
+        let manager = window.app_handle().autolaunch();
+        manager.disable().map_err(|e| e.to_string())
+    }
+    #[cfg(not(desktop))]
+    {
+        Err("Autostart not supported on this platform".to_string())
+    }
+}
+
+#[tauri::command]
+fn is_autostart_enabled(window: Window) -> Result<bool, String> {
+    #[cfg(desktop)]
+    {
+        let manager = window.app_handle().autolaunch();
+        manager.is_enabled().map_err(|e| e.to_string())
+    }
+    #[cfg(not(desktop))]
+    {
+        Err("Autostart not supported on this platform".to_string())
+    }
 }
 
 fn run_on_tray<T: FnOnce() -> ()>(f: T) {
@@ -133,6 +173,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             quit,
+            enable_autostart,
+            disable_autostart,
+            is_autostart_enabled,
             netgrab::get_api_data,
             netgrab::open_url,
             netgrab::get_rss_feed,
