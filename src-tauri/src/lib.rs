@@ -105,6 +105,13 @@ pub fn run() {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             println!("[Desqta] Single instance event: {:?}", argv);
             
+            // Show and focus the main window when app is launched again
+            if let Some(window) = app.webview_windows().get("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+                println!("[Desqta] Brought main window to focus");
+            }
+            
             // Handle deep link in single instance
             if let Some(url) = argv.get(1) {
                 println!("[Desqta] Processing deep link in single instance: {}", url);
