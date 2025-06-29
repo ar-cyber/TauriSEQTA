@@ -211,8 +211,8 @@ pub fn run() {
             // Configure the existing main window
             if let Some(window) = app.webview_windows().get("main") {
                 let _ = window.set_title("DesQTA");
-                let _ = window.set_min_size(Some(tauri::Size::Logical(tauri::LogicalSize::new(1200.0, 800.0))));
-                let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(1400.0, 900.0)));
+                let _ = window.set_min_size(Some(tauri::Size::Logical(tauri::LogicalSize::new(900.0, 700.0))));
+                let _ = window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(900.0, 700.0)));
                 let _ = window.set_decorations(false);
                 let _ = window.center();
             }
