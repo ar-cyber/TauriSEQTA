@@ -7,6 +7,7 @@
   const studentId = 69;
 
   let upcomingAssessments = $state<any[]>([]);
+  let allSubjects = $state<any[]>([]);
   let activeSubjects = $state<any[]>([]);
   let lessonColours = $state<any[]>([]);
   let loadingAssessments = $state<boolean>(true);
@@ -14,9 +15,19 @@
   let subjectFilters: Record<string, boolean> = {};
   let remindersEnabled = true;
   let groupBy = $state<'subject' | 'month' | 'status'>('subject');
+  
+  // Year filter state
+  let selectedYear = $state<number>(new Date().getFullYear());
+  let availableYears = $state<number[]>([]);
 
   const filteredAssessments = $derived(
-    upcomingAssessments.filter((a: any) => subjectFilters[a.code]),
+    upcomingAssessments.filter((a: any) => {
+      // Filter by year only
+      const assessmentYear = new Date(a.due).getFullYear();
+      if (assessmentYear !== selectedYear) return false;
+      
+      return true;
+    }),
   );
 
   async function loadLessonColours() {
@@ -46,45 +57,64 @@
       const cachedData = cache.get<{
         assessments: any[];
         subjects: any[];
+        allSubjects: any[];
         filters: Record<string, boolean>;
+        years: number[];
       }>('assessments_overview_data');
 
       if (cachedData) {
         upcomingAssessments = cachedData.assessments;
         activeSubjects = cachedData.subjects;
+        allSubjects = cachedData.allSubjects;
         subjectFilters = cachedData.filters;
+        availableYears = cachedData.years;
         loadingAssessments = false;
         return;
       }
 
-      const [assessmentsRes, classesRes] = await Promise.all([
-        seqtaFetch('/seqta/student/assessment/list/upcoming?', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json; charset=utf-8' },
-          body: { student: studentId },
-        }),
-        seqtaFetch('/seqta/student/load/subjects?', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json; charset=utf-8' },
-          body: {},
-        }),
-      ]);
+      const classesRes = await seqtaFetch('/seqta/student/load/subjects?', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: {},
+      });
 
       const colours = await loadLessonColours();
 
       const classesResJson = JSON.parse(classesRes);
-      const activeClass = classesResJson.payload.find((c: any) => c.active);
-      activeSubjects = activeClass ? activeClass.subjects : [];
+      const folders = classesResJson.payload;
+      
+      // Get all subjects from all folders
+      allSubjects = folders.flatMap((f: any) => f.subjects);
+      
+      // Remove duplicate subjects by programme+metaclass
+      const uniqueSubjectsMap = new Map();
+      allSubjects.forEach((s: any) => {
+        const key = `${s.programme}-${s.metaclass}`;
+        if (!uniqueSubjectsMap.has(key)) uniqueSubjectsMap.set(key, s);
+      });
+      allSubjects = Array.from(uniqueSubjectsMap.values());
 
-      // Initialize subject filters on first run
-      activeSubjects.forEach((s: any) => {
-        if (!(s.code in subjectFilters)) subjectFilters[s.code] = true;
+      // Get active subjects for default filters
+      const activeFolder = folders.find((c: any) => c.active);
+      activeSubjects = activeFolder ? activeFolder.subjects : [];
+
+      // Initialize subject filters on first run - include all subjects
+      allSubjects.forEach((s: any) => {
+        if (!(s.code in subjectFilters)) {
+          // Default to true for active subjects, false for others
+          subjectFilters[s.code] = activeSubjects.some((as: any) => as.code === s.code);
+        }
       });
 
-      const activeCodes = activeSubjects.map((s: any) => s.code);
+      // Fetch upcoming assessments for current active subjects
+      const assessmentsRes = await seqtaFetch('/seqta/student/assessment/list/upcoming?', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: { student: studentId },
+      });
 
-      // Fetch past assessments for each active subject
-      const pastAssessmentsPromises = activeSubjects.map((subject) =>
+      // Fetch past assessments for every subject ever
+      const pastAssessmentsPromises = allSubjects.map((subject) =>
         seqtaFetch('/seqta/student/assessment/list/past?', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -113,18 +143,25 @@
       });
       const uniqueAssessments = Array.from(uniqueAssessmentsMap.values());
 
+      // Process assessments and add colors
       upcomingAssessments = uniqueAssessments
-        .filter((a: any) => activeCodes.includes(a.code))
         .map((a: any) => {
           const prefName = `timetable.subject.colour.${a.code}`;
           const c = colours.find((p: any) => p.name === prefName);
           a.colour = c ? c.value : '#8e8e8e';
           // Get the metaclass from the subject
-          const subject = activeSubjects.find((s: any) => s.code === a.code);
+          const subject = allSubjects.find((s: any) => s.code === a.code);
           a.metaclass = subject?.metaclass;
           return a;
         })
         .sort((a: any, b: any) => new Date(b.due).getTime() - new Date(a.due).getTime());
+
+      // Extract available years from assessments
+      const years = new Set<number>();
+      upcomingAssessments.forEach((a: any) => {
+        years.add(new Date(a.due).getFullYear());
+      });
+      availableYears = Array.from(years).sort((a, b) => b - a); // Sort descending
 
       // Cache all the data for 10 minutes
       cache.set(
@@ -132,7 +169,9 @@
         {
           assessments: upcomingAssessments,
           subjects: activeSubjects,
+          allSubjects: allSubjects,
           filters: subjectFilters,
+          years: availableYears,
         },
         10,
       );
@@ -196,7 +235,7 @@
   let currentYear = $derived(currentDate.getFullYear());
 
   function getAssessmentsForDate(date: Date) {
-    return upcomingAssessments.filter((a) => {
+    return filteredAssessments.filter((a) => {
       const assessmentDate = new Date(a.due);
       return (
         assessmentDate.getDate() === date.getDate() &&
@@ -371,6 +410,24 @@
     </div>
   </div>
 
+  <!-- Year Filter -->
+  {#if availableYears && availableYears.length > 0}
+    <div class="flex flex-col gap-4 p-4 rounded-xl border backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/50 border-slate-300/50 dark:border-slate-700/50">
+      <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-400">Filter by Year</h3>
+      <div class="flex flex-wrap gap-2">
+        {#each availableYears as year}
+          <button
+            class="px-3 py-2 rounded-lg transition-all duration-200 text-sm {selectedYear === year
+              ? 'accent-bg text-white shadow-lg accent-shadow'
+              : 'bg-slate-200/80 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-700/50 hover:scale-105'}"
+            onclick={() => (selectedYear = year)}>
+            {year}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
   {#if loadingAssessments}
     <div class="flex flex-col justify-center items-center py-12 sm:py-16">
       <div
@@ -387,7 +444,10 @@
         🎉
       </div>
       <p class="mt-4 text-lg sm:text-xl text-slate-700 dark:text-slate-300">
-        No upcoming assessments!
+        No assessments for {selectedYear}!
+      </p>
+      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+        Try selecting a different year.
       </p>
     </div>
   {:else if selectedTab === 'board'}
@@ -419,7 +479,7 @@
       <div
         class="flex overflow-x-auto gap-4 pb-4 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-300/20 dark:scrollbar-track-slate-800/10">
         {#if groupBy === 'subject'}
-          {#each activeSubjects.filter((s) => subjectFilters[s.code]) as subject}
+          {#each (allSubjects || []).filter(subject => filteredAssessments.some(a => a.code === subject.code)) as subject}
             <div class="flex-shrink-0 w-72 sm:w-80">
               <div
                 class="p-4 mb-4 rounded-xl border border-l-8 backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/50 border-slate-300/50 dark:border-slate-700/50"
@@ -429,6 +489,9 @@
                 </h3>
                 <p class="text-sm text-slate-600 dark:text-slate-400">
                   {subject.code}
+                  {#if activeSubjects && activeSubjects.some((as: any) => as.code === subject.code)}
+                    <span class="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded">Active</span>
+                  {/if}
                 </p>
               </div>
               <div class="space-y-4">
@@ -638,7 +701,7 @@
           class="sticky top-6 p-4 rounded-xl border backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/50 border-slate-300/50 dark:border-slate-700/50">
           <h3 class="mb-3 text-sm font-semibold text-slate-600 dark:text-slate-400">Quick Jump</h3>
           <div class="space-y-2">
-            {#each activeSubjects.filter((s) => subjectFilters[s.code]) as subject}
+            {#each (allSubjects || []).filter(subject => filteredAssessments.some(a => a.code === subject.code)) as subject}
               <a
                 href="#subject-{subject.code}"
                 class="flex gap-2 items-center px-3 py-2 rounded-lg transition-all duration-300 cursor-pointer hover:bg-slate-200/80 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
@@ -648,6 +711,9 @@
                   style="background-color: {subject.colour || '#8e8e8e'}">
                 </div>
                 <span class="text-sm truncate">{subject.code}</span>
+                {#if activeSubjects && activeSubjects.some((as: any) => as.code === subject.code)}
+                  <span class="text-xs opacity-75">(Active)</span>
+                {/if}
               </a>
             {/each}
           </div>
@@ -656,7 +722,7 @@
 
       <!-- Main Content -->
       <div class="flex-1 space-y-6">
-        {#each activeSubjects.filter((s) => subjectFilters[s.code]) as subject}
+        {#each (allSubjects || []).filter(subject => filteredAssessments.some(a => a.code === subject.code)) as subject}
           <div
             id="subject-{subject.code}"
             class="overflow-hidden rounded-xl border backdrop-blur-sm bg-slate-100/80 dark:bg-slate-800/50 border-slate-300/50 dark:border-slate-700/50">
@@ -670,6 +736,9 @@
                   {subject.title}
                 </h3>
                 <span class="text-sm text-slate-600 dark:text-slate-400">({subject.code})</span>
+                {#if activeSubjects && activeSubjects.some((as: any) => as.code === subject.code)}
+                  <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded">Active</span>
+                {/if}
               </div>
             </div>
             <div class="p-4 space-y-4">
