@@ -41,8 +41,8 @@
 </style>
 
 <div
-  class="lesson-block flex absolute right-1 left-1 flex-col justify-start p-2 bg-white/95 backdrop-blur-sm rounded-xl border-l-4 shadow-lg hover:shadow-xl transition-all duration-200 dark:bg-slate-800/95 group cursor-pointer select-none"
-  style="border-color: {lesson.colour}; min-height: 54px; max-height: 90px;"
+  class="lesson-block flex flex-col justify-start p-2 bg-white/95 backdrop-blur-sm rounded-xl border-l-4 shadow-lg hover:shadow-xl transition-all duration-200 dark:bg-slate-800/95 group cursor-pointer select-none h-full"
+  style="border-color: {lesson.colour}; min-height: 54px;"
   class:expanded={expanded}
   tabindex="0"
   on:click={handleClick}

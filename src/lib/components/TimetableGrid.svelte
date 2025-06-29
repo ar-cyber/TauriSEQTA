@@ -38,6 +38,26 @@
     return lessons.filter((l: any) => l.dayIdx === dayIdx).sort((a: any, b: any) => a.from.localeCompare(b.from));
   }
 
+  function getLessonsGroupedByTime(dayIdx: number) {
+    const dayLessons = getLessonsFor(dayIdx);
+    const grouped: { [key: string]: any[] } = {};
+    
+    dayLessons.forEach((lesson: any) => {
+      const timeKey = `${lesson.from}-${lesson.until}`;
+      if (!grouped[timeKey]) {
+        grouped[timeKey] = [];
+      }
+      grouped[timeKey].push(lesson);
+    });
+    
+    return Object.entries(grouped).map(([timeKey, lessons]) => ({
+      timeKey,
+      lessons,
+      from: lessons[0].from,
+      until: lessons[0].until
+    }));
+  }
+
   function getUniqueTimes() {
     const times = Array.from(new Set(lessons.map((l: any) => l.from)));
     return times.sort((a: any, b: any) => (a as string).localeCompare(b as string));
@@ -204,23 +224,33 @@
             {#each Array(5) as _, dayIdx}
               <div
                 class="relative h-full border-l border-slate-300 dark:border-slate-700 timetable-lesson-col {dayIdx + 1 !== selectedDayState ? 'hidden sm:block' : ''}">
-                {#each getLessonsFor(dayIdx) as lesson}
+                {#each getLessonsGroupedByTime(dayIdx) as lessonGroup}
                   <div
                     class="absolute right-0 left-0"
                     style="
                     top: {timeToY(
-                      timeToMinutes(lesson.from),
+                      timeToMinutes(lessonGroup.from),
                       timeBounds.min,
                       timeBounds.max,
                     )}px;
                     height: {timeToY(
-                      timeToMinutes(lesson.until),
+                      timeToMinutes(lessonGroup.until),
                       timeBounds.min,
                       timeBounds.max,
                     ) -
-                      timeToY(timeToMinutes(lesson.from), timeBounds.min, timeBounds.max)}px;
+                      timeToY(timeToMinutes(lessonGroup.from), timeBounds.min, timeBounds.max)}px;
                   ">
-                    <TimetableLesson lesson={lesson} />
+                    {#if lessonGroup.lessons.length === 1}
+                      <TimetableLesson lesson={lessonGroup.lessons[0]} />
+                    {:else}
+                      <div class="flex gap-1 h-full p-1">
+                        {#each lessonGroup.lessons as lesson}
+                          <div class="flex-1 min-w-0">
+                            <TimetableLesson lesson={lesson} />
+                          </div>
+                        {/each}
+                      </div>
+                    {/if}
                   </div>
                 {/each}
               </div>
