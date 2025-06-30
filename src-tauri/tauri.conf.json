@@ -39,7 +39,8 @@
     },
     "icon": [
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "BetterSEQTA+ Studios"
   },
   "plugins": {
     "deep-link": {
