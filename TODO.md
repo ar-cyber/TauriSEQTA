@@ -41,7 +41,7 @@
 - [x] Add reminder notifications
 - [ ] Add progress tracking
 - [ ] Implement assessment categories
-- [ ] Add assessment analytics
+- [x] Add assessment analytics
 
 ### Reports
 - [ ] Add report categories and filtering
