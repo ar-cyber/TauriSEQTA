@@ -333,7 +333,7 @@
                   class="flex flex-col gap-2 items-start p-3 rounded-lg transition-all duration-200 sm:flex-row sm:items-center bg-slate-100/80 dark:bg-slate-800/50 hover:shadow-lg hover:bg-slate-200/80 dark:hover:bg-slate-700/50 animate-fade-in">
                   <input
                     class="px-2 py-1.5 w-full bg-white rounded transition sm:w-32 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
-                   placeholder="Name"
+                    placeholder="Name"
                     bind:value={shortcut.name} />
                   <input
                     class="px-2 py-1.5 w-full bg-white rounded transition sm:w-10 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
