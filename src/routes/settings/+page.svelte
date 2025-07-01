@@ -285,10 +285,10 @@
       <section
         class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up relative">
         <!-- Experimental Label -->
-        <div class="absolute -top-3 -right-3 z-10">
+        <div class="absolute top-5 right-2 z-10">
           <div class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12">
             EXPERIMENTAL
-          </div>
+         </div>
         </div>
         <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
           <h2 class="text-base font-semibold sm:text-lg">Cloud Sync</h2>
@@ -350,15 +350,15 @@
                 <div
                   class="flex flex-col gap-2 items-start p-3 rounded-lg transition-all duration-200 sm:flex-row sm:items-center bg-slate-100/80 dark:bg-slate-800/50 hover:shadow-lg hover:bg-slate-200/80 dark:hover:bg-slate-700/50 animate-fade-in">
                   <input
-                    class="px-2 py-1.5 w-full bg-white rounded transition sm:w-24 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
+                    class="px-2 py-1.5 w-full bg-white rounded transition sm:w-32 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
                     placeholder="Name"
                     bind:value={shortcut.name} />
                   <input
-                    class="px-2 py-1.5 w-full bg-white rounded transition sm:w-22 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
+                    class="px-2 py-1.5 w-full bg-white rounded transition sm:w-10 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
                     placeholder="Icon emoji"
                     bind:value={shortcut.icon} />
                   <input
-                    class="px-2 py-1.5 w-full bg-white rounded transition sm:flex-1 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
+                    class="px-2 py-1.5 w-full bg-white rounded transition sm:flex-10 dark:bg-slate-900/50 focus:ring-2 focus:ring-blue-500"
                     placeholder="URL"
                     bind:value={shortcut.url} />
                   <button
