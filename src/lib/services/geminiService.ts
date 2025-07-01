@@ -27,6 +27,11 @@ interface GradePrediction {
   reasoning: string;
 }
 
+export interface LessonSummary {
+  summary: string;
+  steps: string[];
+}
+
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
 export class GeminiService {
@@ -174,6 +179,57 @@ Be realistic and consider that the prediction should be based on demonstrated pe
       return prediction as GradePrediction;
     } catch (error) {
       console.error('Error calling Gemini API:', error);
+      return null;
+    }
+  }
+
+  static async summarizeLessonContent(lesson: { title: string; content: string; attachments: { name: string }[] }): Promise<LessonSummary | null> {
+    const apiKey = await this.getApiKey();
+    if (!apiKey) {
+      throw new Error('No Gemini API key set. Please add your API key in Settings.');
+    }
+    const attachmentList = lesson.attachments.map(a => `- ${a.name}`).join('\n');
+    const prompt = `You are an AI assistant for students. Given the following lesson content, provide:
+1. A concise summary of the lesson (2-3 sentences)
+2. A step-by-step list of what a student should do to complete the lesson (as bullet points)
+
+Lesson Title: ${lesson.title}
+Lesson Content:
+${lesson.content}
+
+Attachments (names only):
+${attachmentList}
+
+Respond ONLY in this JSON format:
+{
+  "summary": "[concise summary]",
+  "steps": ["step 1", "step 2", ...]
+}`;
+    try {
+      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.3,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
+        })
+      });
+      if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+      const data = await response.json();
+      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) throw new Error('Invalid response from Gemini API');
+      const responseText = data.candidates[0].content.parts[0].text;
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      const summaryObj = JSON.parse(jsonMatch[0]);
+      if (!summaryObj.summary || !Array.isArray(summaryObj.steps)) throw new Error('Invalid summary format');
+      return summaryObj as LessonSummary;
+    } catch (error) {
+      console.error('Error calling Gemini API for lesson summary:', error);
       return null;
     }
   }

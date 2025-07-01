@@ -79,6 +79,7 @@ pub struct Settings {
     pub gemini_api_key: Option<String>,
     pub ai_integrations_enabled: Option<bool>,
     pub grade_analyser_enabled: Option<bool>,
+    pub lesson_summary_analyser_enabled: Option<bool>,
 }
 
 impl Default for Settings {
@@ -98,6 +99,7 @@ impl Default for Settings {
             gemini_api_key: None,
             ai_integrations_enabled: Some(false),
             grade_analyser_enabled: Some(true),
+            lesson_summary_analyser_enabled: Some(true),
         }
     }
 }
@@ -267,6 +269,7 @@ impl Settings {
         default_settings.gemini_api_key = get_opt_string(&existing_json, "gemini_api_key");
         default_settings.ai_integrations_enabled = get_opt_bool(&existing_json, "ai_integrations_enabled");
         default_settings.grade_analyser_enabled = get_opt_bool(&existing_json, "grade_analyser_enabled");
+        default_settings.lesson_summary_analyser_enabled = get_opt_bool(&existing_json, "lesson_summary_analyser_enabled");
 
         default_settings
     }

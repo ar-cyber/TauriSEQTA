@@ -21,6 +21,10 @@
     ResourceLink,
     LinkPreview as LinkPreviewType,
   } from '../types';
+  import { GeminiService } from '../../../lib/services/geminiService';
+  import type { LessonSummary } from '../../../lib/services/geminiService';
+  import { onMount } from 'svelte';
+  import { invoke } from '@tauri-apps/api/core';
 
   let {
     coursePayload,
@@ -35,6 +39,12 @@
   } = $props();
 
   let linkPreviews: Map<string, LinkPreviewType | null> = $state(new Map());
+  let aiSummary: LessonSummary | null = $state(null);
+  let aiSummaryLoading = $state(false);
+  let aiSummaryError: string | null = $state(null);
+  let aiIntegrationsEnabled = $state(false);
+  let lessonSummaryAnalyserEnabled = $state(true);
+  let settingsLoaded = $state(false);
 
   function isModule<T extends Module>(
     module: Module,
@@ -141,9 +151,124 @@
 
     return orderedModules;
   }
+
+  function extractLessonText(lessonContent: WeeklyLessonContent): string {
+    let lessonText = '';
+    if (lessonContent.h) lessonText += lessonContent.h + '\n';
+    if (lessonContent.document && lessonContent.document.contents) {
+      try {
+        const doc = JSON.parse(lessonContent.document.contents);
+        if (doc.modules && Array.isArray(doc.modules)) {
+          for (const mod of doc.modules) {
+            if (mod.content && typeof mod.content.value === 'string') {
+              lessonText += mod.content.value + '\n';
+            } else if (mod.content && mod.content.content && mod.content.content.blocks) {
+              for (const block of mod.content.content.blocks) {
+                if (block.text) lessonText += block.text + '\n';
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // ignore parse errors
+      }
+    }
+    return lessonText.trim();
+  }
+
+  async function generateLessonSummary() {
+    aiSummaryLoading = true;
+    aiSummaryError = null;
+    aiSummary = null;
+    try {
+      if (!selectedLessonContent) return;
+      const lessonTitle = selectedLessonContent.t || 'Lesson';
+      const lessonText = extractLessonText(selectedLessonContent);
+      const attachments = (selectedLessonContent.r || []).map(r => ({ name: r.t }));
+      aiSummary = await GeminiService.summarizeLessonContent({
+        title: lessonTitle,
+        content: lessonText,
+        attachments
+      });
+    } catch (e) {
+      aiSummaryError = e instanceof Error ? e.message : String(e);
+    } finally {
+      aiSummaryLoading = false;
+    }
+  }
+
+  $effect(() => {
+    if (selectedLessonContent) {
+      aiSummary = null;
+      aiSummaryError = null;
+    }
+  });
+
+  onMount(async () => {
+    try {
+      const settings = await invoke<any>('get_settings');
+      aiIntegrationsEnabled = settings.ai_integrations_enabled ?? false;
+      lessonSummaryAnalyserEnabled = settings.lesson_summary_analyser_enabled ?? true;
+      settingsLoaded = true;
+    } catch (e) {
+      aiIntegrationsEnabled = false;
+      lessonSummaryAnalyserEnabled = true;
+      settingsLoaded = true;
+    }
+  });
 </script>
 
 <div class="overflow-y-auto relative flex-1">
+  {#if settingsLoaded && !showingOverview && selectedLessonContent && aiIntegrationsEnabled && lessonSummaryAnalyserEnabled}
+    <div class="px-2 sm:px-4 md:px-8 py-2 sm:py-4 md:py-6">
+      <div class="p-4 mb-6 flex flex-col gap-4 rounded-xl border backdrop-blur-sm bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200/50 dark:border-purple-700/50">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">AI Lesson Summary</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">
+              Generate an AI-powered summary and actionable steps for this lesson's content and resources.
+            </p>
+          </div>
+          <button
+            class="px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            onclick={generateLessonSummary}
+            disabled={aiSummaryLoading}
+          >
+            {#if aiSummaryLoading}
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Generating...
+              </div>
+            {:else}
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Generate Summary
+              </div>
+            {/if}
+          </button>
+        </div>
+        {#if aiSummaryError}
+          <div class="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+            <p class="text-sm text-red-700 dark:text-red-400">{aiSummaryError}</p>
+          </div>
+        {/if}
+        {#if aiSummary}
+          <div class="p-4 rounded-xl border bg-white/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-md mb-2">
+            <div class="mb-2 text-lg font-semibold text-slate-900 dark:text-white">Summary</div>
+            <div class="mb-4 text-slate-800 dark:text-slate-200">{aiSummary.summary}</div>
+            <div class="mb-2 text-lg font-semibold text-slate-900 dark:text-white">Steps</div>
+            <ol class="list-decimal list-inside space-y-1 text-slate-800 dark:text-slate-200">
+              {#each aiSummary.steps as step}
+                <li>{step}</li>
+              {/each}
+            </ol>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
   {#if !showingOverview && selectedLessonContent}
     <div class="p-6">
       <h1

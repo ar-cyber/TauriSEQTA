@@ -42,6 +42,7 @@
   let showCloudSyncModal = false;
   let aiIntegrationsEnabled = false;
   let gradeAnalyserEnabled = true;
+  let lessonSummaryAnalyserEnabled = true;
 
   async function loadSettings() {
     loading = true;
@@ -61,6 +62,7 @@
         gemini_api_key?: string;
         ai_integrations_enabled?: boolean;
         grade_analyser_enabled?: boolean;
+        lesson_summary_analyser_enabled?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -76,6 +78,7 @@
       theme.set(settings.theme ?? 'dark');
       aiIntegrationsEnabled = settings.ai_integrations_enabled ?? false;
       gradeAnalyserEnabled = settings.grade_analyser_enabled ?? true;
+      lessonSummaryAnalyserEnabled = settings.lesson_summary_analyser_enabled ?? true;
 
       console.log('Loading settings', {
         shortcuts,
@@ -101,6 +104,7 @@
       theme.set('dark');
       aiIntegrationsEnabled = false;
       gradeAnalyserEnabled = true;
+      lessonSummaryAnalyserEnabled = true;
     }
     loading = false;
   }
@@ -137,6 +141,7 @@
           gemini_api_key: geminiApiKey,
           ai_integrations_enabled: aiIntegrationsEnabled,
           grade_analyser_enabled: gradeAnalyserEnabled,
+          lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
         },
       });
       saveSuccess = true;
@@ -229,6 +234,7 @@
     theme.set(cloudSettings.theme ?? 'dark');
     aiIntegrationsEnabled = cloudSettings.ai_integrations_enabled ?? false;
     gradeAnalyserEnabled = cloudSettings.grade_analyser_enabled ?? true;
+    lessonSummaryAnalyserEnabled = cloudSettings.lesson_summary_analyser_enabled ?? true;
 
     notify({
       title: 'Settings Downloaded',
@@ -730,6 +736,17 @@
                 class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
                 >Grade Analyser (AI-powered grade predictions)</label>
             </div>
+            <div class="flex gap-3 items-center mb-2">
+              <input
+                id="lesson-summary-analyser-enabled"
+                type="checkbox"
+                class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                bind:checked={lessonSummaryAnalyserEnabled} />
+              <label
+                for="lesson-summary-analyser-enabled"
+                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+                >Lesson Summary Analyser (AI-powered lesson summaries)</label>
+              </div>
             <label for="gemini-api-key" class="text-sm font-medium text-slate-800 dark:text-slate-200">Gemini API Key</label>
             <input
               id="gemini-api-key"
