@@ -36,9 +36,12 @@
   let weatherCountry = '';
   let disableSchoolPicture = false;
   let enhancedAnimations = true;
+  let geminiApiKey = '';
 
   let remindersEnabled = true;
   let showCloudSyncModal = false;
+  let aiIntegrationsEnabled = false;
+  let gradeAnalyserEnabled = true;
 
   async function loadSettings() {
     loading = true;
@@ -55,6 +58,9 @@
         theme: 'light' | 'dark';
         disable_school_picture?: boolean;
         enhanced_animations?: boolean;
+        gemini_api_key?: string;
+        ai_integrations_enabled?: boolean;
+        grade_analyser_enabled?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -65,8 +71,11 @@
       remindersEnabled = settings.reminders_enabled ?? true;
       disableSchoolPicture = settings.disable_school_picture ?? false;
       enhancedAnimations = settings.enhanced_animations ?? true;
+      geminiApiKey = settings.gemini_api_key ?? '';
       accentColor.set(settings.accent_color ?? '#3b82f6');
       theme.set(settings.theme ?? 'dark');
+      aiIntegrationsEnabled = settings.ai_integrations_enabled ?? false;
+      gradeAnalyserEnabled = settings.grade_analyser_enabled ?? true;
 
       console.log('Loading settings', {
         shortcuts,
@@ -87,8 +96,11 @@
       remindersEnabled = true;
       disableSchoolPicture = false;
       enhancedAnimations = true;
+      geminiApiKey = '';
       accentColor.set('#3b82f6');
       theme.set('dark');
+      aiIntegrationsEnabled = false;
+      gradeAnalyserEnabled = true;
     }
     loading = false;
   }
@@ -122,6 +134,9 @@
           theme: $theme,
           disable_school_picture: disableSchoolPicture,
           enhanced_animations: enhancedAnimations,
+          gemini_api_key: geminiApiKey,
+          ai_integrations_enabled: aiIntegrationsEnabled,
+          grade_analyser_enabled: gradeAnalyserEnabled,
         },
       });
       saveSuccess = true;
@@ -209,8 +224,11 @@
     remindersEnabled = cloudSettings.reminders_enabled ?? true;
     disableSchoolPicture = cloudSettings.disable_school_picture ?? false;
     enhancedAnimations = cloudSettings.enhanced_animations ?? true;
+    geminiApiKey = cloudSettings.gemini_api_key ?? '';
     accentColor.set(cloudSettings.accent_color ?? '#3b82f6');
     theme.set(cloudSettings.theme ?? 'dark');
+    aiIntegrationsEnabled = cloudSettings.ai_integrations_enabled ?? false;
+    gradeAnalyserEnabled = cloudSettings.grade_analyser_enabled ?? true;
 
     notify({
       title: 'Settings Downloaded',
@@ -677,6 +695,56 @@
             </a>
           </div>
         </div>
+      </section>
+
+      <!-- AI Features -->
+      <section
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">AI Features</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Enable AI-powered features like grade predictions by providing your Free Gemini API key.
+          </p>
+          <div class="flex gap-3 items-center mt-4">
+            <input
+              id="ai-integrations-enabled"
+              type="checkbox"
+              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+              bind:checked={aiIntegrationsEnabled} />
+            <label
+              for="ai-integrations-enabled"
+              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+              >Enable AI Integrations</label>
+          </div>
+        </div>
+        {#if aiIntegrationsEnabled}
+          <div class="p-4 space-y-4 sm:p-6">
+            <div class="flex gap-3 items-center mb-2">
+              <input
+                id="grade-analyser-enabled"
+                type="checkbox"
+                class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                bind:checked={gradeAnalyserEnabled} />
+              <label
+                for="grade-analyser-enabled"
+                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+                >Grade Analyser (AI-powered grade predictions)</label>
+            </div>
+            <label for="gemini-api-key" class="text-sm font-medium text-slate-800 dark:text-slate-200">Gemini API Key</label>
+            <input
+              id="gemini-api-key"
+              type="text"
+              class="w-full px-3 py-2 rounded border border-slate-300/50 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Paste your Gemini API key here"
+              bind:value={geminiApiKey}
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+              Get your API key from <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">aistudio.google.com</a> for AI-powered features.
+            </p>
+          </div>
+        {/if}
       </section>
 
       <!-- Add this somewhere in the settings page navigation or main content -->

@@ -76,6 +76,9 @@ pub struct Settings {
     pub theme: String,
     pub disable_school_picture: bool,
     pub enhanced_animations: bool,
+    pub gemini_api_key: Option<String>,
+    pub ai_integrations_enabled: Option<bool>,
+    pub grade_analyser_enabled: Option<bool>,
 }
 
 impl Default for Settings {
@@ -92,6 +95,9 @@ impl Default for Settings {
             theme: "system".to_string(), // Default to system theme
             disable_school_picture: false,
             enhanced_animations: true,
+            gemini_api_key: None,
+            ai_integrations_enabled: Some(false),
+            grade_analyser_enabled: Some(true),
         }
     }
 }
@@ -210,6 +216,14 @@ impl Settings {
                 .unwrap_or_default()
         };
 
+        let get_opt_string = |json: &serde_json::Value, key: &str| {
+            json.get(key).and_then(|v| v.as_str()).map(|s| s.to_string())
+        };
+
+        let get_opt_bool = |json: &serde_json::Value, key: &str| {
+            json.get(key).and_then(|v| v.as_bool())
+        };
+
         // Merge shortcuts
         let shortcuts_json = get_array(&existing_json, "shortcuts");
         let mut shortcuts = Vec::new();
@@ -250,6 +264,9 @@ impl Settings {
         default_settings.theme = get_string(&existing_json, "theme", &default_settings.theme);
         default_settings.disable_school_picture = get_bool(&existing_json, "disable_school_picture", default_settings.disable_school_picture);
         default_settings.enhanced_animations = get_bool(&existing_json, "enhanced_animations", default_settings.enhanced_animations);
+        default_settings.gemini_api_key = get_opt_string(&existing_json, "gemini_api_key");
+        default_settings.ai_integrations_enabled = get_opt_bool(&existing_json, "ai_integrations_enabled");
+        default_settings.grade_analyser_enabled = get_opt_bool(&existing_json, "grade_analyser_enabled");
 
         default_settings
     }
