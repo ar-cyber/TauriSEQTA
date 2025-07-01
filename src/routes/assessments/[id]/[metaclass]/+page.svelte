@@ -89,8 +89,8 @@
       <button
         class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
         onclick={() => (tab = 'overview')}
-        class:border-blue-500={tab === 'overview'}
-        class:text-blue-400={tab === 'overview'}
+        class:border-accent-ring={tab === 'overview'}
+        class:text-accent-bg={tab === 'overview'}
         class:text-slate-400={tab !== 'overview'}
         class:border-transparent={tab !== 'overview'}>
         Overview
@@ -98,8 +98,8 @@
       <button
         class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
         onclick={() => (tab = 'details')}
-        class:border-blue-500={tab === 'details'}
-        class:text-blue-400={tab === 'details'}
+        class:border-accent-ring={tab === 'details'}
+        class:text-accent-bg={tab === 'details'}
         class:text-slate-400={tab !== 'details'}
         class:border-transparent={tab !== 'details'}>
         Details
@@ -108,8 +108,8 @@
         <button
           class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
           onclick={() => (tab = 'submissions')}
-          class:border-blue-500={tab === 'submissions'}
-          class:text-blue-400={tab === 'submissions'}
+          class:border-accent-ring={tab === 'submissions'}
+          class:text-accent-bg={tab === 'submissions'}
           class:text-slate-400={tab !== 'submissions'}
           class:border-transparent={tab !== 'submissions'}>
           Submissions
@@ -122,7 +122,7 @@
   <div class="container px-6 py-8 mx-auto">
     {#if loading}
       <div class="flex justify-center items-center h-64">
-        <div class="w-12 h-12 rounded-full border-t-2 border-b-2 border-blue-500 animate-spin">
+        <div class="w-12 h-12 rounded-full border-t-2 border-b-2 border-accent-500 animate-spin">
         </div>
       </div>
     {:else if error}
@@ -134,7 +134,7 @@
         <!-- Overview Tab: Description and Resources -->
         <div class="grid gap-8 animate-fade-in">
           <div
-            class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+            class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <h1 class="mb-2 text-2xl font-bold">Assessment Overview</h1>
             <div class="max-w-none prose prose-invert">
               <div class="whitespace-pre-line text-slate-300">
@@ -144,15 +144,15 @@
           </div>
           {#if assessmentData.resources?.length}
             <div
-              class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+              class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
               <h2 class="text-xl font-bold">Resources</h2>
               <div class="grid gap-4">
                 {#each assessmentData.resources as resource}
                   <div
-                    class="flex items-center gap-4 p-4 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
+                    class="flex items-center gap-4 p-4 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent-500/5">
                     <Icon
                       src={getFileIcon(resource.userfile.mimetype)}
-                      class="w-6 h-6 text-blue-400" />
+                      class="w-6 h-6 text-accent-400" />
                     <div class="flex-1 min-w-0">
                       <div class="text-sm font-medium truncate">
                         {resource.name}
@@ -176,15 +176,15 @@
         <!-- Details Tab: Grade, Feedback, Teacher Files -->
         <div class="grid gap-8 animate-fade-in">
           <div
-            class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+            class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <!-- Grade Bar -->
             {#if assessmentData.marked && firstCriterion}
               <div class="mb-4">
                 <div class="mb-2 text-2xl font-bold">Grade</div>
                 <div
-                  class="overflow-hidden relative w-full h-16 rounded-xl border transition-all duration-300 dark:bg-slate-800 bg-slate-200 dark:border-slate-700 border-slate-200 hover:shadow-lg hover:shadow-blue-500/10">
+                  class="overflow-hidden relative w-full h-16 rounded-xl border transition-all duration-300 dark:bg-slate-800 bg-slate-200 dark:border-slate-700 border-slate-200 hover:shadow-lg hover:shadow-accent-500/10">
                   <div
-                    class="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-500"
+                    class="absolute top-0 left-0 h-full bg-accent-600 transition-all duration-500"
                     style="width: {firstCriterion.results.percentage}%">
                   </div>
                   <div class="flex relative z-10 justify-center items-center h-full">
@@ -207,7 +207,7 @@
             {/if}
             {#if assessmentData.marked && assessmentData.engagement?.feedbackComment}
               <div
-                class="p-4 mb-4 rounded-xl transition-all duration-300 dark:bg-slate-800 bg-slate-200 hover:shadow-lg hover:shadow-blue-500/5">
+                class="p-4 mb-4 rounded-xl transition-all duration-300 dark:bg-slate-800 bg-slate-200 hover:shadow-lg hover:shadow-accent-500/5">
                 <div class="mb-1 font-semibold">Teacher feedback</div>
                 <div class="dark:text-slate-300 text-slate-700">
                   {assessmentData.engagement.feedbackComment}
@@ -220,8 +220,8 @@
                 <div class="grid gap-2">
                   {#each teacherFiles as file}
                     <div
-                      class="flex items-center gap-4 p-3 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/5">
-                      <Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-blue-400" />
+                      class="flex items-center gap-4 p-3 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent-500/5">
+                      <Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-accent-400" />
                       <div class="flex-1 min-w-0">
                         <div class="text-sm font-medium truncate">
                           {file.filename}
@@ -246,7 +246,7 @@
         <!-- Submissions Tab -->
         <div class="grid gap-8 animate-fade-in">
           <div
-            class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-blue-500/10">
+            class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <h1 class="mb-4 text-2xl font-bold">Submissions</h1>
             {#if allSubmissions.filter((f) => !f.staff).length === 0}
               <div class="text-slate-400">No submissions found.</div>
@@ -255,7 +255,7 @@
                 {#each allSubmissions.filter((f) => !f.staff) as file}
                   <div
                     class="flex items-center gap-4 p-3 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg bg-slate-200/50 dark:bg-slate-800">
-                    <Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-blue-400" />
+                    <Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-accent-400" />
                     <div class="flex-1 min-w-0">
                       <div class="text-sm font-medium truncate">
                         {file.filename}
