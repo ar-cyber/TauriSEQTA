@@ -8,12 +8,15 @@
     Bell,
     Minus,
     Square2Stack,
-    XMark
+    XMark,
+    Squares2x2
   } from 'svelte-hero-icons';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { derived, writable } from 'svelte/store';
   import { fade, scale } from 'svelte/transition';
+  import PagesMenu from './PagesMenu.svelte';
+  import GlobalSearch from './GlobalSearch.svelte';
 
   interface Props {
     sidebarOpen: boolean;
@@ -106,6 +109,7 @@
 
   let searchInput: HTMLInputElement | null = null;
   let selectedIndex = $state(-1);
+  let showPagesMenu = $state(false);
 
   function handleSelect(page: { name: string; path: string }) {
     searchStore.set('');
@@ -135,8 +139,20 @@
     }
   }
 
+  function openPagesMenu() {
+    showPagesMenu = true;
+    setTimeout(() => {
+      const input = document.getElementById('pages-search-input');
+      if (input) input.focus();
+    }, 10);
+  }
+
+  function closePagesMenu() {
+    showPagesMenu = false;
+  }
+
   onMount(() => {
-    if (searchInput) searchInput.value = '';
+    // No need to set searchInput.value here since the search input is now in PagesMenu
   });
 
   $effect(() => {
@@ -161,52 +177,14 @@
         class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300">
         DesQTA
       </h1>
-      <div class="relative w-64 ml-2">
-        <input
-          bind:this={searchInput}
-          type="text"
-          class="w-full px-4 py-2 rounded-xl bg-white/30 dark:bg-gray-800/40 text-slate-900 dark:text-white border border-white/20 dark:border-gray-700/40 shadow-lg backdrop-blur-md focus:outline-none focus:ring-2 accent-ring transition-all duration-200 placeholder:text-slate-500 dark:placeholder:text-gray-400"
-          placeholder="Quick search..."
-          oninput={() => showDropdownStore.set(true)}
-          onfocus={handleFocus}
-          onblur={handleBlur}
-          bind:value={$searchStore}
-          autocomplete="off"
-          style="backdrop-filter: blur(8px);"
-          onkeydown={handleKeydown}
-        />
-        {#if $showDropdownStore && $filteredPages.length > 0}
-          <ul
-            class="absolute left-0 mt-2 w-full rounded-2xl border border-white/20 dark:border-gray-700/40 bg-white/60 dark:bg-gray-900/70 shadow-2xl backdrop-blur-xl z-50 overflow-hidden animate-in"
-            in:scale={{ duration: 180, start: 0.98, opacity: 0 }}
-            out:scale={{ duration: 120, start: 1, opacity: 0 }}
-            style="backdrop-filter: blur(16px);"
-            role="listbox"
-          >
-            {#each $filteredPages as page, i}
-              <button
-                type="button"
-                role="option"
-                aria-selected={selectedIndex === i}
-                class={`flex items-center gap-3 w-full text-left px-5 py-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-base font-medium ${selectedIndex === i ? 'bg-accent-500 text-white' : 'text-slate-900 dark:text-white'}`}
-                onmousedown={() => handleSelect(page)}
-                tabindex="-1"
-              >
-                <span class="w-5 h-5 flex-shrink-0 rounded-lg bg-accent-500/20 flex items-center justify-center">
-                  <!-- Optionally add an icon here in the future -->
-                </span>
-                {page.name}
-              </button>
-            {/each}
-          </ul>
-        {/if}
-      </div>
+      {#if weatherEnabled && weatherData}
+        <WeatherWidget {weatherData} />
+      {/if}
     </div>
-    {#if weatherEnabled && weatherData}
-      <WeatherWidget {weatherData} />
-    {/if}
   </div>
-
+  <div class="flex-1 flex justify-center">
+    <GlobalSearch />
+  </div>
   <div class="flex items-center space-x-2">
     <button
       class="flex relative justify-center items-center rounded-xl border transition-all duration-200 size-12 bg-white/60 border-slate-200/40 hover:accent-bg dark:bg-slate-800/60 dark:border-slate-700/40 focus:outline-none focus:ring-2 accent-ring playful"
@@ -254,4 +232,7 @@
       </button>
     </div>
   </div>
+  {#if showPagesMenu}
+    <PagesMenu on:close={closePagesMenu} />
+  {/if}
 </header>
