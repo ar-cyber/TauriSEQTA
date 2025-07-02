@@ -1,8 +1,8 @@
 <script lang="ts">
-import { createEventDispatcher, onMount } from 'svelte';
+import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 import { goto } from '$app/navigation';
 import { writable, derived } from 'svelte/store';
-import { Icon, Squares2x2 } from 'svelte-hero-icons';
+import { Icon, Squares2x2, BookOpen, ClipboardDocumentList } from 'svelte-hero-icons';
 import { scale } from 'svelte/transition';
 
 const dispatch = createEventDispatcher();
@@ -33,6 +33,12 @@ let inputBox: HTMLInputElement | null = null;
 let modalInput = $state<HTMLInputElement | null>(null);
 let inPagesFolder = $state(false);
 
+let folderOptions = [
+  { name: 'Pages', icon: Squares2x2 },
+  { name: 'Courses', icon: BookOpen },
+  { name: 'Assessments', icon: ClipboardDocumentList },
+];
+
 function openModal() {
   showModal.set(true);
   inPagesFolder = false;
@@ -61,18 +67,48 @@ function handleSelect(page: { name: string; path: string }) {
   goto(page.path);
 }
 function handleKeydown(e: KeyboardEvent) {
-  if (!$showModal || $filteredPages.length === 0) return;
-  if (e.key === 'ArrowDown') {
-    selectedIndex = (selectedIndex + 1) % $filteredPages.length;
-    e.preventDefault();
-  } else if (e.key === 'ArrowUp') {
-    selectedIndex = (selectedIndex - 1 + $filteredPages.length) % $filteredPages.length;
-    e.preventDefault();
-  } else if (e.key === 'Enter' && selectedIndex >= 0) {
-    handleSelect($filteredPages[selectedIndex]);
-    e.preventDefault();
-  } else if (e.key === 'Escape') {
-    closeModal();
+  if (!$showModal) return;
+  if (inPagesFolder) {
+    if ($filteredPages.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      selectedIndex = (selectedIndex + 1) % $filteredPages.length;
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      selectedIndex = (selectedIndex - 1 + $filteredPages.length) % $filteredPages.length;
+      e.preventDefault();
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      handleSelect($filteredPages[selectedIndex]);
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      closeModal();
+    }
+  } else {
+    // General menu
+    if (e.key === 'ArrowDown') {
+      selectedIndex = (selectedIndex + 1) % folderOptions.length;
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      selectedIndex = (selectedIndex - 1 + folderOptions.length) % folderOptions.length;
+      e.preventDefault();
+    } else if (e.key === 'Enter') {
+      if (selectedIndex === 0) {
+        openPagesFolder();
+        e.preventDefault();
+        return;
+      } else if (selectedIndex === 1) {
+        // openCoursesFolder();
+        inPagesFolder = 'courses';
+        e.preventDefault();
+        return;
+      } else if (selectedIndex === 2) {
+        // openAssessmentsFolder();
+        inPagesFolder = 'assessments';
+        e.preventDefault();
+        return;
+      }
+    } else if (e.key === 'Escape') {
+      closeModal();
+    }
   }
 }
 onMount(() => {
@@ -82,7 +118,31 @@ onMount(() => {
     }
   };
   window.addEventListener('mousedown', handleClick);
-  return () => window.removeEventListener('mousedown', handleClick);
+
+  const handleGlobalKeydown = (e: KeyboardEvent) => {
+    // Ctrl+K or Cmd+K
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openModal();
+    }
+    // Escape
+    if ($showModal && e.key === 'Escape') {
+      if (inPagesFolder === true || inPagesFolder === 'courses' || inPagesFolder === 'assessments') {
+        inPagesFolder = false;
+        setTimeout(() => {
+          if (modalInput) modalInput.focus();
+        }, 10);
+      } else {
+        closeModal();
+      }
+    }
+  };
+  window.addEventListener('keydown', handleGlobalKeydown);
+
+  return () => {
+    window.removeEventListener('mousedown', handleClick);
+    window.removeEventListener('keydown', handleGlobalKeydown);
+  };
 });
 </script>
 
@@ -151,21 +211,25 @@ onMount(() => {
         {/if}
       {:else}
         <ul class="w-full mt-2 mb-4 px-2 space-y-1 max-h-96 overflow-y-auto" role="listbox">
-          {#if !$searchStore || 'pages'.includes($searchStore.toLowerCase())}
+          {#each folderOptions as folder, i}
             <button
               type="button"
               role="option"
-              aria-selected={selectedIndex === 0}
-              class={`flex items-center gap-3 w-full text-left px-5 py-3 cursor-pointer transition-all duration-200 rounded-xl hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-base font-medium ${selectedIndex === 0 ? 'bg-accent-500 text-white' : 'text-slate-900 dark:text-white'}`}
-              onclick={openPagesFolder}
+              aria-selected={selectedIndex === i}
+              class={`flex items-center gap-3 w-full text-left px-5 py-3 cursor-pointer transition-all duration-200 rounded-xl hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-base font-medium ${selectedIndex === i ? 'bg-accent-500 text-white' : 'text-slate-900 dark:text-white'}`}
+              onclick={() => {
+                if (i === 0) openPagesFolder();
+                else if (i === 1) inPagesFolder = 'courses';
+                else if (i === 2) inPagesFolder = 'assessments';
+              }}
               tabindex="-1"
             >
               <span class="w-5 h-5 flex-shrink-0 rounded-lg bg-accent-500/20 flex items-center justify-center">
-                <Icon src={Squares2x2} class="w-5 h-5" />
+                <Icon src={folder.icon} class="w-5 h-5" />
               </span>
-              Pages
+              {folder.name}
             </button>
-          {/if}
+          {/each}
         </ul>
       {/if}
       <div class="flex items-center gap-4 px-6 pb-4 pt-2 text-xs text-slate-500 dark:text-gray-400">
@@ -174,5 +238,24 @@ onMount(() => {
         <span class="flex items-center gap-1"><kbd class="px-1 py-0.5 rounded bg-slate-200 dark:bg-gray-700">Esc</kbd> Close</span>
       </div>
     </div>
+  </div>
+{/if}
+
+{#if inPagesFolder === true}
+  {#if $filteredPages.length > 0}
+    <div class="flex flex-col items-center justify-center h-40 text-slate-500 dark:text-gray-400">
+      <Icon src={Squares2x2} class="w-8 h-8 mb-2" />
+      <span>Pages folder (mock, empty)</span>
+    </div>
+  {/if}
+{:else if inPagesFolder === 'courses'}
+  <div class="flex flex-col items-center justify-center h-40 text-slate-500 dark:text-gray-400">
+    <Icon src={BookOpen} class="w-8 h-8 mb-2" />
+    <span>Courses folder (mock, empty)</span>
+  </div>
+{:else if inPagesFolder === 'assessments'}
+  <div class="flex flex-col items-center justify-center h-40 text-slate-500 dark:text-gray-400">
+    <Icon src={ClipboardDocumentList} class="w-8 h-8 mb-2" />
+    <span>Assessments folder (mock, empty)</span>
   </div>
 {/if} 
