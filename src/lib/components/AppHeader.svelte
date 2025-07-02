@@ -10,6 +10,10 @@
     Square2Stack,
     XMark
   } from 'svelte-hero-icons';
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import { derived, writable } from 'svelte/store';
+  import { fade, scale } from 'svelte/transition';
 
   interface Props {
     sidebarOpen: boolean;
@@ -77,6 +81,48 @@
   }: Props = $props();
 
   const appWindow = Window.getCurrent();
+
+  const pages = [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Assessments', path: '/assessments' },
+    { name: 'Courses', path: '/courses' },
+    { name: 'Directory', path: '/directory' },
+    { name: 'Direqt Messages', path: '/direqt-messages' },
+    { name: 'News', path: '/news' },
+    { name: 'Notices', path: '/notices' },
+    { name: 'QR Sign In', path: '/qrsignin' },
+    { name: 'Reports', path: '/reports' },
+    { name: 'Settings', path: '/settings' },
+    { name: 'Timetable', path: '/timetable' },
+    { name: 'Welcome', path: '/welcome' },
+  ];
+
+  const searchStore = writable('');
+  const showDropdownStore = writable(false);
+  const filteredPages = derived(searchStore, ($search) =>
+    $search ? pages.filter((p) => p.name.toLowerCase().includes($search.toLowerCase())) : pages
+  );
+
+  let searchInput: HTMLInputElement | null = null;
+
+  function handleSelect(page: { name: string; path: string }) {
+    searchStore.set('');
+    showDropdownStore.set(false);
+    goto(page.path);
+  }
+
+  function handleFocus() {
+    showDropdownStore.set(true);
+  }
+
+  function handleBlur() {
+    setTimeout(() => showDropdownStore.set(false), 100);
+  }
+
+  onMount(() => {
+    if (searchInput) searchInput.value = '';
+  });
 </script>
 
 <header class="flex justify-between items-center px-3 pr-2 w-full h-16 bg-white dark:bg-slate-950 relative z-[999999]" data-tauri-drag-region>
@@ -93,6 +139,40 @@
         class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300">
         DesQTA
       </h1>
+      <div class="relative w-64 ml-2">
+        <input
+          bind:this={searchInput}
+          type="text"
+          class="w-full px-4 py-2 rounded-xl bg-white/30 dark:bg-gray-800/40 text-slate-900 dark:text-white border border-white/20 dark:border-gray-700/40 shadow-lg backdrop-blur-md focus:outline-none focus:ring-2 accent-ring transition-all duration-200 placeholder:text-slate-500 dark:placeholder:text-gray-400"
+          placeholder="Quick search..."
+          oninput={() => showDropdownStore.set(true)}
+          onfocus={handleFocus}
+          onblur={handleBlur}
+          bind:value={$searchStore}
+          autocomplete="off"
+          style="backdrop-filter: blur(8px);"
+        />
+        {#if $showDropdownStore && $filteredPages.length > 0}
+          <ul
+            class="absolute left-0 mt-2 w-full rounded-2xl border border-white/20 dark:border-gray-700/40 bg-white/60 dark:bg-gray-900/70 shadow-2xl backdrop-blur-xl z-50 overflow-hidden animate-in"
+            in:scale={{ duration: 180, start: 0.98, opacity: 0 }}
+            out:scale={{ duration: 120, start: 1, opacity: 0 }}
+            style="backdrop-filter: blur(16px);"
+          >
+            {#each $filteredPages as page}
+              <li
+                class="flex items-center gap-3 px-5 py-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-slate-900 dark:text-white text-base font-medium"
+                onmousedown={() => handleSelect(page)}
+              >
+                <span class="w-5 h-5 flex-shrink-0 rounded-lg bg-accent-500/20 flex items-center justify-center">
+                  <!-- Optionally add an icon here in the future -->
+                </span>
+                {page.name}
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
     </div>
     {#if weatherEnabled && weatherData}
       <WeatherWidget {weatherData} />
