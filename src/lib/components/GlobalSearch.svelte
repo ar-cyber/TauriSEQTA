@@ -16,7 +16,6 @@ const pages = [
   { name: 'Direqt Messages', path: '/direqt-messages' },
   { name: 'News', path: '/news' },
   { name: 'Notices', path: '/notices' },
-  { name: 'QR Sign In', path: '/qrsignin' },
   { name: 'Reports', path: '/reports' },
   { name: 'Settings', path: '/settings' },
   { name: 'Timetable', path: '/timetable' },
@@ -38,6 +37,15 @@ let folderOptions = [
   { name: 'Courses', icon: BookOpen },
   { name: 'Assessments', icon: ClipboardDocumentList },
 ];
+
+const visibleFolders = derived(searchStore, $search =>
+  $search.trim() === ''
+    ? folderOptions
+    : folderOptions.filter(folder => folder.name.toLowerCase().includes($search.trim().toLowerCase()))
+);
+const totalItems = derived([visibleFolders, searchStore, filteredPages], ([$visibleFolders, $searchStore, $filteredPages]) =>
+  $visibleFolders.length + ($searchStore.trim() !== '' ? $filteredPages.length : 0)
+);
 
 function openModal() {
   showModal.set(true);
@@ -83,29 +91,25 @@ function handleKeydown(e: KeyboardEvent) {
       closeModal();
     }
   } else {
-    // General menu
+    if ($totalItems === 0) return;
     if (e.key === 'ArrowDown') {
-      selectedIndex = (selectedIndex + 1) % folderOptions.length;
+      selectedIndex = (selectedIndex + 1) % $totalItems;
       e.preventDefault();
     } else if (e.key === 'ArrowUp') {
-      selectedIndex = (selectedIndex - 1 + folderOptions.length) % folderOptions.length;
+      selectedIndex = (selectedIndex - 1 + $totalItems) % $totalItems;
       e.preventDefault();
-    } else if (e.key === 'Enter') {
-      if (selectedIndex === 0) {
-        openPagesFolder();
-        e.preventDefault();
-        return;
-      } else if (selectedIndex === 1) {
-        // openCoursesFolder();
-        inPagesFolder = 'courses';
-        e.preventDefault();
-        return;
-      } else if (selectedIndex === 2) {
-        // openAssessmentsFolder();
-        inPagesFolder = 'assessments';
-        e.preventDefault();
-        return;
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      if (selectedIndex < $visibleFolders.length) {
+        // Folder
+        if ($visibleFolders[selectedIndex].name === 'Pages') inPagesFolder = 'pages';
+        else if ($visibleFolders[selectedIndex].name === 'Courses') inPagesFolder = 'courses';
+        else if ($visibleFolders[selectedIndex].name === 'Assessments') inPagesFolder = 'assessments';
+      } else {
+        // Page result
+        handleSelect($filteredPages[selectedIndex - $visibleFolders.length]);
       }
+      e.preventDefault();
+      return;
     } else if (e.key === 'Escape') {
       closeModal();
     }
@@ -128,7 +132,7 @@ onMount(() => {
     // Escape
     if ($showModal && e.key === 'Escape') {
       if (inPagesFolder === 'pages' || inPagesFolder === 'courses' || inPagesFolder === 'assessments') {
-        inPagesFolder = false;
+        inPagesFolder = 'pages';
         setTimeout(() => {
           if (modalInput) modalInput.focus();
         }, 10);
@@ -210,16 +214,16 @@ onMount(() => {
         {/if}
       {:else}
         <ul class="w-full mt-2 mb-4 px-2 space-y-1 max-h-96 overflow-y-auto" role="listbox">
-          {#each folderOptions as folder, i}
+          {#each $visibleFolders as folder, i}
             <button
               type="button"
               role="option"
               aria-selected={selectedIndex === i}
               class={`flex items-center gap-3 w-full text-left px-5 py-3 cursor-pointer transition-all duration-200 rounded-xl hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-base font-medium ${selectedIndex === i ? 'bg-accent-500 text-white' : 'text-slate-900 dark:text-white'}`}
               onclick={() => {
-                if (i === 0) openPagesFolder();
-                else if (i === 1) inPagesFolder = 'courses';
-                else if (i === 2) inPagesFolder = 'assessments';
+                if (folder.name === 'Pages') inPagesFolder = 'pages';
+                else if (folder.name === 'Courses') inPagesFolder = 'courses';
+                else if (folder.name === 'Assessments') inPagesFolder = 'assessments';
               }}
               tabindex="-1"
             >
@@ -229,6 +233,24 @@ onMount(() => {
               {folder.name}
             </button>
           {/each}
+          {#if $searchStore.trim() !== '' && $filteredPages.length > 0}
+            <li class="mt-4 mb-1 px-5 text-xs font-semibold text-accent-500 uppercase tracking-wider">Pages</li>
+            {#each $filteredPages as page, j}
+              <button
+                type="button"
+                role="option"
+                aria-selected={selectedIndex === $visibleFolders.length + j}
+                class={`flex items-center gap-3 w-full text-left px-5 py-3 cursor-pointer transition-all duration-200 rounded-xl hover:scale-[1.02] hover:bg-accent-100 dark:hover:bg-accent-700 text-base font-medium ${selectedIndex === $visibleFolders.length + j ? 'bg-accent-500 text-white' : 'text-slate-900 dark:text-white'}`}
+                onclick={() => handleSelect(page)}
+                tabindex="-1"
+              >
+                <span class="w-5 h-5 flex-shrink-0 rounded-lg bg-accent-500/20 flex items-center justify-center">
+                  <Icon src={Squares2x2} class="w-5 h-5" />
+                </span>
+                {page.name}
+              </button>
+            {/each}
+          {/if}
         </ul>
       {/if}
       <div class="flex items-center gap-4 px-6 pb-4 pt-2 text-xs text-slate-500 dark:text-gray-400">
