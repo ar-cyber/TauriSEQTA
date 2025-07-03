@@ -8,7 +8,7 @@ import { scale } from 'svelte/transition';
 const dispatch = createEventDispatcher();
 
 const pages = [
-  { name: 'Dashboard', path: '/dashboard' },
+  { name: 'Home', path: '/' },
   { name: 'Analytics', path: '/analytics' },
   { name: 'Assessments', path: '/assessments' },
   { name: 'Courses', path: '/courses' },
@@ -31,7 +31,7 @@ const filteredPages = derived(searchStore, ($search) =>
 let selectedIndex = $state(0);
 let inputBox: HTMLInputElement | null = null;
 let modalInput = $state<HTMLInputElement | null>(null);
-let inPagesFolder = $state(false);
+let inPagesFolder = $state<false | 'pages' | 'courses' | 'assessments'>(false);
 
 let folderOptions = [
   { name: 'Pages', icon: Squares2x2 },
@@ -127,7 +127,7 @@ onMount(() => {
     }
     // Escape
     if ($showModal && e.key === 'Escape') {
-      if (inPagesFolder === true || inPagesFolder === 'courses' || inPagesFolder === 'assessments') {
+      if (inPagesFolder === 'pages' || inPagesFolder === 'courses' || inPagesFolder === 'assessments') {
         inPagesFolder = false;
         setTimeout(() => {
           if (modalInput) modalInput.focus();
@@ -149,9 +149,8 @@ onMount(() => {
 <!-- Header search box trigger -->
 <div class="flex-1 flex justify-center">
   <input
-    bind:this={inputBox}
     type="text"
-    class="w-72 px-5 py-2 rounded-xl bg-white/20 dark:bg-gray-800/40 border border-accent-500 text-accent-500 font-semibold shadow-md backdrop-blur-md transition-all duration-200 focus:outline-none focus:ring-2 accent-ring placeholder:text-accent-500/70 text-center cursor-pointer"
+    class="w-72 px-5 py-2 rounded-xl bg-white/20 dark:bg-gray-800/40 border border-accent-500 text-accent-500 font-semibold shadow-md backdrop-blur-md transition-all duration-200 focus:outline-none focus:ring-2 accent-ring placeholder:text-accent-500/70 text-center cursor-pointer select-none"
     placeholder="Quick search..."
     readonly
     onfocus={openModal}
@@ -241,7 +240,7 @@ onMount(() => {
   </div>
 {/if}
 
-{#if inPagesFolder === true}
+{#if inPagesFolder === 'pages'}
   {#if $filteredPages.length > 0}
     <div class="flex flex-col items-center justify-center h-40 text-slate-500 dark:text-gray-400">
       <Icon src={Squares2x2} class="w-8 h-8 mb-2" />
