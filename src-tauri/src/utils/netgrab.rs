@@ -92,6 +92,7 @@ pub async fn fetch_api_data(
     body: Option<Value>,
     parameters: Option<HashMap<String, String>>,
     is_image: bool,
+    return_url: bool
 ) -> Result<String, String> {
     let client = create_client();
     let session = session::Session::load();
@@ -133,7 +134,11 @@ pub async fn fetch_api_data(
             // Encode to base64
             let base64_str = general_purpose::STANDARD.encode(&bytes);
             Ok(base64_str)
-        } else {
+        }
+        else if (return_url == true){
+            Ok(String::from(resp.url().as_str()))
+        }
+        else {
             let text = resp.text().await.map_err(|e| e.to_string())?;
             Ok(text)
         }
@@ -147,7 +152,15 @@ pub async fn get_api_data(
     url: &str,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters), false).await
+    fetch_api_data(url, RequestMethod::GET, None, None, Some(parameters), false, false).await
+}
+
+#[tauri::command]
+pub async fn get_seqta_file(file_type: &str, uuid: &str) -> Result<String, String> {
+    let mut params = HashMap::new();
+    params.insert(String::from("type"), String::from(file_type));
+    params.insert(String::from("file"), String::from(uuid));
+    fetch_api_data("/seqta/student/load/file", RequestMethod::GET, None, None, Some(params), false, true).await
 }
 
 #[derive(Serialize)]
@@ -313,7 +326,7 @@ pub async fn post_api_data(
     data: Value,
     parameters: HashMap<String, String>,
 ) -> Result<String, String> {
-    fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters), false).await
+    fetch_api_data(url, RequestMethod::POST, None, Some(data), Some(parameters), false, false).await
 }
 
 /// Clear the session data with API call and remove the session file
