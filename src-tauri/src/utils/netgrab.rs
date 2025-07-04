@@ -135,7 +135,7 @@ pub async fn fetch_api_data(
             let base64_str = general_purpose::STANDARD.encode(&bytes);
             Ok(base64_str)
         }
-        else if (return_url == true){
+        else if return_url == true {
             Ok(String::from(resp.url().as_str()))
         }
         else {
