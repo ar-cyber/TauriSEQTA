@@ -10,6 +10,8 @@
     PresentationChartLine,
     Photo,
   } from 'svelte-hero-icons';
+  import { openUrl } from '@tauri-apps/plugin-opener';
+  import { invoke } from '@tauri-apps/api/core';
 
   let assessmentData: any = $state(null);
   let loading = $state(true);
@@ -162,8 +164,21 @@
                       </div>
                     </div>
                     <button
-                      disabled
-                      class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
+                      type="button"
+                      class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 text-white bg-accent-bg hover:bg-accent-ring"
+                      onclick={async () => {
+                        try {
+                          const url = await invoke('get_seqta_file', {
+                            fileType: 'resource',
+                            uuid: resource.userfile.uuid,
+                          });
+                          if (typeof url === 'string') {
+                            await openUrl(url);
+                          }
+                        } catch (e) {
+                          // Optionally handle error
+                        }
+                      }}>
                       Download
                     </button>
                   </div>
@@ -231,6 +246,7 @@
                         </div>
                       </div>
                       <button
+                        type="button"
                         disabled
                         class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
                         Download
@@ -269,6 +285,7 @@
                       </div>
                     </div>
                     <button
+                      type="button"
                       disabled
                       class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
                       Download
