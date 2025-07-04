@@ -3,7 +3,7 @@
   import { seqtaFetch } from '../../utils/netUtil';
   import { cache } from '../../utils/cache';
   import { invoke } from '@tauri-apps/api/core';
-  import { openURL } from '../../utils/netUtil';
+  import { openUrl } from '@tauri-apps/plugin-opener';
 
   let reports = $state<any[]>([]);
   let loading = $state(true);
@@ -66,7 +66,7 @@
         uuid: report.uuid,
       });
       if (typeof url === 'string') {
-        await openURL(url);
+        await openUrl(url);
       }
     } catch (e) {
       // Optionally handle error (e.g., show a toast)
