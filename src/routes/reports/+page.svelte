@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { seqtaFetch } from '../../utils/netUtil';
   import { cache } from '../../utils/cache';
+  import { invoke } from '@tauri-apps/api/core';
+  import { openURL } from '../../utils/netUtil';
 
   let reports = $state<any[]>([]);
   let loading = $state(true);
@@ -57,6 +59,20 @@
     }
   }
 
+  async function openReportInBrowser(report: any) {
+    try {
+      const url = await invoke('get_seqta_file', {
+        fileType: 'report',
+        uuid: report.uuid,
+      });
+      if (typeof url === 'string') {
+        await openURL(url);
+      }
+    } catch (e) {
+      // Optionally handle error (e.g., show a toast)
+    }
+  }
+
   onMount(loadReports);
 </script>
 
@@ -103,6 +119,12 @@
               class="text-xs font-semibold text-center opacity-80 text-slate-900 dark:text-white animate-fade-in">
               {formatDate(report.created_date)}
             </div>
+            <button
+              class="mt-4 inline-block w-full text-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 accent-bg accent-ring text-white"
+              onclick={() => openReportInBrowser(report)}
+            >
+              Download
+            </button>
           </div>
         </div>
       {/each}
