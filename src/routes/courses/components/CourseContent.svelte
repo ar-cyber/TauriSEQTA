@@ -297,7 +297,8 @@
           </h3>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {#each selectedLessonContent.r as resource, i}
-              <div
+              <button
+                type="button"
                 class="relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 {getFileColor(
                   resource.mimetype,
                 )} animate-slide-in cursor-pointer"
@@ -334,7 +335,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             {/each}
           </div>
         </div>
@@ -404,7 +405,8 @@
                     {#each renderedModule.content as resource, j}
                       {@const fileDetails = coursePayload.cf.find((f) => f.uuid === resource.uuid)}
                       {#if fileDetails}
-                        <div
+                        <button
+                          type="button"
                           class="relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 {getFileColor(
                             fileDetails.mimetype,
                           )} animate-slide-in cursor-pointer"
@@ -437,7 +439,7 @@
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       {/if}
                     {/each}
                   </div>
