@@ -382,7 +382,7 @@
           <div>
             <h3 class="mb-3 text-sm font-semibold sm:text-base sm:mb-4">Widget Settings</h3>
             <p class="mb-4 text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-              Configure which widgets appear on your in DesQTA.
+              Configure which widgets appear on your DesQTA dashboard.
             </p>
             <div
               class="p-4 space-y-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
