@@ -188,6 +188,7 @@ pub fn run() {
             netgrab::get_rss_feed,
             netgrab::post_api_data,
             netgrab::fetch_api_data,
+            netgrab::get_seqta_file,
             login::check_session_exists,
             login::save_session,
             login::create_login_window,

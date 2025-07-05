@@ -47,6 +47,9 @@
       "desktop": {
       "schemes": ["desqta"]
       }
+    },
+    "shell": {
+      "open": true
     }
   }
 }

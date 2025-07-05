@@ -177,10 +177,10 @@
         class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300">
         DesQTA
       </h1>
-      {#if weatherEnabled && weatherData}
-        <WeatherWidget {weatherData} />
-      {/if}
-    </div>
+    {#if weatherEnabled && weatherData}
+      <WeatherWidget {weatherData} />
+    {/if}
+  </div>
   </div>
   <div class="flex-1 flex justify-center">
     <GlobalSearch />

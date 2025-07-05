@@ -25,6 +25,7 @@
   import type { LessonSummary } from '../../../lib/services/geminiService';
   import { onMount } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
+  import { openUrl } from '@tauri-apps/plugin-opener';
 
   let {
     coursePayload,
@@ -296,11 +297,25 @@
           </h3>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {#each selectedLessonContent.r as resource, i}
-              <div
+              <button
+                type="button"
                 class="relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 {getFileColor(
                   resource.mimetype,
-                )} animate-slide-in"
-                style="--animation-delay: {0.15 + i * 0.05}s;">
+                )} animate-slide-in cursor-pointer"
+                style="--animation-delay: {0.15 + i * 0.05}s;"
+                onclick={async () => {
+                  try {
+                    const url = await invoke('get_seqta_file', {
+                      fileType: 'resource',
+                      uuid: resource.uuid,
+                    });
+                    if (typeof url === 'string') {
+                      await openUrl(url);
+                    }
+                  } catch (e) {
+                    // Optionally handle error
+                  }
+                }}>
                 <span
                   class="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-40 blur-2xl animate-pulse pointer-events-none"
                   style={`background: radial-gradient(circle at 40% 60%, var(--tw-gradient-from, #fff), transparent 70%); --tw-gradient-from: ${getFileColor(resource.mimetype).match(/bg-([a-z]+)-900/) ? getFileColor(resource.mimetype).replace(/.*bg-([a-z]+)-900.*/, 'var(--tw-color-$1-400)') : 'var(--tw-color-indigo-400)'}`}
@@ -320,7 +335,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             {/each}
           </div>
         </div>
@@ -390,11 +405,25 @@
                     {#each renderedModule.content as resource, j}
                       {@const fileDetails = coursePayload.cf.find((f) => f.uuid === resource.uuid)}
                       {#if fileDetails}
-                        <div
+                        <button
+                          type="button"
                           class="relative p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 {getFileColor(
                             fileDetails.mimetype,
-                          )} animate-slide-in"
-                          style="--animation-delay: {0.15 + j * 0.03}s;">
+                          )} animate-slide-in cursor-pointer"
+                          style="--animation-delay: {0.15 + j * 0.03}s;"
+                          onclick={async () => {
+                            try {
+                              const url = await invoke('get_seqta_file', {
+                                fileType: 'resource',
+                                uuid: resource.uuid,
+                              });
+                              if (typeof url === 'string') {
+                                await openUrl(url);
+                              }
+                            } catch (e) {
+                              // Optionally handle error
+                            }
+                          }}>
                           <span
                             class="absolute -top-4 -left-4 w-20 h-20 rounded-full opacity-40 blur-2xl animate-pulse pointer-events-none"
                             style={`background: radial-gradient(circle at 40% 60%, var(--tw-gradient-from, #fff), transparent 70%); --tw-gradient-from: ${getFileColor(fileDetails.mimetype).match(/bg-([a-z]+)-900/) ? getFileColor(fileDetails.mimetype).replace(/.*bg-([a-z]+)-900.*/, 'var(--tw-color-$1-400)') : 'var(--tw-color-indigo-400)'}`}
@@ -410,7 +439,7 @@
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       {/if}
                     {/each}
                   </div>
