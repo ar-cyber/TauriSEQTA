@@ -10,6 +10,7 @@
     DocumentText,
     GlobeAlt,
   } from 'svelte-hero-icons';
+  import { openUrl } from '@tauri-apps/plugin-opener';
 
   interface Props {
     open: boolean;
@@ -152,9 +153,11 @@
           <h3 class="mb-3 sm:mb-4 text-base sm:text-lg font-semibold text-slate-900 dark:text-white">Links</h3>
           <div class="space-y-3 sm:space-y-4">
             <a
-              href="https://github.com/betterseqta/desqta"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#"
+              onclick={(e) => {
+                e.preventDefault();
+                openUrl('https://github.com/betterseqta/desqta');
+              }}
               class="flex items-center p-2 sm:p-3 space-x-2 sm:space-x-3 bg-slate-100 rounded-xl transition-all duration-200 hover:bg-slate-200 dark:bg-slate-700/50 dark:hover:bg-slate-700 group">
               <div
                 class="flex justify-center items-center w-7 h-7 sm:w-8 sm:h-8 bg-slate-800 rounded-lg dark:bg-slate-200">
@@ -166,9 +169,11 @@
               </div>
             </a>
             <a
-              href="https://desqta.betterseqta.org"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#"
+              onclick={(e) => {
+                e.preventDefault();
+                openUrl('https://desqta.betterseqta.org');
+              }}
               class="flex items-center p-2 sm:p-3 space-x-2 sm:space-x-3 bg-slate-100 rounded-xl transition-all duration-200 hover:bg-slate-200 dark:bg-slate-700/50 dark:hover:bg-slate-700 group">
               <div
                 class="flex justify-center items-center w-7 h-7 sm:w-8 sm:h-8 bg-slate-800 rounded-lg dark:bg-slate-200">
