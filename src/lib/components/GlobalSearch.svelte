@@ -151,7 +151,7 @@ onMount(() => {
 </script>
 
 <!-- Header search box trigger -->
-<div class="flex-1 flex justify-center">
+<div class="flex-1 flex justify-center" data-tauri-drag-region>
   <input
     type="text"
     class="w-72 px-5 py-2 rounded-xl bg-white/20 dark:bg-gray-800/40 border border-accent-500 text-accent-500 font-semibold shadow-md backdrop-blur-md transition-all duration-200 focus:outline-none focus:ring-2 accent-ring placeholder:text-accent-500/70 text-center cursor-pointer select-none"
