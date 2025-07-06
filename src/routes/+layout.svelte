@@ -59,6 +59,7 @@
   let disableSchoolPicture = $state(false);
 
   let enhancedAnimations = $state(true);
+  let autoCollapseSidebar = $state(false);
 
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
@@ -96,6 +97,24 @@
       console.log('Enhanced animations setting reloaded:', enhancedAnimations);
     } catch (e) {
       console.error('Failed to reload enhanced animations setting:', e);
+    }
+  }
+
+  // Function to reload auto collapse sidebar setting
+  async function reloadAutoCollapseSidebarSetting() {
+    try {
+      const settings = await invoke<{ auto_collapse_sidebar?: boolean }>('get_settings');
+      autoCollapseSidebar = settings.auto_collapse_sidebar ?? false;
+      console.log('Auto collapse sidebar setting reloaded:', autoCollapseSidebar);
+    } catch (e) {
+      console.error('Failed to reload auto collapse sidebar setting:', e);
+    }
+  }
+
+  // Function to handle page navigation with auto-collapse
+  function handlePageNavigation() {
+    if (autoCollapseSidebar) {
+      sidebarOpen = false;
     }
   }
 
@@ -211,20 +230,14 @@
     }
   });
 
-  // Reload enhanced animations setting when navigating to settings
-  $effect(() => {
-    if ($page.url.pathname === '/settings') {
-      reloadEnhancedAnimationsSetting();
-    }
-  });
-
   onMount(async () => {
     await Promise.all([
       checkSession(),
       loadWeatherSettings(),
       loadAccentColor(),
       loadTheme(),
-      loadEnhancedAnimationsSetting()
+      loadEnhancedAnimationsSetting(),
+      reloadAutoCollapseSidebarSetting()
     ]);
     if (weatherEnabled) {
       if (forceUseLocation) fetchWeather();
@@ -258,6 +271,20 @@
       }
     }
     isLoading = false;
+  });
+
+  // Effect to handle page navigation and auto-collapse sidebar
+  $effect(() => {
+    if (autoCollapseSidebar) {
+      handlePageNavigation();
+    }
+  });
+
+  // Reload auto collapse sidebar setting when navigating to settings
+  $effect(() => {
+    if ($page.url.pathname === '/settings') {
+      reloadAutoCollapseSidebarSetting();
+    }
   });
 
   onMount(() => {
@@ -315,7 +342,7 @@
     />
 
     <div class="flex flex-1 min-h-0">
-      <AppSidebar {sidebarOpen} {menu} />
+      <AppSidebar {sidebarOpen} {menu} onMenuItemClick={handlePageNavigation} />
 
       <main
         class="overflow-y-auto flex-1 border-t border-l border-slate-200 bg-slate-100/50 dark:border-slate-700/50 dark:bg-slate-900/50">

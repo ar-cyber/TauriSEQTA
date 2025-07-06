@@ -11,9 +11,16 @@
   interface Props {
     sidebarOpen: boolean;
     menu: MenuItem[];
+    onMenuItemClick?: () => void;
   }
 
-  let { sidebarOpen, menu }: Props = $props();
+  let { sidebarOpen, menu, onMenuItemClick }: Props = $props();
+
+  function handleMenuItemClick() {
+    if (onMenuItemClick) {
+      onMenuItemClick();
+    }
+  }
 </script>
 
 <aside
@@ -24,6 +31,7 @@
     {#each menu as item}
       <a
         href={item.path}
+        onclick={handleMenuItemClick}
         class="flex gap-4 items-center text-md px-3 py-3 font-medium rounded-xl transition-all duration-200 hover:bg-accent-100 hover:text-slate-900 dark:hover:bg-accent-600 dark:hover:text-white focus:outline-none {(
           item.path === '/'
             ? $page.url.pathname === '/'

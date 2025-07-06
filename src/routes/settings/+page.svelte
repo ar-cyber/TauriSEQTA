@@ -43,6 +43,7 @@
   let aiIntegrationsEnabled = false;
   let gradeAnalyserEnabled = true;
   let lessonSummaryAnalyserEnabled = true;
+  let autoCollapseSidebar = false;
 
   async function loadSettings() {
     loading = true;
@@ -63,6 +64,7 @@
         ai_integrations_enabled?: boolean;
         grade_analyser_enabled?: boolean;
         lesson_summary_analyser_enabled?: boolean;
+        auto_collapse_sidebar?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -79,6 +81,7 @@
       aiIntegrationsEnabled = settings.ai_integrations_enabled ?? false;
       gradeAnalyserEnabled = settings.grade_analyser_enabled ?? true;
       lessonSummaryAnalyserEnabled = settings.lesson_summary_analyser_enabled ?? true;
+      autoCollapseSidebar = settings.auto_collapse_sidebar ?? false;
 
       console.log('Loading settings', {
         shortcuts,
@@ -105,6 +108,7 @@
       aiIntegrationsEnabled = false;
       gradeAnalyserEnabled = true;
       lessonSummaryAnalyserEnabled = true;
+      autoCollapseSidebar = false;
     }
     loading = false;
   }
@@ -142,6 +146,7 @@
           ai_integrations_enabled: aiIntegrationsEnabled,
           grade_analyser_enabled: gradeAnalyserEnabled,
           lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
+          auto_collapse_sidebar: autoCollapseSidebar,
         },
       });
       saveSuccess = true;
@@ -235,6 +240,7 @@
     aiIntegrationsEnabled = cloudSettings.ai_integrations_enabled ?? false;
     gradeAnalyserEnabled = cloudSettings.grade_analyser_enabled ?? true;
     lessonSummaryAnalyserEnabled = cloudSettings.lesson_summary_analyser_enabled ?? true;
+    autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
 
     notify({
       title: 'Settings Downloaded',
@@ -540,8 +546,19 @@
               Adjust the layout and sizing of various elements.
             </p>
             <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
-              <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                Layout settings coming soon...
+              <div class="flex gap-4 items-center mb-4">
+                <input
+                  id="auto-collapse-sidebar"
+                  type="checkbox"
+                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                  bind:checked={autoCollapseSidebar} />
+                <label
+                  for="auto-collapse-sidebar"
+                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+                  >Auto-collapse sidebar when navigating</label>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">
+                When enabled, the sidebar will automatically collapse when you click on a page link, giving you more space for content.
               </p>
             </div>
           </div>

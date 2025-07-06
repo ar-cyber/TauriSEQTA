@@ -80,6 +80,7 @@ pub struct Settings {
     pub ai_integrations_enabled: Option<bool>,
     pub grade_analyser_enabled: Option<bool>,
     pub lesson_summary_analyser_enabled: Option<bool>,
+    pub auto_collapse_sidebar: bool,
 }
 
 impl Default for Settings {
@@ -100,6 +101,7 @@ impl Default for Settings {
             ai_integrations_enabled: Some(false),
             grade_analyser_enabled: Some(true),
             lesson_summary_analyser_enabled: Some(true),
+            auto_collapse_sidebar: false,
         }
     }
 }
@@ -270,6 +272,7 @@ impl Settings {
         default_settings.ai_integrations_enabled = get_opt_bool(&existing_json, "ai_integrations_enabled");
         default_settings.grade_analyser_enabled = get_opt_bool(&existing_json, "grade_analyser_enabled");
         default_settings.lesson_summary_analyser_enabled = get_opt_bool(&existing_json, "lesson_summary_analyser_enabled");
+        default_settings.auto_collapse_sidebar = get_bool(&existing_json, "auto_collapse_sidebar", default_settings.auto_collapse_sidebar);
 
         default_settings
     }
