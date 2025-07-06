@@ -81,6 +81,7 @@ pub struct Settings {
     pub grade_analyser_enabled: Option<bool>,
     pub lesson_summary_analyser_enabled: Option<bool>,
     pub auto_collapse_sidebar: bool,
+    pub auto_expand_sidebar_hover: bool,
 }
 
 impl Default for Settings {
@@ -102,6 +103,7 @@ impl Default for Settings {
             grade_analyser_enabled: Some(true),
             lesson_summary_analyser_enabled: Some(true),
             auto_collapse_sidebar: false,
+            auto_expand_sidebar_hover: false,
         }
     }
 }
@@ -273,6 +275,7 @@ impl Settings {
         default_settings.grade_analyser_enabled = get_opt_bool(&existing_json, "grade_analyser_enabled");
         default_settings.lesson_summary_analyser_enabled = get_opt_bool(&existing_json, "lesson_summary_analyser_enabled");
         default_settings.auto_collapse_sidebar = get_bool(&existing_json, "auto_collapse_sidebar", default_settings.auto_collapse_sidebar);
+        default_settings.auto_expand_sidebar_hover = get_bool(&existing_json, "auto_expand_sidebar_hover", default_settings.auto_expand_sidebar_hover);
 
         default_settings
     }

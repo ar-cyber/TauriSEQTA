@@ -60,6 +60,7 @@
 
   let enhancedAnimations = $state(true);
   let autoCollapseSidebar = $state(false);
+  let autoExpandSidebarHover = $state(false);
 
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
@@ -111,10 +112,43 @@
     }
   }
 
+  // Function to reload auto expand sidebar hover setting
+  async function reloadAutoExpandSidebarHoverSetting() {
+    try {
+      const settings = await invoke<{ auto_expand_sidebar_hover?: boolean }>('get_settings');
+      autoExpandSidebarHover = settings.auto_expand_sidebar_hover ?? false;
+      console.log('Auto expand sidebar hover setting reloaded:', autoExpandSidebarHover);
+    } catch (e) {
+      console.error('Failed to reload auto expand sidebar hover setting:', e);
+    }
+  }
+
   // Function to handle page navigation with auto-collapse
   function handlePageNavigation() {
     if (autoCollapseSidebar) {
       sidebarOpen = false;
+    }
+  }
+
+  // Function to handle mouse hover for auto-expand
+  function handleMouseMove(event: MouseEvent) {
+    if (autoExpandSidebarHover && !sidebarOpen && !isMobile) {
+      const x = event.clientX;
+      if (x <= 20) { // Hover within 20px of left edge
+        sidebarOpen = true;
+      }
+    }
+  }
+
+  // Function to handle mouse leave for auto-collapse
+  function handleMouseLeave() {
+    if (autoExpandSidebarHover && sidebarOpen && !isMobile) {
+      // Add a small delay to prevent immediate collapse
+      setTimeout(() => {
+        if (autoExpandSidebarHover && !isMobile) {
+          sidebarOpen = false;
+        }
+      }, 300);
     }
   }
 
@@ -237,7 +271,8 @@
       loadAccentColor(),
       loadTheme(),
       loadEnhancedAnimationsSetting(),
-      reloadAutoCollapseSidebarSetting()
+      reloadAutoCollapseSidebarSetting(),
+      reloadAutoExpandSidebarHoverSetting()
     ]);
     if (weatherEnabled) {
       if (forceUseLocation) fetchWeather();
@@ -284,6 +319,7 @@
   $effect(() => {
     if ($page.url.pathname === '/settings') {
       reloadAutoCollapseSidebarSetting();
+      reloadAutoExpandSidebarHoverSetting();
     }
   });
 
@@ -298,10 +334,16 @@
     checkMobile();
     window.addEventListener('resize', checkMobile);
     document.addEventListener('click', handleClickOutside);
+    
+    // Add mouse event listeners for auto-expand hover
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
       document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   });
 
