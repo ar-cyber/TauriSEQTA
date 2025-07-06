@@ -1,5 +1,8 @@
 /* Aero Theme - Global Styles (Windows 7 Aero Replica) */
 
+/* Import 7.css for Windows 7-style interface elements */
+@import url('https://unpkg.com/7.css');
+
 :root {
   --accent-color-value: #3399ff;
   --accent-color-hover: #1976d2;
