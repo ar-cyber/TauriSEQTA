@@ -18,7 +18,7 @@
     try {
       // List all theme directories manually (since getAvailableThemes is hardcoded)
       const themeNames = [
-        'default', 'sunset', 'light', 'mint', 'grape', 'midnight', 'bubblegum', 'solarized', 'glass'
+        'default', 'sunset', 'light', 'mint', 'grape', 'midnight', 'bubblegum', 'solarized', 'glass', 'aero'
       ];
       const themePromises = themeNames.map(async (name) => {
         try {
