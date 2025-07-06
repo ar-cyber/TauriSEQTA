@@ -50,7 +50,7 @@
 </script>
 
 <section
-  class="w-full xl:w-[28rem] h-full border-r border-slate-300/50 dark:border-slate-800/50 flex flex-col bg-slate-100/10 dark:bg-slate-900 backdrop-blur-sm">
+  class="w-full xl:w-[28rem] h-full border-r border-slate-300/50 dark:border-slate-800/50 flex flex-col bg-white dark:bg-slate-900 backdrop-blur-sm shadow-md rounded-xl m-2">
   <div
     class="flex items-center p-4 text-base font-semibold border-b text-slate-900 sm:text-lg border-slate-300/50 dark:border-slate-800/50 dark:text-white">
     <svg
@@ -64,12 +64,12 @@
   </div>
 
   <div
-    class="overflow-y-auto flex-1 p-2 scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-slate-800/10">
+    class="overflow-y-auto flex-1 p-2 scrollbar-thin scrollbar-thumb-accent-500/30 scrollbar-track-slate-800/10">
     {#if loading}
       <div
         class="flex flex-col justify-center items-center p-8 h-32 text-center text-slate-600 dark:text-slate-300">
         <div
-          class="w-8 h-8 rounded-full border-4 animate-spin sm:w-10 sm:h-10 border-indigo-500/30 border-t-indigo-500">
+          class="w-8 h-8 rounded-full border-4 animate-spin sm:w-10 sm:h-10 border-accent-500/30 border-t-accent-500">
         </div>
         <p class="mt-4 text-sm sm:text-base">Loading messages...</p>
       </div>
@@ -93,12 +93,12 @@
       {#each messages.filter((m: Message) => m.folder === selectedFolder) as msg (msg.id)}
         <button
           class="w-full text-left p-3 mb-2 transition-all duration-200 flex flex-col gap-2
-            rounded-lg relative animate-fadeIn
+            rounded-lg relative animate-fadeIn shadow-md
             {selectedMessage?.id === msg.id
-            ? 'bg-indigo-500/10 shadow-lg border border-indigo-500/50 hover:bg-indigo-500/20'
-            : 'border border-slate-300/30 dark:border-slate-800/30 hover:border-slate-400/50 dark:hover:border-slate-700/50 hover:bg-slate-200/30 dark:hover:bg-slate-800/30'}
-            {msg.unread ? 'border-l-4 border-l-indigo-500' : ''}
-            focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            ? 'border-2 border-accent-500 focus:ring-2 accent-ring'
+            : 'border border-slate-300/30 dark:border-slate-800/30 hover:border-accent-500/30 dark:hover:border-accent-700/30 hover:bg-accent-100/30 dark:hover:bg-accent-700/30 hover:scale-[1.02]'}
+            {msg.unread ? 'border-l-4 border-l-accent-500' : ''}
+            focus:outline-none focus:ring-2 accent-ring"
           onclick={() => openMessage(msg)}>
           <!-- Top row: sender and date -->
           <div class="flex justify-between items-center w-full">
