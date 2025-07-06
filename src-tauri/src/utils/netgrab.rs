@@ -4,8 +4,7 @@ use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
 use serde_json::{json, Value};
-use std::{io::Cursor};
-use std::collections::HashMap;
+use std::{io::Cursor, sync::OnceLock, collections::HashMap};
 use anyhow::{Result, anyhow};
 use url::Url;
 
@@ -13,6 +12,8 @@ use base64::{engine::general_purpose, Engine as _};
 // opens a file using the default program:
 
 use crate::session;
+
+static GLOBAL_REQWEST: OnceLock<reqwest::Client> = OnceLock::new();
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HomeworkItem {
@@ -36,52 +37,55 @@ pub enum RequestMethod {
 
 /// Build an HTTP client with headers based on the saved session.
 fn create_client() -> reqwest::Client {
-    let session = session::Session::load();
-    let mut headers = reqwest::header::HeaderMap::new();
+    GLOBAL_REQWEST.get_or_init(|| {
+        let session = session::Session::load();
+        let mut headers = reqwest::header::HeaderMap::new();
 
-    // Build the complete cookie string with JSESSIONID and additional cookies
-    let mut cookie_parts = Vec::new();
+        // Build the complete cookie string with JSESSIONID and additional cookies
+        let mut cookie_parts = Vec::new();
 
-    // Add JSESSIONID first if it exists
-    if !session.jsessionid.is_empty() {
-        cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
-    }
+        // Add JSESSIONID first if it exists
+        if !session.jsessionid.is_empty() {
+            cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
+        }
 
-    // Add all additional cookies
-    for cookie in session.additional_cookies {
-        cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
-    }
+        // Add all additional cookies
+        for cookie in session.additional_cookies {
+            cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
+        }
 
-    // Set the combined cookie header if we have any cookies
-    if !cookie_parts.is_empty() {
+        // Set the combined cookie header if we have any cookies
+        if !cookie_parts.is_empty() {
+            headers.insert(
+                reqwest::header::COOKIE,
+                cookie_parts.join("; ").parse().unwrap(),
+            );
+        }
+
         headers.insert(
-            reqwest::header::COOKIE,
-            cookie_parts.join("; ").parse().unwrap(),
+            reqwest::header::USER_AGENT,
+            "Mozilla/5.0 (DesQTA)".parse().unwrap(),
         );
-    }
+        headers.insert(
+            reqwest::header::ACCEPT,
+            "application/json, text/plain, */*".parse().unwrap(),
+        );
+        headers.insert(
+            reqwest::header::ACCEPT_LANGUAGE,
+            "en-US,en;q=0.9".parse().unwrap(),
+        );
 
-    headers.insert(
-        reqwest::header::USER_AGENT,
-        "Mozilla/5.0 (DesQTA)".parse().unwrap(),
-    );
-    headers.insert(
-        reqwest::header::ACCEPT,
-        "application/json, text/plain, */*".parse().unwrap(),
-    );
-    headers.insert(
-        reqwest::header::ACCEPT_LANGUAGE,
-        "en-US,en;q=0.9".parse().unwrap(),
-    );
+        if !session.base_url.is_empty() {
+            headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
+            headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
+        }
 
-    if !session.base_url.is_empty() {
-        headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
-        headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
-    }
-
-    reqwest::Client::builder()
-        .default_headers(headers)
-        .build()
-        .expect("Failed to create HTTP client")
+        reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .expect("Failed to create HTTP client")
+        }
+    ).clone()
 }
 
 #[tauri::command]
