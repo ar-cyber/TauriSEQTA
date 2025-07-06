@@ -132,23 +132,16 @@
 
   // Function to handle mouse hover for auto-expand
   function handleMouseMove(event: MouseEvent) {
-    if (autoExpandSidebarHover && !sidebarOpen && !isMobile) {
+    if (autoExpandSidebarHover && !isMobile) {
       const x = event.clientX;
-      if (x <= 20) { // Hover within 20px of left edge
+      
+      if (!sidebarOpen && x <= 20) {
+        // Expand sidebar when hovering near left edge
         sidebarOpen = true;
+      } else if (sidebarOpen && x > 280) {
+        // Collapse sidebar when mouse moves away from sidebar area (sidebar width is ~256px + some buffer)
+        sidebarOpen = false;
       }
-    }
-  }
-
-  // Function to handle mouse leave for auto-collapse
-  function handleMouseLeave() {
-    if (autoExpandSidebarHover && sidebarOpen && !isMobile) {
-      // Add a small delay to prevent immediate collapse
-      setTimeout(() => {
-        if (autoExpandSidebarHover && !isMobile) {
-          sidebarOpen = false;
-        }
-      }, 300);
     }
   }
 
@@ -337,13 +330,11 @@
     
     // Add mouse event listeners for auto-expand hover
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
       document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   });
 
