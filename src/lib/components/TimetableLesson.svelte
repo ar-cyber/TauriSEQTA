@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  const { lesson } = $props<{
+  const { lesson, overlap = false } = $props<{
     lesson: {
       description: string;
       staff: string;
@@ -10,6 +10,7 @@
       until: string;
       colour: string;
     };
+    overlap?: boolean;
   }>();
 
   let expanded = $state(false);
@@ -49,23 +50,25 @@
 >
   <!-- Subject and Time Header -->
   <div class="flex justify-between items-center mb-0.5">
-    <h3 class="text-sm font-bold text-slate-900 dark:text-white truncate flex-1 mr-2">
+    <h3 class="text-sm font-bold text-slate-900 dark:text-white break-words whitespace-normal flex-1 mr-2">
       {lesson.description}
     </h3>
-    <span class="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
-      {lesson.from} - {lesson.until}
-    </span>
+    {#if !overlap}
+      <span class="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
+        {lesson.from} - {lesson.until}
+      </span>
+    {/if}
   </div>
 
   <!-- Teacher and Room: always visible -->
   <div class="flex flex-col gap-0.5 mb-0.5">
     {#if lesson.staff}
-      <span class="text-xs text-slate-600 dark:text-slate-400 truncate">
+      <span class="text-xs text-slate-600 dark:text-slate-400 break-words whitespace-normal">
         {lesson.staff}
       </span>
     {/if}
     {#if lesson.room}
-      <span class="text-xs text-slate-600 dark:text-slate-400 truncate">
+      <span class="text-xs text-slate-600 dark:text-slate-400 break-words whitespace-normal">
         Room {lesson.room}
       </span>
     {/if}

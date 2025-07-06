@@ -246,7 +246,7 @@
                       <div class="flex gap-1 h-full p-1">
                         {#each lessonGroup.lessons as lesson}
                           <div class="flex-1 min-w-0">
-                            <TimetableLesson lesson={lesson} />
+                            <TimetableLesson lesson={lesson} overlap={true} />
                           </div>
                         {/each}
                       </div>
