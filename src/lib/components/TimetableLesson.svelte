@@ -54,9 +54,9 @@
       {lesson.description}
     </h3>
     {#if !overlap}
-      <span class="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
-        {lesson.from} - {lesson.until}
-      </span>
+    <span class="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
+      {lesson.from} - {lesson.until}
+    </span>
     {/if}
   </div>
 

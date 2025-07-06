@@ -9,6 +9,7 @@
     Bell,
     DocumentText,
     GlobeAlt,
+    Sun,
   } from 'svelte-hero-icons';
   import { openUrl } from '@tauri-apps/plugin-opener';
 
@@ -116,28 +117,97 @@
                   src={ClipboardDocumentList}
                   class="w-3 h-3 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400" />
               </div>
-              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Assessment Tracking</span>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Timetable (week view, export, lesson details)</span>
             </li>
             <li class="flex items-center space-x-2 sm:space-x-3">
-              <div
-                class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-orange-100 rounded-lg dark:bg-orange-900/50">
-                <Icon src={CalendarDays} class="w-3 h-3 sm:w-4 sm:h-4 text-orange-600 dark:text-orange-400" />
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-yellow-100 rounded-lg dark:bg-yellow-900/50">
+                <Icon src={ClipboardDocumentList} class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600 dark:text-yellow-400" />
               </div>
-              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Timetable Integration</span>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Assessment Tracking & AI Grade Predictions</span>
             </li>
             <li class="flex items-center space-x-2 sm:space-x-3">
-              <div
-                class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg dark:bg-pink-900/50">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 rounded-lg dark:bg-indigo-900/50">
+                <Icon src={DocumentText} class="w-3 h-3 sm:w-4 sm:h-4 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Analytics (grade distribution, performance graphs)</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg dark:bg-pink-900/50">
                 <Icon src={ChatBubbleLeftRight} class="w-3 h-3 sm:w-4 sm:h-4 text-pink-600 dark:text-pink-400" />
               </div>
-              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Direqt Messaging</span>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Direqt Messaging (folders, RSS, compose, DMs)</span>
             </li>
             <li class="flex items-center space-x-2 sm:space-x-3">
-              <div
-                class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-red-100 rounded-lg dark:bg-red-900/50">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-red-100 rounded-lg dark:bg-red-900/50">
                 <Icon src={Bell} class="w-3 h-3 sm:w-4 sm:h-4 text-red-600 dark:text-red-400" />
               </div>
-              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Real-time Notifications</span>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Real-time Notifications & Reminders</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-purple-100 rounded-lg dark:bg-purple-900/50">
+                <Icon src={GlobeAlt} class="w-3 h-3 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">News Reader (multi-country RSS, source selection)</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-orange-100 rounded-lg dark:bg-orange-900/50">
+                <Icon src={DocumentText} class="w-3 h-3 sm:w-4 sm:h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Notice Board with Label Filtering</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-teal-100 rounded-lg dark:bg-teal-900/50">
+                <Icon src={ClipboardDocumentList} class="w-3 h-3 sm:w-4 sm:h-4 text-teal-600 dark:text-teal-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Reports Viewer & Download</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 rounded-lg dark:bg-gray-900/50">
+                <Icon src={CalendarDays} class="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">QR Sign-in Utility</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-lime-100 rounded-lg dark:bg-lime-900/50">
+                <Icon src={BookOpen} class="w-3 h-3 sm:w-4 sm:h-4 text-lime-600 dark:text-lime-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Homepage Shortcuts & Custom Widgets</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-cyan-100 rounded-lg dark:bg-cyan-900/50">
+                <Icon src={GlobeAlt} class="w-3 h-3 sm:w-4 sm:h-4 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Cloud Sync for Settings</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-fuchsia-100 rounded-lg dark:bg-fuchsia-900/50">
+                <Icon src={Sun} class="w-3 h-3 sm:w-4 sm:h-4 text-fuchsia-600 dark:text-fuchsia-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Appearance & Theme Customization</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-amber-100 rounded-lg dark:bg-amber-900/50">
+                <Icon src={ClipboardDocumentList} class="w-3 h-3 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Sidebar Auto-Collapse & Auto-Expand on Hover</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-rose-100 rounded-lg dark:bg-rose-900/50">
+                <Icon src={Bell} class="w-3 h-3 sm:w-4 sm:h-4 text-rose-600 dark:text-rose-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Enhanced Playful UI Animations</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-sky-100 rounded-lg dark:bg-sky-900/50">
+                <Icon src={GlobeAlt} class="w-3 h-3 sm:w-4 sm:h-4 text-sky-600 dark:text-sky-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">Plugin System for Extensibility</span>
+            </li>
+            <li class="flex items-center space-x-2 sm:space-x-3">
+              <div class="flex justify-center items-center w-5 h-5 sm:w-6 sm:h-6 bg-violet-100 rounded-lg dark:bg-violet-900/50">
+                <Icon src={BookOpen} class="w-3 h-3 sm:w-4 sm:h-4 text-violet-600 dark:text-violet-400" />
+              </div>
+              <span class="text-sm sm:text-base text-slate-900 dark:text-white">AI Integrations (Gemini, Grade & Lesson Analysis)</span>
             </li>
             <li class="flex items-center space-x-2 sm:space-x-3">
               <div
