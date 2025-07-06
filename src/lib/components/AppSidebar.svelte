@@ -26,7 +26,8 @@
 <aside
   class="overflow-hidden transition-all duration-300 ease-in-out"
   class:w-64={sidebarOpen}
-  class:w-0={!sidebarOpen}>
+  class:w-0={!sidebarOpen}
+  style="background: var(--background-color);">
   <nav class="p-3 py-[1px] space-y-2 w-64 min-w-64">
     {#each menu as item}
       <a

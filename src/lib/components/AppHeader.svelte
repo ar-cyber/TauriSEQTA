@@ -163,7 +163,7 @@
   });
 </script>
 
-<header class="flex justify-between items-center px-3 pr-2 w-full h-16 bg-white dark:bg-slate-950 relative z-[999999]" data-tauri-drag-region>
+<header class="flex justify-between items-center px-3 pr-2 w-full h-16 relative z-[999999]" data-tauri-drag-region style="background: var(--background-color);">
   <div class="flex items-center space-x-4">
     <button
       class="flex justify-center items-center w-10 h-10 rounded-xl transition-all duration-200 bg-slate-100 hover:accent-bg dark:bg-slate-800 focus:outline-none focus:ring-2 accent-ring playful"

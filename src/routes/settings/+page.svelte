@@ -801,8 +801,28 @@
         {/if}
       </section>
 
-      <!-- Add this somewhere in the settings page navigation or main content -->
-      <a href="/settings/theme-store" class="block px-4 py-2 rounded-lg bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold shadow hover:scale-105 transition-all duration-200 mt-4 mb-4">Theme Store (Preview Sunset Theme)</a>
+      <!-- Theme Store Link -->
+      <section
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Theme Store</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Browse and install custom themes for DesQTA
+          </p>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <p class="mb-4 text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+              Explore a collection of beautiful themes to customize your DesQTA experience.
+            </p>
+            <a
+              href="/settings/theme-store"
+              class="inline-block px-6 py-2 w-full text-center text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105">
+              Open Theme Store
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   {/if}
 </div>

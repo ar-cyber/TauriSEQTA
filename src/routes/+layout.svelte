@@ -10,7 +10,7 @@
 
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
-  import { accentColor, loadAccentColor, theme, loadTheme } from '../lib/stores/theme';
+  import { accentColor, loadAccentColor, theme, loadTheme, loadCurrentTheme } from '../lib/stores/theme';
   import { Icon } from 'svelte-hero-icons';
   import {
     Home,
@@ -263,6 +263,7 @@
       loadWeatherSettings(),
       loadAccentColor(),
       loadTheme(),
+      loadCurrentTheme(),
       loadEnhancedAnimationsSetting(),
       reloadAutoCollapseSidebarSetting(),
       reloadAutoExpandSidebarHoverSetting()
@@ -378,7 +379,8 @@
       <AppSidebar {sidebarOpen} {menu} onMenuItemClick={handlePageNavigation} />
 
       <main
-        class="overflow-y-auto flex-1 border-t border-l border-slate-200 bg-slate-100/50 dark:border-slate-700/50 dark:bg-slate-900/50">
+        class="overflow-y-auto flex-1 border-t border-l border-slate-200 dark:border-slate-700/50"
+        style="background: var(--background-color);">
         {#if $needsSetup}
           <LoginScreen
             {seqtaUrl}
