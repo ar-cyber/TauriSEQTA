@@ -122,7 +122,7 @@
       </a>
     <h1 class="text-3xl font-bold">Theme Store</h1>
     </div>
-   <div class="text-sm text-slate-600 dark:text-slate-400">Current: {capitalizeName(currentThemeName)}</div>
+   <div class="text-sm text-slate-600 dark:text-slate-400">Current theme: {capitalizeName(currentThemeName)}</div>
   </div>
 
   {#if loading}

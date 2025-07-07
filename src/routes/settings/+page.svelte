@@ -766,7 +766,7 @@
             for="grade-analyser-enabled"
             class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
           >
-            Grade Analyser (AI-powered grade predictions)
+            Grade Analyser
           </label>
         </div>
         <div class="flex gap-3 items-center">
@@ -780,7 +780,7 @@
             for="lesson-summary-analyser-enabled"
             class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
           >
-            Lesson Summary Analyser (AI-powered lesson summaries)
+            Lesson Summary Analyser
           </label>
         </div>
         <div class="mt-6">
