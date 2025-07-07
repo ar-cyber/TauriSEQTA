@@ -295,11 +295,6 @@
     @apply text-3xl font-bold text-white bg-blue-500 p-6 rounded-t-xl m-4 mb-0;
   }
 
-
-:global(body) {
-  overflow: hidden;
-}
-
   :global(.course-content h2) {
     @apply text-xl font-bold text-white bg-blue-500 p-4 rounded-xl m-4 mb-2;
   }
