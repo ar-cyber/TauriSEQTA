@@ -332,22 +332,22 @@
   </div>
   <div class="flex-1 flex justify-center">
     {#if globalSearchEnabled}
-      <GlobalSearch />
+    <GlobalSearch />
     {/if}
   </div>
   <div class="flex items-center space-x-2">
     <div class="relative notification-dropdown">
-      <button
-        class="flex relative justify-center items-center rounded-xl border transition-all duration-200 size-12 bg-white/60 border-slate-200/40 hover:accent-bg dark:bg-slate-800/60 dark:border-slate-700/40 focus:outline-none focus:ring-2 accent-ring playful"
+    <button
+      class="flex relative justify-center items-center rounded-xl border transition-all duration-200 size-12 bg-white/60 border-slate-200/40 hover:accent-bg dark:bg-slate-800/60 dark:border-slate-700/40 focus:outline-none focus:ring-2 accent-ring playful"
         onclick={toggleNotifications}>
-        <Icon src={Bell} class="w-5 h-5 text-slate-700 dark:text-slate-300 hover:text-white" />
-        {#if unreadNotifications > 0}
-          <span
-            class="flex absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
-            {unreadNotifications}
-          </span>
-        {/if}
-      </button>
+      <Icon src={Bell} class="w-5 h-5 text-slate-700 dark:text-slate-300 hover:text-white" />
+      {#if unreadNotifications > 0}
+        <span
+          class="flex absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+          {unreadNotifications}
+        </span>
+      {/if}
+    </button>
 
       {#if showNotifications}
         <div

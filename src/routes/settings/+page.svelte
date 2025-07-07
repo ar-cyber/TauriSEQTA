@@ -250,8 +250,8 @@
     aiIntegrationsEnabled = cloudSettings.ai_integrations_enabled ?? false;
     gradeAnalyserEnabled = cloudSettings.grade_analyser_enabled ?? true;
     lessonSummaryAnalyserEnabled = cloudSettings.lesson_summary_analyser_enabled ?? true;
-            autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
-        autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
+    autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
+    autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
         globalSearchEnabled = cloudSettings.global_search_enabled ?? true;
 
     notify({
