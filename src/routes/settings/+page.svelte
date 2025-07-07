@@ -286,7 +286,7 @@
       </button>
       {#if saveSuccess}
         <span class="text-sm text-green-400 animate-fade-in sm:text-base"
-          >Settings saved successfully!</span>
+          >Saved!</span>
       {/if}
       {#if saveError}
         <span class="text-sm text-red-400 animate-fade-in sm:text-base">{saveError}</span>
@@ -398,67 +398,68 @@
             </p>
             <div
               class="p-4 space-y-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
-              <div class="flex gap-4 items-center">
-                <input
-                  id="weather-enabled"
-                  type="checkbox"
-                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                  bind:checked={weatherEnabled} />
-                <label
-                  for="weather-enabled"
-                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                  >Show Weather Widget</label>
-              </div>
-              <div class="flex gap-4 items-center">
-                <input
-                  id="force-use-location"
-                  type="checkbox"
-                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                  bind:checked={forceUseLocation} />
-                <label
-                  for="force-use-location"
-                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                  >Only use Fallback Location for Weather</label>
-                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                  Useful if you use a VPN or want to choose the location, though the system
-                  sometimes does not work.
-                </p>
-              </div>
-              <div
-                class="flex flex-col gap-2 items-start pl-1"
-                style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled
-                  ? 'auto'
-                  : 'none'};">
-                <label
-                  for="weather-city"
-                  class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
-                  >Fallback City:</label>
-                <input
-                  id="weather-city"
-                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Perth"
-                  bind:value={weatherCity} />
-              </div>
-              <div
-                class="flex flex-col gap-2 items-start pl-1"
-                style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled
-                  ? 'auto'
-                  : 'none'};">
-                <label
-                  for="weather-country"
-                  class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
-                  >Fallback Country Code</label>
-                <a
-                  href="https://countrycode.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs text-blue-400 hover:underline">If unsure, visit countrycode.org</a>
-                <input
-                  id="weather-country"
-                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="AU"
-                  bind:value={weatherCountry} />
-              </div>
+              <!-- Always visible -->
+<div class="flex gap-4 items-center">
+  <input
+    id="weather-enabled"
+    type="checkbox"
+    class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+    bind:checked={weatherEnabled} />
+  <label
+    for="weather-enabled"
+    class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+    >Show Weather Widget</label>
+</div>
+
+<!-- Show this ONLY if weatherEnabled is true -->
+{#if weatherEnabled}
+  <div class="flex gap-4 items-center">
+    <input
+      id="force-use-location"
+      type="checkbox"
+      class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+      bind:checked={forceUseLocation} />
+    <label
+      for="force-use-location"
+      class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+      >Only use Fallback Location for Weather</label>
+  </div>
+
+  <!-- Show fallback inputs ONLY if forceUseLocation is true -->
+  {#if forceUseLocation}
+    <div class="flex flex-col gap-2 items-start pl-1">
+      <label
+        for="weather-city"
+        class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
+        >Fallback City:</label>
+      <input
+        id="weather-city"
+        class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Perth"
+        bind:value={weatherCity} />
+    </div>
+
+    <div class="flex flex-col gap-2 items-start pl-1">
+      <label
+        for="weather-country"
+        class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
+        >Fallback Country Code</label>
+      <span class="text-xs">
+        Visit <a
+          href="https://countrycode.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-400 hover:underline">countrycode.org</a> to find your country code.
+      </span>
+      <input
+        id="weather-country"
+        class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="AU"
+        bind:value={weatherCountry} />
+    </div>
+  {/if}
+{/if}
+
             </div>
           </div>
         </div>
