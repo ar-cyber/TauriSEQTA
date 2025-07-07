@@ -363,12 +363,9 @@
       {weatherEnabled}
       {weatherData}
       {userInfo}
-      {notifications}
-      {unreadNotifications}
       {showUserDropdown}
       onToggleSidebar={() => (sidebarOpen = !sidebarOpen)}
       onToggleUserDropdown={() => (showUserDropdown = !showUserDropdown)}
-      onClearNotifications={() => (notifications = [])}
       onLogout={handleLogout}
       onShowAbout={() => (showAboutModal = true)}
       onClickOutside={handleClickOutside}
