@@ -101,6 +101,11 @@
     await handleApplyTheme(selectedTheme.name.toLowerCase());
     selectedTheme = null;
   }
+
+  function capitalizeName(name: string) {
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  
 </script>
 
 <div class="p-8 max-w-5xl mx-auto">
@@ -117,7 +122,7 @@
       </a>
     <h1 class="text-3xl font-bold">Theme Store</h1>
     </div>
-    <div class="text-sm text-slate-600 dark:text-slate-400">Current: {currentThemeName}</div>
+   <div class="text-sm text-slate-600 dark:text-slate-400">Current: {capitalizeName(currentThemeName)}</div>
   </div>
 
   {#if loading}
