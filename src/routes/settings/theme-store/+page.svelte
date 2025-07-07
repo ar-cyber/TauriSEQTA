@@ -10,6 +10,12 @@
   let error: string | null = null;
   let currentThemeName = 'default';
   let imgErrors: boolean[] = [];
+  let themeOptions: any = {};
+  let showAdvanced = false;
+  let showFeatures = false;
+  let showFonts = false;
+  let showAnimations = false;
+  let showCustom = false;
 
   // Load all themes from static/themes/*
   async function loadThemes() {
@@ -59,7 +65,10 @@
 
   function openThemeModal(theme: ThemeManifest) {
     selectedTheme = theme;
+    // Deep copy to avoid mutating the manifest directly
+    themeOptions = JSON.parse(JSON.stringify(theme));
   }
+
   function closeThemeModal() {
     selectedTheme = null;
   }
@@ -72,6 +81,25 @@
       return `background: linear-gradient(135deg, ${theme.customProperties.primaryColor} 0%, ${theme.customProperties.secondaryColor} 100%)`;
     }
     return `background: ${theme.customProperties.backgroundColor}`;
+  }
+
+  function handleOptionChange(section: string, key: string, value: any) {
+    if (section === 'settings') themeOptions.settings[key] = value;
+    if (section === 'customProperties') themeOptions.customProperties[key] = value;
+    if (section === 'features') themeOptions.features[key] = value;
+    if (section === 'fonts') themeOptions.fonts[key] = value;
+    if (section === 'animations') themeOptions.animations[key] = value;
+    // Live apply custom properties
+    themeService.setCustomProperties(themeOptions.customProperties);
+    themeService.setThemeFonts(themeOptions.fonts);
+  }
+
+  async function handleApplyThemeWithOptions() {
+    if (!selectedTheme) return;
+    themeService.setCustomProperties(themeOptions.customProperties);
+    themeService.setThemeFonts(themeOptions.fonts);
+    await handleApplyTheme(selectedTheme.name.toLowerCase());
+    selectedTheme = null;
   }
 </script>
 
@@ -127,7 +155,7 @@
     {#if selectedTheme}
       <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
         <div
-          class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-fade-in-up relative"
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden animate-fade-in-up relative flex flex-col"
           style="{getThemePreviewStyle(selectedTheme)}"
         >
           <button
@@ -163,25 +191,135 @@
                 </div>
               </div>
             </div>
-            <div class="p-6 flex flex-col items-center">
-              <div class="font-semibold text-lg mb-2">{selectedTheme.name} Theme</div>
-              <div class="text-sm text-slate-700 dark:text-slate-300 mb-4 text-center">{selectedTheme.description}</div>
-              <div class="flex gap-4">
-                <button
-                  class="px-4 py-2 rounded-lg font-semibold text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent accent-bg hover:accent-bg-hover active:scale-95"
-                  on:click={() => handleApplyTheme(selectedTheme.name.toLowerCase())}
-                >
-                  Apply Theme
-                </button>
-                {#if currentThemeName !== 'default'}
-                  <button
-                    class="px-4 py-2 rounded-lg font-semibold text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600 active:scale-95"
-                    on:click={() => handleApplyTheme('default')}
-                  >
-                    Reset to Default
+            <div class="flex-1 overflow-y-auto px-6 pt-6 pb-2">
+              <div class="font-semibold text-lg mb-2 text-slate-800 dark:text-white">{selectedTheme.name} Theme</div>
+              <div class="text-sm text-slate-700 dark:text-slate-200 mb-4 text-center">{selectedTheme.description}</div>
+              <!-- Theme Options Section -->
+              <div class="w-full max-w-3xl mx-auto mb-4 p-6 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md">
+                <div class="accent-bg accent-text px-4 py-2 rounded-lg shadow font-medium text-base mb-4 transition-colors duration-200">
+                  Theme Options
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                  <!-- Accent Color -->
+                  <div class="flex items-center gap-2">
+                    <label class="block text-base font-medium flex-1 text-slate-800 dark:text-white" for="accentColor">Accent Color</label>
+                    <div class="flex items-center gap-2">
+                      <input id="accentColor" aria-label="Accent Color" type="color" class="w-10 h-10 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-accent transition-all" bind:value={themeOptions.settings.defaultAccentColor} on:input={e => handleOptionChange('settings', 'defaultAccentColor', (e.target && (e.target as HTMLInputElement).value) || themeOptions.settings.defaultAccentColor)} />
+                      <span class="w-8 h-8 rounded-lg border border-gray-300" style="background: {themeOptions.settings.defaultAccentColor}"></span>
+                    </div>
+                  </div>
+                  <!-- Default Theme -->
+                  <div>
+                    <label class="block text-base font-medium mb-1 text-slate-800 dark:text-white" for="defaultTheme">Default Theme</label>
+                    <select id="defaultTheme" aria-label="Default Theme" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow px-3 py-2 focus:ring-2 focus:ring-accent transition-all bg-white dark:bg-gray-900 text-base text-slate-800 dark:text-white" bind:value={themeOptions.settings.defaultTheme} on:change={e => handleOptionChange('settings', 'defaultTheme', (e.target && (e.target as HTMLSelectElement).value) || themeOptions.settings.defaultTheme)}>
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                      <option value="system">System</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- Advanced Options Accordion -->
+                <div class="mb-2">
+                  <button class="w-full flex items-center justify-between px-4 py-2 rounded-lg bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-slate-200 font-medium shadow transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent" on:click={() => showAdvanced = !showAdvanced} aria-expanded={showAdvanced} aria-controls="advanced-options">
+                    Advanced Options
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-200" style="transform: rotate({showAdvanced ? 90 : 0}deg);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                   </button>
-                {/if}
+                  {#if showAdvanced}
+                    <div id="advanced-options" class="mt-4 space-y-4">
+                      <!-- Features Accordion -->
+                      <div>
+                        <button class="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-200 font-medium shadow transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent" on:click={() => showFeatures = !showFeatures} aria-expanded={showFeatures} aria-controls="features-options">
+                          Features
+                          <svg class="w-4 h-4 ml-2 transition-transform duration-200" style="transform: rotate({showFeatures ? 90 : 0}deg);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                        {#if showFeatures}
+                          <div id="features-options" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            {#each Object.keys(themeOptions.features) as feat}
+                              <div class="flex items-center gap-2">
+                                <input id={feat} aria-label={feat} type="checkbox" class="accent-bg accent-ring rounded focus:ring-2 focus:ring-accent transition-all w-5 h-5" checked={themeOptions.features[feat]} on:change={e => handleOptionChange('features', feat, (e.target && (e.target as HTMLInputElement).checked) || false)} />
+                                <label class="text-base font-medium text-slate-800 dark:text-white" for={feat}>{feat}</label>
+                              </div>
+                            {/each}
+                          </div>
+                        {/if}
+                      </div>
+                      <!-- Fonts Accordion -->
+                      <div>
+                        <button class="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-200 font-medium shadow transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent" on:click={() => showFonts = !showFonts} aria-expanded={showFonts} aria-controls="fonts-options">
+                          Fonts
+                          <svg class="w-4 h-4 ml-2 transition-transform duration-200" style="transform: rotate({showFonts ? 90 : 0}deg);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                        {#if showFonts}
+                          <div id="fonts-options" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            {#each Object.keys(themeOptions.fonts) as fontKey}
+                              <div>
+                                <label class="block text-base font-medium mb-1 text-slate-800 dark:text-white" for={fontKey + '-font'}>{fontKey} font</label>
+                                <input id={fontKey + '-font'} aria-label={fontKey + ' font'} type="text" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow px-3 py-2 focus:ring-2 focus:ring-accent transition-all bg-white dark:bg-gray-900 text-base text-slate-800 dark:text-white" bind:value={themeOptions.fonts[fontKey]} on:input={e => handleOptionChange('fonts', fontKey, (e.target && (e.target as HTMLInputElement).value) || themeOptions.fonts[fontKey])} />
+                              </div>
+                            {/each}
+                          </div>
+                        {/if}
+                      </div>
+                      <!-- Animations Accordion -->
+                      <div>
+                        <button class="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-200 font-medium shadow transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent" on:click={() => showAnimations = !showAnimations} aria-expanded={showAnimations} aria-controls="animations-options">
+                          Animations
+                          <svg class="w-4 h-4 ml-2 transition-transform duration-200" style="transform: rotate({showAnimations ? 90 : 0}deg);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                        {#if showAnimations}
+                          <div id="animations-options" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            {#each Object.keys(themeOptions.animations) as animKey}
+                              <div>
+                                <label class="block text-base font-medium mb-1 text-slate-800 dark:text-white" for={animKey + '-anim'}>{animKey}</label>
+                                <input id={animKey + '-anim'} aria-label={animKey} type="text" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow px-3 py-2 focus:ring-2 focus:ring-accent transition-all bg-white dark:bg-gray-900 text-base text-slate-800 dark:text-white" bind:value={themeOptions.animations[animKey]} on:input={e => handleOptionChange('animations', animKey, (e.target && (e.target as HTMLInputElement).value) || themeOptions.animations[animKey])} />
+                              </div>
+                            {/each}
+                          </div>
+                        {/if}
+                      </div>
+                      <!-- Custom Properties Accordion -->
+                      <div>
+                        <button class="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-200 font-medium shadow transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent" on:click={() => showCustom = !showCustom} aria-expanded={showCustom} aria-controls="custom-options">
+                          Custom Properties
+                          <svg class="w-4 h-4 ml-2 transition-transform duration-200" style="transform: rotate({showCustom ? 90 : 0}deg);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                        {#if showCustom}
+                          <div id="custom-options" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            {#each Object.keys(themeOptions.customProperties) as prop}
+                              <div class="flex items-center gap-2">
+                                <label class="block text-base font-medium flex-1 text-slate-800 dark:text-white" for={prop}>{prop}</label>
+                                {#if themeOptions.customProperties[prop]?.startsWith('#') || themeOptions.customProperties[prop]?.startsWith('rgb')}
+                                  <input id={prop} aria-label={prop} type="color" class="w-10 h-10 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-accent transition-all" value={themeOptions.customProperties[prop]} on:input={e => handleOptionChange('customProperties', prop, (e.target && (e.target as HTMLInputElement).value) || themeOptions.customProperties[prop])} />
+                                  <span class="w-8 h-8 rounded-lg border border-gray-300" style="background: {themeOptions.customProperties[prop]}"></span>
+                                {:else}
+                                  <input id={prop} aria-label={prop} type="text" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow px-3 py-2 focus:ring-2 focus:ring-accent transition-all bg-white dark:bg-gray-900 text-base text-slate-800 dark:text-white" bind:value={themeOptions.customProperties[prop]} on:input={e => handleOptionChange('customProperties', prop, (e.target && (e.target as HTMLInputElement).value) || themeOptions.customProperties[prop])} />
+                                {/if}
+                              </div>
+                            {/each}
+                          </div>
+                        {/if}
+                      </div>
+                    </div>
+                  {/if}
+                </div>
               </div>
+            </div>
+            <!-- Sticky action buttons -->
+            <div class="flex gap-4 justify-center items-center p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sticky bottom-0 z-10">
+              <button
+                class="px-4 py-2 rounded-lg font-semibold text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent accent-bg hover:accent-bg-hover active:scale-95"
+                on:click={handleApplyThemeWithOptions}
+              >
+                Apply Theme
+              </button>
+              {#if currentThemeName !== 'default'}
+                <button
+                  class="px-4 py-2 rounded-lg font-semibold text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600 active:scale-95"
+                  on:click={() => handleApplyTheme('default')}
+                >
+                  Reset to Default
+                </button>
+              {/if}
             </div>
           </div>
         </div>

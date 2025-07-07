@@ -226,6 +226,14 @@ class ThemeService {
     
     await this.saveThemePreference('default');
   }
+
+  public setCustomProperties(properties: Record<string, string>): void {
+    this.applyCustomProperties(properties);
+  }
+
+  public setThemeFonts(fonts: ThemeManifest['fonts']): void {
+    this.loadThemeFonts(fonts);
+  }
 }
 
 // Export singleton instance
