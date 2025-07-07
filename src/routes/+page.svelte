@@ -11,7 +11,7 @@
   import Homework from '$lib/components/Homework.svelte';
   import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
   import { Icon } from 'svelte-hero-icons';
-  import { ArrowsPointingOut, ArrowsPointingIn, XMark } from 'svelte-hero-icons';
+  import { ArrowsPointingOut, ArrowsPointingIn, XMark, ArrowPath } from 'svelte-hero-icons';
 
   let currentSelectedDate: Date = new Date();
   let lessons = $state<any[]>([]);
@@ -326,6 +326,19 @@
     return widgets.filter(w => !usedIds.has(w.id));
   }
 
+  function resetLayout() {
+    // Reset to default layout
+    widgetLayouts = widgets.map((widget, index) => ({
+      id: widget.id,
+      x: index < 5 ? 0 : (index === 5 || index === 6 ? 0 : 1),
+      y: index,
+      width: widget.defaultWidth,
+      height: widget.defaultHeight,
+      enabled: true,
+    }));
+    saveWidgetLayouts();
+  }
+
   function getWidgetById(id: string): Widget | undefined {
     return widgets.find(w => w.id === id);
   }
@@ -383,6 +396,13 @@
           class="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-500 text-white hover:bg-accent-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
         >
           + Add Widget
+        </button>
+        <button
+          onclick={resetLayout}
+          class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-500 text-white hover:bg-slate-600 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        >
+          <Icon src={ArrowPath} class="w-4 h-4" />
+          Reset Layout
         </button>
       </div>
     {/if}
