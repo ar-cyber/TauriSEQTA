@@ -142,7 +142,7 @@
         </svg>
         Back to Settings
       </a>
-      <h1 class="text-2xl font-bold">Plugin Store</h1>
+    <h1 class="text-2xl font-bold">Plugin Store</h1>
     </div>
   </div>
 

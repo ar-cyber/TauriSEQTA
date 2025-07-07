@@ -141,6 +141,9 @@
     dragOffset.y = event.clientY - rect.top;
     draggedWidget = widgetId;
     
+    // Add dragging class to body for cursor feedback
+    document.body.classList.add('dragging');
+    
     event.preventDefault();
   }
 
@@ -151,14 +154,123 @@
     if (!container) return;
     
     const containerRect = container.getBoundingClientRect();
-    const x = Math.floor((event.clientX - containerRect.left - dragOffset.x) / 200); // 200px per grid cell
-    const y = Math.floor((event.clientY - containerRect.top - dragOffset.y) / 200);
+    const gridSize = 200; // 200px per grid cell
+    const x = Math.floor((event.clientX - containerRect.left - dragOffset.x) / gridSize);
+    const y = Math.floor((event.clientY - containerRect.top - dragOffset.y) / gridSize);
     
     const widget = widgetLayouts.find(w => w.id === draggedWidget);
     if (widget) {
-      widget.x = Math.max(0, Math.min(1, x)); // Constrain to 0-1 for x
-      widget.y = Math.max(0, y); // Allow unlimited y
+      const newX = Math.max(0, Math.min(1, x)); // Constrain to 0-1 for x
+      const newY = Math.max(0, y); // Allow unlimited y
+      
+      // Check if the new position would cause collisions
+      const newPosition = { x: newX, y: newY, width: widget.width, height: widget.height };
+      const collisionResult = checkCollisionAndResolve(newPosition, widget.id);
+      
+      if (collisionResult.canMove) {
+        widget.x = newX;
+        widget.y = newY;
+        // Apply any necessary moves to other widgets
+        collisionResult.moves.forEach(move => {
+          const targetWidget = widgetLayouts.find(w => w.id === move.widgetId);
+          if (targetWidget) {
+            targetWidget.x = move.newX;
+            targetWidget.y = move.newY;
+          }
+        });
+      }
     }
+  }
+
+  function checkCollisionAndResolve(newPosition: { x: number; y: number; width: number; height: number }, draggedWidgetId: string) {
+    const moves: Array<{ widgetId: string; newX: number; newY: number }> = [];
+    const occupiedPositions = new Map<string, string>(); // position -> widgetId
+    
+    // First, mark all positions as occupied except for the dragged widget
+    widgetLayouts.forEach(w => {
+      if (w.id !== draggedWidgetId && w.enabled) {
+        for (let dx = 0; dx < w.width; dx++) {
+          for (let dy = 0; dy < w.height; dy++) {
+            const pos = `${w.x + dx},${w.y + dy}`;
+            occupiedPositions.set(pos, w.id);
+          }
+        }
+      }
+    });
+    
+    // Check for conflicts and resolve them
+    const conflicts = new Set<string>();
+    for (let dx = 0; dx < newPosition.width; dx++) {
+      for (let dy = 0; dy < newPosition.height; dy++) {
+        const pos = `${newPosition.x + dx},${newPosition.y + dy}`;
+        if (occupiedPositions.has(pos)) {
+          conflicts.add(occupiedPositions.get(pos)!);
+        }
+      }
+    }
+    
+    // If no conflicts, we can move
+    if (conflicts.size === 0) {
+      return { canMove: true, moves: [] };
+    }
+    
+    // Resolve conflicts by pushing widgets down
+    const resolvedWidgets = new Set<string>();
+    
+    for (const conflictingWidgetId of conflicts) {
+      if (resolvedWidgets.has(conflictingWidgetId)) continue;
+      
+      const conflictingWidget = widgetLayouts.find(w => w.id === conflictingWidgetId);
+      if (!conflictingWidget) continue;
+      
+      // Calculate how much to push this widget down
+      let pushDistance = newPosition.height;
+      
+      // Check if pushing this widget would create new conflicts
+      const newY = conflictingWidget.y + pushDistance;
+      for (let dx = 0; dx < conflictingWidget.width; dx++) {
+        for (let dy = 0; dy < conflictingWidget.height; dy++) {
+          const newPos = `${conflictingWidget.x + dx},${newY + dy}`;
+          if (occupiedPositions.has(newPos) && occupiedPositions.get(newPos) !== conflictingWidgetId) {
+            // Need to push further
+            const otherWidget = widgetLayouts.find(w => w.id === occupiedPositions.get(newPos));
+            if (otherWidget) {
+              pushDistance = Math.max(pushDistance, (otherWidget.y + otherWidget.height) - newY);
+            }
+          }
+        }
+      }
+      
+      moves.push({
+        widgetId: conflictingWidgetId,
+        newX: conflictingWidget.x,
+        newY: conflictingWidget.y + pushDistance
+      });
+      
+      resolvedWidgets.add(conflictingWidgetId);
+      
+      // Update occupied positions for this widget
+      for (let dx = 0; dx < conflictingWidget.width; dx++) {
+        for (let dy = 0; dy < conflictingWidget.height; dy++) {
+          const oldPos = `${conflictingWidget.x + dx},${conflictingWidget.y + dy}`;
+          const newPos = `${conflictingWidget.x + dx},${conflictingWidget.y + dy + pushDistance}`;
+          occupiedPositions.delete(oldPos);
+          occupiedPositions.set(newPos, conflictingWidgetId);
+        }
+      }
+    }
+    
+    // Final check: ensure the new position is now available
+    for (let dx = 0; dx < newPosition.width; dx++) {
+      for (let dy = 0; dy < newPosition.height; dy++) {
+        const pos = `${newPosition.x + dx},${newPosition.y + dy}`;
+        if (occupiedPositions.has(pos)) {
+          return { canMove: false, moves: [] };
+        }
+      }
+    }
+    
+    return { canMove: true, moves };
   }
 
   function handleDragEnd() {
@@ -166,6 +278,8 @@
       saveWidgetLayouts();
       draggedWidget = null;
     }
+    // Remove dragging class
+    document.body.classList.remove('dragging');
   }
 
   function toggleWidgetSize(widgetId: string) {
@@ -288,13 +402,22 @@
 
   <!-- Widget Grid -->
   <div class="widget-grid relative" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; min-height: 100vh;">
+    {#if isEditMode}
+      <!-- Grid Overlay for Visual Feedback -->
+      <div class="absolute inset-0 pointer-events-none" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        {#each Array.from({ length: 20 }, (_, i) => i) as row}
+          <div class="border border-dashed border-slate-300 dark:border-slate-600 opacity-30" style="grid-row: {row + 1}; grid-column: 1;"></div>
+          <div class="border border-dashed border-slate-300 dark:border-slate-600 opacity-30" style="grid-row: {row + 1}; grid-column: 2;"></div>
+        {/each}
+      </div>
+    {/if}
     {#each widgetLayouts.filter(w => w.enabled).sort((a, b) => a.y - b.y || a.x - b.x) as layout (layout.id)}
       {@const widget = getWidgetById(layout.id)}
       {@const renderedWidget = renderWidget(layout.id)}
       
       {#if renderedWidget}
         <div
-          class="widget-container relative {isEditMode ? 'cursor-move' : ''} bg-white/80 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 {draggedWidget === layout.id ? 'opacity-75 shadow-lg' : ''}"
+          class="widget-container relative {isEditMode ? 'cursor-move' : ''} bg-white/80 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 transition-all duration-200 {draggedWidget === layout.id ? 'opacity-75 shadow-lg scale-105 z-50' : 'hover:shadow-md'} {isEditMode ? 'hover:border-accent-300 dark:hover:border-accent-600' : ''}"
           style="grid-column: {layout.x + 1} / span {layout.width}; grid-row: {layout.y + 1} / span {layout.height};"
           onmousedown={(e) => handleDragStart(e, layout.id)}
         >
@@ -342,6 +465,20 @@
     ></iframe>
   {/if}
 </Modal>
+
+<style>
+  :global(body.dragging) {
+    cursor: grabbing !important;
+  }
+  
+  :global(body.dragging *) {
+    cursor: grabbing !important;
+  }
+  
+  .widget-container {
+    min-height: 200px;
+  }
+</style>
 
 <!-- Widget Picker Modal -->
 <Modal

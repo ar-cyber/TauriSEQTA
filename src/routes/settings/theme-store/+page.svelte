@@ -115,7 +115,7 @@
         </svg>
         Back to Settings
       </a>
-      <h1 class="text-3xl font-bold">Theme Store</h1>
+    <h1 class="text-3xl font-bold">Theme Store</h1>
     </div>
     <div class="text-sm text-slate-600 dark:text-slate-400">Current: {currentThemeName}</div>
   </div>
