@@ -717,49 +717,28 @@
         </div>
       </section>
 
-      <!-- Plugins Section -->
-      <section
-        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
-          <h2 class="text-base font-semibold sm:text-lg">Plugins</h2>
-          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            Enhance your DesQTA experience with plugins
-          </p>
-        </div>
-        <div class="p-4 sm:p-6">
-          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
-            <p class="mb-4 text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-              Install additional features and customizations from our plugin store.
-            </p>
-            <a
-              href="/settings/plugins"
-              class="inline-block px-6 py-2 w-full text-center text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105">
-              Open Plugin Store
-            </a>
-          </div>
-        </div>
-      </section>
-
       <!-- AI Features -->
       <section
-        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
-          <h2 class="text-base font-semibold sm:text-lg">AI Features</h2>
-          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            Enable AI-powered features like grade predictions by providing your Free Gemini API key.
-          </p>
-          <div class="flex gap-3 items-center mt-4">
-            <input
-              id="ai-integrations-enabled"
-              type="checkbox"
-              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-              bind:checked={aiIntegrationsEnabled} />
-            <label
-              for="ai-integrations-enabled"
-              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-              >Enable AI Integrations</label>
-          </div>
-        </div>
+  class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+  <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+    <h2 class="text-base font-semibold sm:text-lg">AI Features</h2>
+    <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+      Enable AI-powered features by providing your free Gemini API key.
+    </p>
+  </div>
+  <div class="p-4 space-y-4 sm:p-6">
+    <div class="flex gap-3 items-center">
+      <input
+        id="ai-integrations-enabled"
+        type="checkbox"
+        class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+        bind:checked={aiIntegrationsEnabled} />
+      <label
+        for="ai-integrations-enabled"
+        class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200">
+        Enable AI Features
+      </label>
+       </div>
         {#if aiIntegrationsEnabled}
           <div class="p-4 space-y-4 sm:p-6">
             <div class="flex gap-3 items-center mb-2">
@@ -795,10 +774,33 @@
               spellcheck="false"
             />
             <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
-              Get your API key from <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">aistudio.google.com</a> for AI-powered features.
+              Get your API key from <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">aistudio.google.com</a>
             </p>
           </div>
         {/if}
+      </section>
+
+      <!-- Plugins Section -->
+      <section
+        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Plugins</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Enhance your DesQTA experience with plugins
+          </p>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="p-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
+            <p class="mb-4 text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+              Install additional features and customizations from our plugin store.
+            </p>
+            <a
+              href="/settings/plugins"
+              class="inline-block px-6 py-2 w-full text-center text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105">
+              Open Plugin Store
+            </a>
+          </div>
+        </div>
       </section>
 
       <!-- Theme Store Link -->
