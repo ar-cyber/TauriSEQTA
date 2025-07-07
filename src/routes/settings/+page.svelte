@@ -45,6 +45,7 @@
   let lessonSummaryAnalyserEnabled = true;
   let autoCollapseSidebar = false;
   let autoExpandSidebarHover = false;
+  let globalSearchEnabled = true;
 
   async function loadSettings() {
     loading = true;
@@ -67,6 +68,7 @@
         lesson_summary_analyser_enabled?: boolean;
         auto_collapse_sidebar?: boolean;
         auto_expand_sidebar_hover?: boolean;
+        global_search_enabled?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -85,6 +87,7 @@
       lessonSummaryAnalyserEnabled = settings.lesson_summary_analyser_enabled ?? true;
       autoCollapseSidebar = settings.auto_collapse_sidebar ?? false;
       autoExpandSidebarHover = settings.auto_expand_sidebar_hover ?? false;
+      globalSearchEnabled = settings.global_search_enabled ?? true;
 
       console.log('Loading settings', {
         shortcuts,
@@ -113,6 +116,7 @@
       lessonSummaryAnalyserEnabled = true;
       autoCollapseSidebar = false;
       autoExpandSidebarHover = false;
+      globalSearchEnabled = true;
     }
     loading = false;
   }
@@ -152,6 +156,7 @@
           lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
           auto_collapse_sidebar: autoCollapseSidebar,
           auto_expand_sidebar_hover: autoExpandSidebarHover,
+          global_search_enabled: globalSearchEnabled,
         },
       });
       saveSuccess = true;
@@ -245,8 +250,9 @@
     aiIntegrationsEnabled = cloudSettings.ai_integrations_enabled ?? false;
     gradeAnalyserEnabled = cloudSettings.grade_analyser_enabled ?? true;
     lessonSummaryAnalyserEnabled = cloudSettings.lesson_summary_analyser_enabled ?? true;
-    autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
-    autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
+            autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
+        autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
+        globalSearchEnabled = cloudSettings.global_search_enabled ?? true;
 
     notify({
       title: 'Settings Downloaded',
@@ -579,6 +585,20 @@
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-400">
                 When enabled and the sidebar is collapsed, hovering near the left edge will temporarily expand the sidebar for easy navigation.
+              </p>
+              <div class="flex gap-4 items-center mb-4 mt-4">
+                <input
+                  id="global-search-enabled"
+                  type="checkbox"
+                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                  bind:checked={globalSearchEnabled} />
+                <label
+                  for="global-search-enabled"
+                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+                  >Enable global search (Ctrl+K)</label>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">
+                When enabled, you can use Ctrl+K to open a global search that searches across all your content, courses, and assessments.
               </p>
             </div>
           </div>

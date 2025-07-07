@@ -17,6 +17,7 @@
   import { fade, scale } from 'svelte/transition';
   import PagesMenu from './PagesMenu.svelte';
   import GlobalSearch from './GlobalSearch.svelte';
+  import { invoke } from '@tauri-apps/api/core';
 
   interface Props {
     sidebarOpen: boolean;
@@ -110,6 +111,7 @@
   let searchInput: HTMLInputElement | null = null;
   let selectedIndex = $state(-1);
   let showPagesMenu = $state(false);
+  let globalSearchEnabled = $state(true);
 
   function handleSelect(page: { name: string; path: string }) {
     searchStore.set('');
@@ -151,8 +153,18 @@
     showPagesMenu = false;
   }
 
+  async function loadGlobalSearchSetting() {
+    try {
+      const settings = await invoke<{ global_search_enabled?: boolean }>('get_settings');
+      globalSearchEnabled = settings.global_search_enabled ?? true;
+    } catch (error) {
+      console.error('Failed to load global search setting:', error);
+      globalSearchEnabled = true; // Default to enabled if loading fails
+    }
+  }
+
   onMount(() => {
-    // No need to set searchInput.value here since the search input is now in PagesMenu
+    loadGlobalSearchSetting();
   });
 
   $effect(() => {
@@ -183,7 +195,9 @@
   </div>
   </div>
   <div class="flex-1 flex justify-center">
-    <GlobalSearch />
+    {#if globalSearchEnabled}
+      <GlobalSearch />
+    {/if}
   </div>
   <div class="flex items-center space-x-2">
     <button

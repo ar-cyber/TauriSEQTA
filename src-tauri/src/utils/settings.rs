@@ -82,6 +82,7 @@ pub struct Settings {
     pub lesson_summary_analyser_enabled: Option<bool>,
     pub auto_collapse_sidebar: bool,
     pub auto_expand_sidebar_hover: bool,
+    pub global_search_enabled: bool,
     pub current_theme: Option<String>,
 }
 
@@ -105,6 +106,7 @@ impl Default for Settings {
             lesson_summary_analyser_enabled: Some(true),
             auto_collapse_sidebar: false,
             auto_expand_sidebar_hover: false,
+            global_search_enabled: true,
             current_theme: None,
         }
     }
@@ -278,6 +280,7 @@ impl Settings {
         default_settings.lesson_summary_analyser_enabled = get_opt_bool(&existing_json, "lesson_summary_analyser_enabled");
         default_settings.auto_collapse_sidebar = get_bool(&existing_json, "auto_collapse_sidebar", default_settings.auto_collapse_sidebar);
         default_settings.auto_expand_sidebar_hover = get_bool(&existing_json, "auto_expand_sidebar_hover", default_settings.auto_expand_sidebar_hover);
+        default_settings.global_search_enabled = get_bool(&existing_json, "global_search_enabled", default_settings.global_search_enabled);
         default_settings.current_theme = get_opt_string(&existing_json, "current_theme");
 
         default_settings
