@@ -305,17 +305,26 @@
   function selectWidget(widgetId: string) {
     const widget = getWidgetById(widgetId);
     if (widget) {
-      // Find the next available position
-      const maxY = Math.max(...widgetLayouts.map(w => w.y + w.height), 0);
-      const newLayout: WidgetLayout = {
-        id: widgetId,
-        x: 0,
-        y: maxY,
-        width: widget.defaultWidth,
-        height: widget.defaultHeight,
-        enabled: true,
-      };
-      widgetLayouts = [...widgetLayouts, newLayout];
+      // Check if widget already exists but is disabled
+      const existingWidget = widgetLayouts.find(w => w.id === widgetId);
+      if (existingWidget) {
+        // Re-enable the existing widget
+        existingWidget.enabled = true;
+      } else {
+        // Find the next available position (only consider enabled widgets)
+        const enabledWidgets = widgetLayouts.filter(w => w.enabled);
+        const maxY = enabledWidgets.length > 0 ? Math.max(...enabledWidgets.map(w => w.y + w.height)) : 0;
+        
+        const newLayout: WidgetLayout = {
+          id: widgetId,
+          x: 0,
+          y: maxY,
+          width: widget.defaultWidth,
+          height: widget.defaultHeight,
+          enabled: true,
+        };
+        widgetLayouts = [...widgetLayouts, newLayout];
+      }
       saveWidgetLayouts();
     }
     showWidgetPicker = false;
@@ -443,9 +452,10 @@
         >
           <!-- Widget Header (Edit Mode) -->
           {#if isEditMode}
-            <div class="absolute top-2 right-2 z-10 flex gap-1">
+            <div class="absolute top-2 right-2 z-10 flex gap-1" onmousedown={(e) => e.stopPropagation()}>
               <button
                 onclick={() => toggleWidgetSize(layout.id)}
+                onmousedown={(e) => e.stopPropagation()}
                 class="p-1 rounded bg-slate-800/80 text-white hover:bg-slate-700/80 transition-colors"
                 title={layout.width === 1 ? 'Expand' : 'Shrink'}
               >
@@ -453,6 +463,7 @@
               </button>
               <button
                 onclick={() => toggleWidgetEnabled(layout.id)}
+                onmousedown={(e) => e.stopPropagation()}
                 class="p-1 rounded bg-red-600/80 text-white hover:bg-red-500/80 transition-colors"
                 title="Remove Widget"
               >
