@@ -415,18 +415,7 @@
         </button>
       </div>
     {/if}
-    <button
-      onclick={toggleEditMode}
-      class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
-    >
-      {#if isEditMode}
-        <Icon src={ArrowsPointingIn} class="w-4 h-4" />
-        Exit Edit Mode
-      {:else}
-        <Icon src={ArrowsPointingOut} class="w-4 h-4" />
-        Edit Layout
-      {/if}
-    </button>
+    <!-- Remove Edit Layout button from here -->
   </div>
 
   <!-- Widget Grid -->
@@ -481,6 +470,22 @@
         </div>
       {/if}
     {/each}
+  </div>
+
+  <!-- Move Edit Layout button to the bottom -->
+  <div class="flex justify-end mt-8">
+    <button
+      onclick={toggleEditMode}
+      class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
+    >
+      {#if isEditMode}
+        <Icon src={ArrowsPointingIn} class="w-4 h-4" />
+        Exit Edit Mode
+      {:else}
+        <Icon src={ArrowsPointingOut} class="w-4 h-4" />
+        Edit Layout
+      {/if}
+    </button>
   </div>
 </div>
 
