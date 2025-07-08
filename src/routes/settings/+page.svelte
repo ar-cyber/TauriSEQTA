@@ -137,28 +137,30 @@
       enhancedAnimations,
     });
     try {
-      await invoke('save_settings', {
-        newSettings: {
-          shortcuts,
-          feeds,
-          weather_enabled: weatherEnabled,
-          weather_city: weatherCity,
-          weather_country: weatherCountry,
-          reminders_enabled: remindersEnabled,
-          force_use_location: forceUseLocation,
-          accent_color: $accentColor,
-          theme: $theme,
-          disable_school_picture: disableSchoolPicture,
-          enhanced_animations: enhancedAnimations,
-          gemini_api_key: geminiApiKey,
-          ai_integrations_enabled: aiIntegrationsEnabled,
-          grade_analyser_enabled: gradeAnalyserEnabled,
-          lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
-          auto_collapse_sidebar: autoCollapseSidebar,
-          auto_expand_sidebar_hover: autoExpandSidebarHover,
-          global_search_enabled: globalSearchEnabled,
-        },
-      });
+      // Load current settings to preserve fields like widget_layout
+      const currentSettings = await invoke<any>('get_settings');
+      const newSettings = {
+        ...currentSettings,
+        shortcuts,
+        feeds,
+        weather_enabled: weatherEnabled,
+        weather_city: weatherCity,
+        weather_country: weatherCountry,
+        reminders_enabled: remindersEnabled,
+        force_use_location: forceUseLocation,
+        accent_color: $accentColor,
+        theme: $theme,
+        disable_school_picture: disableSchoolPicture,
+        enhanced_animations: enhancedAnimations,
+        gemini_api_key: geminiApiKey,
+        ai_integrations_enabled: aiIntegrationsEnabled,
+        grade_analyser_enabled: gradeAnalyserEnabled,
+        lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
+        auto_collapse_sidebar: autoCollapseSidebar,
+        auto_expand_sidebar_hover: autoExpandSidebarHover,
+        global_search_enabled: globalSearchEnabled,
+      };
+      await invoke('save_settings', { newSettings });
       saveSuccess = true;
       setTimeout(() => location.reload(), 1500);
     } catch (e) {
