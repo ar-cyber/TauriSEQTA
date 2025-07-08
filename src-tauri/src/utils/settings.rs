@@ -82,7 +82,9 @@ pub struct Settings {
     pub lesson_summary_analyser_enabled: Option<bool>,
     pub auto_collapse_sidebar: bool,
     pub auto_expand_sidebar_hover: bool,
+    pub global_search_enabled: bool,
     pub current_theme: Option<String>,
+    pub widget_layout: Vec<WidgetLayout>,
 }
 
 impl Default for Settings {
@@ -105,7 +107,18 @@ impl Default for Settings {
             lesson_summary_analyser_enabled: Some(true),
             auto_collapse_sidebar: false,
             auto_expand_sidebar_hover: false,
+            global_search_enabled: true,
             current_theme: None,
+            widget_layout: vec![
+                WidgetLayout { id: "shortcuts".to_string(), x: 0, y: 0, width: 2, height: 1, enabled: true },
+                WidgetLayout { id: "today_schedule".to_string(), x: 0, y: 1, width: 2, height: 1, enabled: true },
+                WidgetLayout { id: "notices".to_string(), x: 0, y: 2, width: 2, height: 1, enabled: true },
+                WidgetLayout { id: "upcoming_assessments".to_string(), x: 0, y: 3, width: 2, height: 1, enabled: true },
+                WidgetLayout { id: "welcome_portal".to_string(), x: 0, y: 4, width: 2, height: 1, enabled: true },
+                WidgetLayout { id: "homework".to_string(), x: 0, y: 5, width: 1, height: 1, enabled: true },
+                WidgetLayout { id: "todo_list".to_string(), x: 0, y: 6, width: 1, height: 1, enabled: true },
+                WidgetLayout { id: "focus_timer".to_string(), x: 1, y: 5, width: 1, height: 2, enabled: true },
+            ],
         }
     }
 }
@@ -121,6 +134,16 @@ pub struct Shortcut {
 pub struct Feed {
     
     pub url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct WidgetLayout {
+    pub id: String,
+    pub x: i32,
+    pub y: i32,
+    pub width: i32, // 1 = half width, 2 = full width
+    pub height: i32, // 1 = normal height, 2 = double height
+    pub enabled: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -278,7 +301,34 @@ impl Settings {
         default_settings.lesson_summary_analyser_enabled = get_opt_bool(&existing_json, "lesson_summary_analyser_enabled");
         default_settings.auto_collapse_sidebar = get_bool(&existing_json, "auto_collapse_sidebar", default_settings.auto_collapse_sidebar);
         default_settings.auto_expand_sidebar_hover = get_bool(&existing_json, "auto_expand_sidebar_hover", default_settings.auto_expand_sidebar_hover);
+        default_settings.global_search_enabled = get_bool(&existing_json, "global_search_enabled", default_settings.global_search_enabled);
         default_settings.current_theme = get_opt_string(&existing_json, "current_theme");
+        
+        // Merge widget layout
+        let widget_layout_json = get_array(&existing_json, "widget_layout");
+        let mut widget_layout = Vec::new();
+        for layout_json in widget_layout_json {
+            if let (Some(id), Some(x), Some(y), Some(width), Some(height), Some(enabled)) = (
+                layout_json.get("id").and_then(|v| v.as_str()),
+                layout_json.get("x").and_then(|v| v.as_i64()),
+                layout_json.get("y").and_then(|v| v.as_i64()),
+                layout_json.get("width").and_then(|v| v.as_i64()),
+                layout_json.get("height").and_then(|v| v.as_i64()),
+                layout_json.get("enabled").and_then(|v| v.as_bool()),
+            ) {
+                widget_layout.push(WidgetLayout {
+                    id: id.to_string(),
+                    x: x as i32,
+                    y: y as i32,
+                    width: width as i32,
+                    height: height as i32,
+                    enabled,
+                });
+            }
+        }
+        if !widget_layout.is_empty() {
+            default_settings.widget_layout = widget_layout;
+        }
 
         default_settings
     }

@@ -230,7 +230,7 @@
   });
 </script>
 
-<div class="flex w-full h-full">
+<div class="flex w-full h-full overflow-y-hidden">
   <!-- Subject Selection Sidebar -->
   <SubjectSidebar
     bind:search

@@ -45,6 +45,7 @@
   let lessonSummaryAnalyserEnabled = true;
   let autoCollapseSidebar = false;
   let autoExpandSidebarHover = false;
+  let globalSearchEnabled = true;
 
   async function loadSettings() {
     loading = true;
@@ -67,6 +68,7 @@
         lesson_summary_analyser_enabled?: boolean;
         auto_collapse_sidebar?: boolean;
         auto_expand_sidebar_hover?: boolean;
+        global_search_enabled?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -85,6 +87,7 @@
       lessonSummaryAnalyserEnabled = settings.lesson_summary_analyser_enabled ?? true;
       autoCollapseSidebar = settings.auto_collapse_sidebar ?? false;
       autoExpandSidebarHover = settings.auto_expand_sidebar_hover ?? false;
+      globalSearchEnabled = settings.global_search_enabled ?? true;
 
       console.log('Loading settings', {
         shortcuts,
@@ -113,6 +116,7 @@
       lessonSummaryAnalyserEnabled = true;
       autoCollapseSidebar = false;
       autoExpandSidebarHover = false;
+      globalSearchEnabled = true;
     }
     loading = false;
   }
@@ -133,27 +137,30 @@
       enhancedAnimations,
     });
     try {
-      await invoke('save_settings', {
-        newSettings: {
-          shortcuts,
-          feeds,
-          weather_enabled: weatherEnabled,
-          weather_city: weatherCity,
-          weather_country: weatherCountry,
-          reminders_enabled: remindersEnabled,
-          force_use_location: forceUseLocation,
-          accent_color: $accentColor,
-          theme: $theme,
-          disable_school_picture: disableSchoolPicture,
-          enhanced_animations: enhancedAnimations,
-          gemini_api_key: geminiApiKey,
-          ai_integrations_enabled: aiIntegrationsEnabled,
-          grade_analyser_enabled: gradeAnalyserEnabled,
-          lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
-          auto_collapse_sidebar: autoCollapseSidebar,
-          auto_expand_sidebar_hover: autoExpandSidebarHover,
-        },
-      });
+      // Load current settings to preserve fields like widget_layout
+      const currentSettings = await invoke<any>('get_settings');
+      const newSettings = {
+        ...currentSettings,
+        shortcuts,
+        feeds,
+        weather_enabled: weatherEnabled,
+        weather_city: weatherCity,
+        weather_country: weatherCountry,
+        reminders_enabled: remindersEnabled,
+        force_use_location: forceUseLocation,
+        accent_color: $accentColor,
+        theme: $theme,
+        disable_school_picture: disableSchoolPicture,
+        enhanced_animations: enhancedAnimations,
+        gemini_api_key: geminiApiKey,
+        ai_integrations_enabled: aiIntegrationsEnabled,
+        grade_analyser_enabled: gradeAnalyserEnabled,
+        lesson_summary_analyser_enabled: lessonSummaryAnalyserEnabled,
+        auto_collapse_sidebar: autoCollapseSidebar,
+        auto_expand_sidebar_hover: autoExpandSidebarHover,
+        global_search_enabled: globalSearchEnabled,
+      };
+      await invoke('save_settings', { newSettings });
       saveSuccess = true;
       setTimeout(() => location.reload(), 1500);
     } catch (e) {
@@ -247,6 +254,7 @@
     lessonSummaryAnalyserEnabled = cloudSettings.lesson_summary_analyser_enabled ?? true;
     autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
     autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
+        globalSearchEnabled = cloudSettings.global_search_enabled ?? true;
 
     notify({
       title: 'Settings Downloaded',
@@ -280,7 +288,7 @@
       </button>
       {#if saveSuccess}
         <span class="text-sm text-green-400 animate-fade-in sm:text-base"
-          >Settings saved successfully!</span>
+          >Saved!</span>
       {/if}
       {#if saveError}
         <span class="text-sm text-red-400 animate-fade-in sm:text-base">{saveError}</span>
@@ -302,12 +310,6 @@
       <!-- Cloud Sync Section -->
       <section
         class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up relative">
-        <!-- Experimental Label -->
-        <div class="absolute top-5 right-2 z-10">
-          <div class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12">
-            EXPERIMENTAL
-         </div>
-        </div>
         <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
           <h2 class="text-base font-semibold sm:text-lg">Cloud Sync</h2>
           <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
@@ -382,7 +384,7 @@
                   <button
                     class="px-2 text-red-400 transition-transform duration-200 hover:text-red-600 active:scale-110"
                     onclick={() => removeShortcut(idx)}
-                    title="Remove">✕</button>
+                    title="Remove">❌</button>
                 </div>
               {/each}
               <button
@@ -398,67 +400,68 @@
             </p>
             <div
               class="p-4 space-y-4 rounded-lg bg-slate-100/80 dark:bg-slate-800/50 animate-fade-in">
-              <div class="flex gap-4 items-center">
-                <input
-                  id="weather-enabled"
-                  type="checkbox"
-                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                  bind:checked={weatherEnabled} />
-                <label
-                  for="weather-enabled"
-                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                  >Show Weather Widget</label>
-              </div>
-              <div class="flex gap-4 items-center">
-                <input
-                  id="force-use-location"
-                  type="checkbox"
-                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                  bind:checked={forceUseLocation} />
-                <label
-                  for="force-use-location"
-                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                  >Only use Fallback Location for Weather</label>
-                <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-                  Useful if you use a VPN or want to choose the location, though the system
-                  sometimes does not work.
-                </p>
-              </div>
-              <div
-                class="flex flex-col gap-2 items-start pl-1"
-                style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled
-                  ? 'auto'
-                  : 'none'};">
-                <label
-                  for="weather-city"
-                  class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
-                  >Fallback City:</label>
-                <input
-                  id="weather-city"
-                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Perth"
-                  bind:value={weatherCity} />
-              </div>
-              <div
-                class="flex flex-col gap-2 items-start pl-1"
-                style="opacity: {weatherEnabled ? 1 : 0.5}; pointer-events: {weatherEnabled
-                  ? 'auto'
-                  : 'none'};">
-                <label
-                  for="weather-country"
-                  class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
-                  >Fallback Country Code</label>
-                <a
-                  href="https://countrycode.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs text-blue-400 hover:underline">If unsure, visit countrycode.org</a>
-                <input
-                  id="weather-country"
-                  class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="AU"
-                  bind:value={weatherCountry} />
-              </div>
+              <!-- Always visible -->
+<div class="flex gap-4 items-center">
+  <input
+    id="weather-enabled"
+    type="checkbox"
+    class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+    bind:checked={weatherEnabled} />
+  <label
+    for="weather-enabled"
+    class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+    >Show Weather Widget</label>
+</div>
+
+<!-- Show this ONLY if weatherEnabled is true -->
+{#if weatherEnabled}
+  <div class="flex gap-4 items-center">
+    <input
+      id="force-use-location"
+      type="checkbox"
+      class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+      bind:checked={forceUseLocation} />
+    <label
+      for="force-use-location"
+      class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+      >Only use Fallback Location for Weather</label>
+  </div>
+
+  <!-- Show fallback inputs ONLY if forceUseLocation is true -->
+  {#if forceUseLocation}
+    <div class="flex flex-col gap-2 items-start pl-1">
+      <label
+        for="weather-city"
+        class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
+        >Fallback City:</label>
+      <input
+        id="weather-city"
+        class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Perth"
+        bind:value={weatherCity} />
+    </div>
+
+    <div class="flex flex-col gap-2 items-start pl-1">
+      <label
+        for="weather-country"
+        class="text-xs text-slate-600 sm:text-sm dark:text-slate-400"
+        >Fallback Country Code</label>
+      <span class="text-xs">
+        Visit <a
+          href="https://countrycode.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-400 hover:underline">countrycode.org</a> to find your country code.
+      </span>
+      <input
+        id="weather-country"
+        class="px-3 py-2 w-full bg-white rounded border transition text-slate-900 sm:w-64 dark:bg-slate-900/50 dark:text-white border-slate-300/50 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="AU"
+        bind:value={weatherCountry} />
+    </div>
+  {/if}
+{/if}
+
             </div>
           </div>
         </div>
@@ -486,11 +489,11 @@
                 <label for="accent-color" class="text-sm text-slate-800 dark:text-slate-200"
                   >Accent Color</label>
                 <div class="flex gap-2 items-center">
-                  <input
-                    type="color"
-                    id="accent-color"
-                    bind:value={$accentColor}
-                    class="w-12 h-12 bg-transparent rounded-lg border cursor-pointer accent-border" />
+                   <input
+                      type="color"
+                      id="accent-color"
+                      bind:value={$accentColor}
+                      class="w-11 h-12 bg-transparent rounded-xl cursor-pointer focus:outline-none" />
                   <input
                     type="text"
                     bind:value={$accentColor}
@@ -580,6 +583,20 @@
               <p class="text-xs text-slate-600 dark:text-slate-400">
                 When enabled and the sidebar is collapsed, hovering near the left edge will temporarily expand the sidebar for easy navigation.
               </p>
+              <div class="flex gap-4 items-center mb-4 mt-4">
+                <input
+                  id="global-search-enabled"
+                  type="checkbox"
+                  class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                  bind:checked={globalSearchEnabled} />
+                <label
+                  for="global-search-enabled"
+                  class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+                  >Enable global search</label>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">
+                When enabled, you can use Ctrl+K to open a global search that searches across all your content, courses, and assessments.
+              </p>
             </div>
           </div>
           <!-- Disable School Picture -->
@@ -592,7 +609,7 @@
             <label
               for="disable-school-picture"
               class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-              >Disable school picture in user dropdown</label>
+              >Disable school picture in user info</label>
           </div>
           <!-- Enhanced Animations Setting -->
           <div class="flex gap-4 items-center mt-4">
@@ -604,12 +621,8 @@
             <label
               for="enhanced-animations"
               class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-              >Enhanced Animations (playful, alive UI)</label>
+              >Enhanced Animations</label>
           </div>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 ml-8">
-            When enabled, interactive elements will have playful, lively animations.<br />
-            You can override this on specific elements in code.
-          </p>
         </div>
       </section>
 
@@ -717,6 +730,94 @@
         </div>
       </section>
 
+      <!-- AI Features -->
+      <section
+  class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up"
+>
+  <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+    <h2 class="text-base font-semibold sm:text-lg">AI Features</h2>
+    <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+      Enable AI-powered features by providing your free Gemini API key.
+    </p>
+  </div>
+  <div class="p-4 space-y-4 sm:p-6">
+    <div class="flex gap-3 items-center">
+      <input
+        id="ai-integrations-enabled"
+        type="checkbox"
+        class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+        bind:checked={aiIntegrationsEnabled}
+      />
+      <label
+        for="ai-integrations-enabled"
+        class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+      >
+        Enable AI Features
+      </label>
+    </div>
+    {#if aiIntegrationsEnabled}
+      <div class="pl-6 mt-3 space-y-3 sm:space-y-4">
+        <div class="flex gap-3 items-center">
+          <input
+            id="grade-analyser-enabled"
+            type="checkbox"
+            class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+            bind:checked={gradeAnalyserEnabled}
+          />
+          <label
+            for="grade-analyser-enabled"
+            class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+          >
+            Grade Analyser
+          </label>
+        </div>
+        <div class="flex gap-3 items-center">
+          <input
+            id="lesson-summary-analyser-enabled"
+            type="checkbox"
+            class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+            bind:checked={lessonSummaryAnalyserEnabled}
+          />
+          <label
+            for="lesson-summary-analyser-enabled"
+            class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+          >
+            Lesson Summary Analyser
+          </label>
+        </div>
+        <div class="mt-6">
+          <label
+            for="gemini-api-key"
+            class="text-sm font-medium text-slate-800 dark:text-slate-200 block mb-1"
+          >
+            Gemini API Key
+          </label>
+          <input
+            id="gemini-api-key"
+            type="text"
+            class="w-full px-3 py-2 rounded border border-slate-300/50 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Paste your Gemini API key here"
+            bind:value={geminiApiKey}
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Get your API key from
+            <a
+              href="https://aistudio.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Google AI Studio
+            </a>
+          </p>
+        </div>
+      </div>
+    {/if}
+  </div>
+</section>
+
       <!-- Plugins Section -->
       <section
         class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-300 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
@@ -738,67 +839,6 @@
             </a>
           </div>
         </div>
-      </section>
-
-      <!-- AI Features -->
-      <section
-        class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-100 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
-          <h2 class="text-base font-semibold sm:text-lg">AI Features</h2>
-          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            Enable AI-powered features like grade predictions by providing your Free Gemini API key.
-          </p>
-          <div class="flex gap-3 items-center mt-4">
-            <input
-              id="ai-integrations-enabled"
-              type="checkbox"
-              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-              bind:checked={aiIntegrationsEnabled} />
-            <label
-              for="ai-integrations-enabled"
-              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-              >Enable AI Integrations</label>
-          </div>
-        </div>
-        {#if aiIntegrationsEnabled}
-          <div class="p-4 space-y-4 sm:p-6">
-            <div class="flex gap-3 items-center mb-2">
-              <input
-                id="grade-analyser-enabled"
-                type="checkbox"
-                class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                bind:checked={gradeAnalyserEnabled} />
-              <label
-                for="grade-analyser-enabled"
-                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                >Grade Analyser (AI-powered grade predictions)</label>
-            </div>
-            <div class="flex gap-3 items-center mb-2">
-              <input
-                id="lesson-summary-analyser-enabled"
-                type="checkbox"
-                class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-                bind:checked={lessonSummaryAnalyserEnabled} />
-              <label
-                for="lesson-summary-analyser-enabled"
-                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-                >Lesson Summary Analyser (AI-powered lesson summaries)</label>
-              </div>
-            <label for="gemini-api-key" class="text-sm font-medium text-slate-800 dark:text-slate-200">Gemini API Key</label>
-            <input
-              id="gemini-api-key"
-              type="text"
-              class="w-full px-3 py-2 rounded border border-slate-300/50 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Paste your Gemini API key here"
-              bind:value={geminiApiKey}
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
-              Get your API key from <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">aistudio.google.com</a> for AI-powered features.
-            </p>
-          </div>
-        {/if}
       </section>
 
       <!-- Theme Store Link -->
