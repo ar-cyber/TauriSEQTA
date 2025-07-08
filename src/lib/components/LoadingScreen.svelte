@@ -57,4 +57,25 @@
 .animate-cloud2 {
   animation: cloud-move2 5s linear infinite alternate;
 }
+
+:global(html), :global(body) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  height: 100%;
+}
+:global(body) {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+:global(body::-webkit-scrollbar) {
+  display: none; /* Chrome/Safari/Webkit */
+}
+
+/* Ensure the loading screen fills the viewport and cannot be scrolled */
+.flex.items-center.justify-center.h-screen {
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
 </style> 
