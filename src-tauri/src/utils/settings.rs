@@ -85,6 +85,7 @@ pub struct Settings {
     pub global_search_enabled: bool,
     pub current_theme: Option<String>,
     pub widget_layout: Vec<WidgetLayout>,
+    pub dev_sensitive_info_hider: bool,
 }
 
 impl Default for Settings {
@@ -119,6 +120,7 @@ impl Default for Settings {
                 WidgetLayout { id: "todo_list".to_string(), x: 0, y: 6, width: 1, height: 1, enabled: true },
                 WidgetLayout { id: "focus_timer".to_string(), x: 1, y: 5, width: 1, height: 2, enabled: true },
             ],
+            dev_sensitive_info_hider: false,
         }
     }
 }
@@ -303,6 +305,7 @@ impl Settings {
         default_settings.auto_expand_sidebar_hover = get_bool(&existing_json, "auto_expand_sidebar_hover", default_settings.auto_expand_sidebar_hover);
         default_settings.global_search_enabled = get_bool(&existing_json, "global_search_enabled", default_settings.global_search_enabled);
         default_settings.current_theme = get_opt_string(&existing_json, "current_theme");
+        default_settings.dev_sensitive_info_hider = get_bool(&existing_json, "dev_sensitive_info_hider", default_settings.dev_sensitive_info_hider);
         
         // Merge widget layout
         let widget_layout_json = get_array(&existing_json, "widget_layout");

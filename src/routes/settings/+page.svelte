@@ -46,6 +46,7 @@
   let autoCollapseSidebar = false;
   let autoExpandSidebarHover = false;
   let globalSearchEnabled = true;
+  let devSensitiveInfoHider = false;
 
   async function loadSettings() {
     loading = true;
@@ -69,6 +70,7 @@
         auto_collapse_sidebar?: boolean;
         auto_expand_sidebar_hover?: boolean;
         global_search_enabled?: boolean;
+        dev_sensitive_info_hider?: boolean;
       }>('get_settings');
       shortcuts = settings.shortcuts || [];
       feeds = settings.feeds || [];
@@ -88,6 +90,7 @@
       autoCollapseSidebar = settings.auto_collapse_sidebar ?? false;
       autoExpandSidebarHover = settings.auto_expand_sidebar_hover ?? false;
       globalSearchEnabled = settings.global_search_enabled ?? true;
+      devSensitiveInfoHider = settings.dev_sensitive_info_hider ?? false;
 
       console.log('Loading settings', {
         shortcuts,
@@ -117,6 +120,7 @@
       autoCollapseSidebar = false;
       autoExpandSidebarHover = false;
       globalSearchEnabled = true;
+      devSensitiveInfoHider = false;
     }
     loading = false;
   }
@@ -159,6 +163,7 @@
         auto_collapse_sidebar: autoCollapseSidebar,
         auto_expand_sidebar_hover: autoExpandSidebarHover,
         global_search_enabled: globalSearchEnabled,
+        dev_sensitive_info_hider: devSensitiveInfoHider,
       };
       await invoke('save_settings', { newSettings });
       saveSuccess = true;
@@ -255,6 +260,7 @@
     autoCollapseSidebar = cloudSettings.auto_collapse_sidebar ?? false;
     autoExpandSidebarHover = cloudSettings.auto_expand_sidebar_hover ?? false;
         globalSearchEnabled = cloudSettings.global_search_enabled ?? true;
+    devSensitiveInfoHider = cloudSettings.dev_sensitive_info_hider ?? false;
 
     notify({
       title: 'Settings Downloaded',
@@ -860,6 +866,32 @@
               class="inline-block px-6 py-2 w-full text-center text-white rounded-lg shadow transition-all duration-200 sm:w-auto accent-bg hover:accent-bg-hover focus:ring-2 accent-ring active:scale-95 hover:scale-105">
               Open Theme Store
             </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dev Settings Section -->
+      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-400 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+          <h2 class="text-base font-semibold sm:text-lg">Dev Settings</h2>
+          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+            Developer options for debugging and testing
+          </p>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="flex gap-3 items-center">
+            <input
+              id="dev-sensitive-info-hider"
+              type="checkbox"
+              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+              bind:checked={devSensitiveInfoHider}
+            />
+            <label
+              for="dev-sensitive-info-hider"
+              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+            >
+              Sensitive Info Hider (API responses replaced with random mock data)
+            </label>
           </div>
         </div>
       </section>
