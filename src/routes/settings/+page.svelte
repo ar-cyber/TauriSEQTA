@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
   import { notify } from '../../utils/notify';
   import {
@@ -47,6 +47,8 @@
   let autoExpandSidebarHover = false;
   let globalSearchEnabled = true;
   let devSensitiveInfoHider = false;
+  let showDevSettings = false;
+  let keyBuffer = '';
 
   async function loadSettings() {
     loading = true;
@@ -268,8 +270,20 @@
     });
   }
 
+  function handleKeydown(event: KeyboardEvent) {
+    keyBuffer += event.key.toLowerCase();
+    if (keyBuffer.length > 3) keyBuffer = keyBuffer.slice(-3);
+    if (keyBuffer === 'dev') {
+      showDevSettings = true;
+    }
+  }
+
   onMount(async () => {
     await Promise.all([loadSettings(), loadTheme()]);
+    window.addEventListener('keydown', handleKeydown);
+  });
+  onDestroy(() => {
+    window.removeEventListener('keydown', handleKeydown);
   });
 </script>
 
@@ -871,30 +885,32 @@
       </section>
 
       <!-- Dev Settings Section -->
-      <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-400 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
-        <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
-          <h2 class="text-base font-semibold sm:text-lg">Dev Settings</h2>
-          <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
-            Developer options for debugging and testing
-          </p>
-        </div>
-        <div class="p-4 sm:p-6">
-          <div class="flex gap-3 items-center">
-            <input
-              id="dev-sensitive-info-hider"
-              type="checkbox"
-              class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
-              bind:checked={devSensitiveInfoHider}
-            />
-            <label
-              for="dev-sensitive-info-hider"
-              class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
-            >
-              Sensitive Info Hider (API responses replaced with random mock data)
-            </label>
+      {#if showDevSettings}
+        <section class="overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm transition-all duration-300 delay-400 bg-white/80 dark:bg-slate-900/50 sm:rounded-2xl border-slate-300/50 dark:border-slate-800/50 hover:shadow-2xl hover:border-blue-700/50 animate-fade-in-up">
+          <div class="px-4 py-4 border-b sm:px-6 border-slate-300/50 dark:border-slate-800/50">
+            <h2 class="text-base font-semibold sm:text-lg">Dev Settings</h2>
+            <p class="text-xs text-slate-600 sm:text-sm dark:text-slate-400">
+              Developer options for debugging and testing
+            </p>
           </div>
-        </div>
-      </section>
+          <div class="p-4 sm:p-6">
+            <div class="flex gap-3 items-center">
+              <input
+                id="dev-sensitive-info-hider"
+                type="checkbox"
+                class="w-4 h-4 accent-blue-600 sm:w-5 sm:h-5"
+                bind:checked={devSensitiveInfoHider}
+              />
+              <label
+                for="dev-sensitive-info-hider"
+                class="text-sm font-medium cursor-pointer text-slate-800 sm:text-base dark:text-slate-200"
+              >
+                Sensitive Info Hider (API responses replaced with random mock data)
+              </label>
+            </div>
+          </div>
+        </section>
+      {/if}
     </div>
   {/if}
 </div>
