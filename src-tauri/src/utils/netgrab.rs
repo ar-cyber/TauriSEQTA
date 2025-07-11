@@ -1,5 +1,6 @@
 use reqwest;
 use reqwest::Client;
+use reqwest::multipart::{Form, Part};
 use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
@@ -161,6 +162,35 @@ pub async fn get_seqta_file(file_type: &str, uuid: &str) -> Result<String, Strin
     params.insert(String::from("type"), String::from(file_type));
     params.insert(String::from("file"), String::from(uuid));
     fetch_api_data("/seqta/student/load/file", RequestMethod::GET, None, None, Some(params), false, true).await
+}
+
+#[tauri::command]
+pub async fn upload_seqta_file(file_name: String, file_path: String) -> Result<String, String> {
+    let mut head: HashMap<String, String> = HashMap::new();
+    head.insert(String::from("X-Accept-Mimes"), String::from("null"));
+    head.insert(String::from("X-File-Name"), String::from(&file_name));
+    head.insert(String::from("X-Requested-With"), String::from("XMLHttpRequest"));
+    
+    
+    let client = create_client();
+    let session = session::Session::load();
+
+    let form = Form::new().file(file_name.clone(), file_path.clone()).await.unwrap();
+    
+    let url = format!("{}/seqta/student/file/upload/xhr2", session.base_url.parse::<String>().unwrap());
+    let mut request = client.post(&url);
+
+    for (key, value) in head {
+            request = request.header(&key, value);
+    }
+
+    match request.multipart(form).send().await {
+        Ok(resp) => {
+            let text = resp.text().await.map_err(|e| e.to_string())?;
+            Ok(text)
+        },
+        Err(e) => Err(format!("File upload failed: {e}")),
+    }
 }
 
 #[derive(Serialize)]
