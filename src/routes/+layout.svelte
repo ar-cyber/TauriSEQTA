@@ -7,6 +7,7 @@
   import LoginScreen from '../lib/components/LoginScreen.svelte';
   import { authService, type UserInfo } from '../lib/services/authService';
   import { weatherService, type WeatherData } from '../lib/services/weatherService';
+  import { errorService } from '../lib/services/errorService';
 
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
