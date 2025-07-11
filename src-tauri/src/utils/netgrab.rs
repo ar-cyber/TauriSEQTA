@@ -1,11 +1,11 @@
-use reqwest;
+use reqwest::{self, RequestBuilder};
 use reqwest::Client;
 use reqwest::multipart::{Form, Part};
 use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
 use serde_json::{json, Value};
-use std::{io::Cursor};
+use std::{io::Cursor, sync::OnceLock};
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use url::Url;
@@ -14,6 +14,8 @@ use base64::{engine::general_purpose, Engine as _};
 // opens a file using the default program:
 
 use crate::session;
+
+static GLOBAL_CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HomeworkItem {
@@ -36,14 +38,44 @@ pub enum RequestMethod {
 }
 
 /// Build an HTTP client with headers based on the saved session.
-fn create_client() -> reqwest::Client {
+fn create_client() -> &'static reqwest::Client {
+
+    GLOBAL_CLIENT.get_or_init(|| {
+        let mut headers = reqwest::header::HeaderMap::new();
+
+        headers.insert(
+            reqwest::header::USER_AGENT,
+            "Mozilla/5.0 (DesQTA)".parse().unwrap(),
+        );
+        headers.insert(
+            reqwest::header::ACCEPT,
+            "application/json, text/plain, */*".parse().unwrap(),
+        );
+        headers.insert(
+            reqwest::header::ACCEPT_LANGUAGE,
+            "en-US,en;q=0.9".parse().unwrap(),
+        );
+
+
+        reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .expect("Failed to create HTTP client")
+
+        
+    })
+
+
+}   
+
+async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
     let session = session::Session::load();
     let mut headers = reqwest::header::HeaderMap::new();
 
     // Build the complete cookie string with JSESSIONID and additional cookies
     let mut cookie_parts = Vec::new();
 
-    // Add JSESSIONID first if it exists
+        // Add JSESSIONID first if it exists
     if !session.jsessionid.is_empty() {
         cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
     }
@@ -53,7 +85,7 @@ fn create_client() -> reqwest::Client {
         cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
     }
 
-    // Set the combined cookie header if we have any cookies
+        // Set the combined cookie header if we have any cookies
     if !cookie_parts.is_empty() {
         headers.insert(
             reqwest::header::COOKIE,
@@ -61,28 +93,11 @@ fn create_client() -> reqwest::Client {
         );
     }
 
-    headers.insert(
-        reqwest::header::USER_AGENT,
-        "Mozilla/5.0 (DesQTA)".parse().unwrap(),
-    );
-    headers.insert(
-        reqwest::header::ACCEPT,
-        "application/json, text/plain, */*".parse().unwrap(),
-    );
-    headers.insert(
-        reqwest::header::ACCEPT_LANGUAGE,
-        "en-US,en;q=0.9".parse().unwrap(),
-    );
-
     if !session.base_url.is_empty() {
-        headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
-        headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
+            headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
+            headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
     }
-
-    reqwest::Client::builder()
-        .default_headers(headers)
-        .build()
-        .expect("Failed to create HTTP client")
+    req.headers(headers)
 }
 
 #[tauri::command]
@@ -107,6 +122,8 @@ pub async fn fetch_api_data(
         RequestMethod::GET => client.get(&full_url),
         RequestMethod::POST => client.post(&full_url),
     };
+
+    request = append_default_headers(request).await;
 
     // Add custom headers if provided
     if let Some(headers) = headers {
@@ -179,6 +196,7 @@ pub async fn upload_seqta_file(file_name: String, file_path: String) -> Result<S
     
     let url = format!("{}/seqta/student/file/upload/xhr2", session.base_url.parse::<String>().unwrap());
     let mut request = client.post(&url);
+    request = append_default_headers(request).await;
 
     for (key, value) in head {
             request = request.header(&key, value);
