@@ -63,81 +63,85 @@
   <title>Error {errorStatus} - DesQTA</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-  <div class="max-w-md w-full text-center">
-    <!-- Error Icon -->
-    <div class="mb-8 flex justify-center">
-      <div class="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center">
-        <Icon 
-          src={ExclamationTriangle} 
-          size="48" 
-          class="text-red-400"
-        />
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-8">
+  <div class="max-w-lg w-full">
+    <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
+      <!-- Error Icon -->
+      <div class="mb-6 flex justify-center">
+        <div class="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <Icon 
+            src={ExclamationTriangle} 
+            size="40" 
+            class="text-red-500 dark:text-red-400"
+          />
+        </div>
       </div>
-    </div>
 
-    <!-- Error Status -->
-    <div class="mb-4">
-      <h1 class="text-6xl font-bold text-red-400 mb-2">{errorStatus}</h1>
-      <h2 class="text-xl font-semibold text-white mb-2">{errorType}</h2>
-    </div>
+      <!-- Error Status -->
+      <div class="mb-6 text-center">
+        <h1 class="text-5xl font-bold text-red-500 dark:text-red-400 mb-2">{errorStatus}</h1>
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">{errorType}</h2>
+      </div>
 
-    <!-- Error Description -->
-    <div class="mb-8">
-      <p class="text-gray-300 leading-relaxed">{errorDescription}</p>
-      {#if !isAuthError && !isNotFoundError}
-        <p class="text-sm text-gray-400 mt-2">Error: {errorMessage}</p>
-      {/if}
-    </div>
+      <!-- Error Description -->
+      <div class="mb-8 text-center">
+        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{errorDescription}</p>
+        {#if !isAuthError && !isNotFoundError}
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+            <span class="font-medium">Error:</span> {errorMessage}
+          </p>
+        {/if}
+      </div>
 
-    <!-- Action Buttons -->
-    <div class="space-y-3">
-      {#if isAuthError}
+      <!-- Action Buttons -->
+      <div class="space-y-3">
+        {#if isAuthError}
+          <button
+            onclick={goHome}
+            class="w-full px-4 py-3 bg-accent-500 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 hover:bg-accent-600"
+          >
+            <Icon src={Home} size="20" class="inline mr-2" />
+            Go to Login
+          </button>
+        {:else}
+          <button
+            onclick={goBack}
+            class="w-full px-4 py-3 bg-accent-500 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 hover:bg-accent-600"
+          >
+            <Icon src={ArrowLeft} size="20" class="inline mr-2" />
+            Go Back
+          </button>
+        {/if}
+
+        <button
+          onclick={refreshPage}
+          class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 hover:bg-slate-200 dark:hover:bg-slate-700"
+        >
+          <Icon src={ArrowPath} size="20" class="inline mr-2" />
+          Try Again
+        </button>
+
         <button
           onclick={goHome}
-          class="w-full px-4 py-3 bg-accent-bg text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-ring focus:ring-offset-2 focus:ring-offset-gray-900"
+          class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 hover:bg-slate-100 dark:hover:bg-slate-800"
         >
           <Icon src={Home} size="20" class="inline mr-2" />
-          Go to Login
+          Go Home
         </button>
-      {:else}
-        <button
-          onclick={goBack}
-          class="w-full px-4 py-3 bg-accent-bg text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-ring focus:ring-offset-2 focus:ring-offset-gray-900"
-        >
-          <Icon src={ArrowLeft} size="20" class="inline mr-2" />
-          Go Back
-        </button>
-      {/if}
-
-      <button
-        onclick={refreshPage}
-        class="w-full px-4 py-3 bg-gray-700 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-      >
-        <Icon src={ArrowPath} size="20" class="inline mr-2" />
-        Try Again
-      </button>
-
-      <button
-        onclick={goHome}
-        class="w-full px-4 py-3 bg-gray-800 text-gray-300 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
-      >
-        <Icon src={Home} size="20" class="inline mr-2" />
-        Go Home
-      </button>
-    </div>
-
-    <!-- Debug Info (only in development) -->
-    {#if import.meta.env.DEV}
-      <div class="mt-8 p-4 bg-gray-800 rounded-lg text-left">
-        <h3 class="text-sm font-semibold text-gray-300 mb-2">Debug Information:</h3>
-        <pre class="text-xs text-gray-400 overflow-auto">{JSON.stringify({
-          status: errorStatus,
-          message: errorMessage,
-          url: $page.url.href,
-          timestamp: new Date().toISOString()
-        }, null, 2)}</pre>
       </div>
-    {/if}
+
+      <!-- Debug Info (only in development) -->
+      {#if import.meta.env.DEV}
+        <div class="mt-8 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-left border border-slate-200 dark:border-slate-700">
+          <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Debug Information:</h3>
+          <pre class="text-xs text-slate-600 dark:text-slate-400 overflow-auto bg-white dark:bg-slate-900 p-3 rounded border border-slate-200 dark:border-slate-700">{JSON.stringify({
+            status: errorStatus,
+            message: errorMessage,
+            url: $page.url.href,
+            timestamp: new Date().toISOString()
+          }, null, 2)}</pre>
+        </div>
+      {/if}
+    </div>
   </div>
 </div> 
