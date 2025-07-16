@@ -194,23 +194,6 @@
             class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <h1 class="mb-2 text-2xl font-bold">Assessment Overview</h1>
             
-            <!-- Basic Assessment Info -->
-            <div class="grid gap-4 p-4 rounded-xl dark:bg-slate-800 bg-slate-200">
-              <div class="flex justify-between items-center">
-                <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Status:</span>
-                <span class="px-2 py-1 text-xs font-medium rounded-full {assessmentData.marked ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}">
-                  {assessmentData.marked ? 'Marked' : 'Not Marked'}
-                </span>
-              </div>
-              {#if assessmentData.submissionSettings}
-                <div class="flex justify-between items-center">
-                  <span class="text-sm font-medium text-slate-600 dark:text-slate-400">File Submission:</span>
-                  <span class="px-2 py-1 text-xs font-medium rounded-full {assessmentData.submissionSettings.fileSubmissionEnabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
-                    {assessmentData.submissionSettings.fileSubmissionEnabled ? 'Enabled' : 'Disabled'}
-                  </span>
-                </div>
-              {/if}
-            </div>
             
             <!-- Description Section -->
             <div>
