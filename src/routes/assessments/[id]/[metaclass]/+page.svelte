@@ -18,12 +18,19 @@
   let assessmentData: any = $state(null);
   let loading = $state(true);
   let error = $state('');
-  let tab = $state('details'); // default tab
+  let tab = $state('overview'); // default tab
   let firstCriterion: any = $state(null);
   let teacherFiles: any[] = $state([]);
   let allSubmissions: any[] = $state([]);
   let uploading = $state(false);
   let uploadError = $state('');
+
+  // Define available tabs based on assessment data
+  const availableTabs = $derived([
+    { id: 'overview', label: 'Overview', icon: '📋' },
+    { id: 'details', label: 'Details', icon: '📊' },
+    { id: 'submissions', label: 'Submissions', icon: '📁' }
+  ]);
 
   async function loadAssessmentDetails() {
     try {
@@ -153,35 +160,18 @@
   <!-- Tabs -->
   <div class="container px-6 pt-6 mx-auto">
     <div class="flex gap-2 border-b dark:border-slate-800 border-slate-200">
-      <button
-        class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
-        onclick={() => (tab = 'overview')}
-        class:border-accent-ring={tab === 'overview'}
-        class:text-accent-bg={tab === 'overview'}
-        class:text-slate-400={tab !== 'overview'}
-        class:border-transparent={tab !== 'overview'}>
-        Overview
-      </button>
-      <button
-        class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
-        onclick={() => (tab = 'details')}
-        class:border-accent-ring={tab === 'details'}
-        class:text-accent-bg={tab === 'details'}
-        class:text-slate-400={tab !== 'details'}
-        class:border-transparent={tab !== 'details'}>
-        Details
-      </button>
-      {#if allSubmissions.length}
+      {#each availableTabs as tabItem}
         <button
-          class="px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
-          onclick={() => (tab = 'submissions')}
-          class:border-accent-ring={tab === 'submissions'}
-          class:text-accent-bg={tab === 'submissions'}
-          class:text-slate-400={tab !== 'submissions'}
-          class:border-transparent={tab !== 'submissions'}>
-          Submissions
+          class="flex gap-2 items-center px-4 py-2 text-xs font-semibold tracking-wide uppercase border-b-2 transition-all duration-200 focus:outline-none hover:scale-105"
+          onclick={() => (tab = tabItem.id)}
+          class:border-accent-ring={tab === tabItem.id}
+          class:text-accent-bg={tab === tabItem.id}
+          class:text-slate-400={tab !== tabItem.id}
+          class:border-transparent={tab !== tabItem.id}>
+          <span class="text-sm">{tabItem.icon}</span>
+          <span>{tabItem.label}</span>
         </button>
-      {/if}
+      {/each}
     </div>
   </div>
 
@@ -203,12 +193,48 @@
           <div
             class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <h1 class="mb-2 text-2xl font-bold">Assessment Overview</h1>
-            <div class="max-w-none prose prose-invert">
-              <div class="whitespace-pre-line text-slate-300">
-                {@html assessmentData.description}
+            
+            <!-- Basic Assessment Info -->
+            <div class="grid gap-4 p-4 rounded-xl dark:bg-slate-800 bg-slate-200">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Status:</span>
+                <span class="px-2 py-1 text-xs font-medium rounded-full {assessmentData.marked ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}">
+                  {assessmentData.marked ? 'Marked' : 'Not Marked'}
+                </span>
               </div>
+              {#if assessmentData.submissionSettings}
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-slate-600 dark:text-slate-400">File Submission:</span>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full {assessmentData.submissionSettings.fileSubmissionEnabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+                    {assessmentData.submissionSettings.fileSubmissionEnabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              {/if}
+            </div>
+            
+            <!-- Description Section -->
+            <div>
+              <h2 class="text-lg font-semibold mb-3">Description</h2>
+              {#if assessmentData.description}
+                <div class="max-w-none prose prose-invert">
+                  <div class="whitespace-pre-line text-slate-300">
+                    {@html assessmentData.description}
+                  </div>
+                </div>
+              {:else}
+                <div class="flex flex-col items-center justify-center py-6 text-center">
+                  <div class="w-12 h-12 mb-3 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                    <Icon src={DocumentText} class="w-6 h-6 text-slate-400" />
+                  </div>
+                  <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-1">No Description Available</h3>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">
+                    This assessment doesn't have a detailed description yet.
+                  </p>
+                </div>
+              {/if}
             </div>
           </div>
+          
           {#if assessmentData.resources?.length}
             <div
               class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
@@ -248,6 +274,20 @@
                     </button>
                   </div>
                 {/each}
+              </div>
+            </div>
+          {:else}
+            <div
+              class="grid gap-6 p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
+              <h2 class="text-xl font-bold">Resources</h2>
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                  <Icon src={DocumentText} class="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Resources Available</h3>
+                <p class="text-slate-600 dark:text-slate-400">
+                  This assessment doesn't have any attached resources or files.
+                </p>
               </div>
             </div>
           {/if}
@@ -302,6 +342,26 @@
                   {assessmentData.engagement.feedbackComment}
                 </div>
               </div>
+            {:else if assessmentData.marked}
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                  <Icon src={DocumentText} class="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Feedback Available</h3>
+                <p class="text-slate-600 dark:text-slate-400">
+                  This assessment has been marked but no detailed feedback is available yet.
+                </p>
+              </div>
+            {:else}
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                  <Icon src={DocumentText} class="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Assessment Not Yet Marked</h3>
+                <p class="text-slate-600 dark:text-slate-400">
+                  This assessment hasn't been marked yet. Check back later for grades and feedback.
+                </p>
+              </div>
             {/if}
           </div>
         </div>
@@ -334,7 +394,15 @@
             {/if}
             
             {#if allSubmissions.filter((f) => !f.staff).length === 0}
-              <div class="text-slate-400">No submissions found.</div>
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                  <Icon src={DocumentText} class="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Submissions Yet</h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
+                  You haven't submitted any files for this assessment yet. Use the upload button above to add your work.
+                </p>
+              </div>
             {:else}
               <div class="grid gap-3">
                 {#each allSubmissions.filter((f) => !f.staff) as file}
