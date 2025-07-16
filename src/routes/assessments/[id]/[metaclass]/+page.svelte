@@ -238,33 +238,6 @@
                 </div>
               </div>
             {/if}
-            {#if assessmentData.resources?.length}
-              <div class="mt-6">
-                <div class="mb-2 font-semibold">Teacher files</div>
-                <div class="grid gap-2">
-                  {#each teacherFiles as file}
-                    <div
-                      class="flex items-center gap-4 p-3 rounded-xl dark:bg-slate-800 bg-slate-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent-500/5">
-                      <Icon src={getFileIcon(file.mimetype)} class="w-5 h-5 text-accent-400" />
-                      <div class="flex-1 min-w-0">
-                        <div class="text-sm font-medium truncate">
-                          {file.filename}
-                        </div>
-                        <div class="text-xs text-slate-400">
-                          {formatFileSize(file.size)}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        disabled
-                        class="px-3 py-1 text-sm font-medium rounded-lg transition-all duration-200 cursor-not-allowed text-slate-300 bg-slate-600 hover:bg-slate-500">
-                        Download
-                      </button>
-                    </div>
-                  {/each}
-                </div>
-              </div>
-            {/if}
           </div>
         </div>
       {:else if tab === 'submissions'}
