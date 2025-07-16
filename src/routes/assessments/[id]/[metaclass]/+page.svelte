@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { seqtaFetch } from '../../../../utils/netUtil';
+  import { seqtaFetch, uploadSeqtaFile } from '../../../../utils/netUtil';
   import {
     Icon,
     ArrowLeft,
@@ -9,9 +9,11 @@
     VideoCamera,
     PresentationChartLine,
     Photo,
+    Plus,
   } from 'svelte-hero-icons';
   import { openUrl } from '@tauri-apps/plugin-opener';
   import { invoke } from '@tauri-apps/api/core';
+  import { open } from '@tauri-apps/plugin-dialog';
 
   let assessmentData: any = $state(null);
   let loading = $state(true);
@@ -20,6 +22,8 @@
   let firstCriterion: any = $state(null);
   let teacherFiles: any[] = $state([]);
   let allSubmissions: any[] = $state([]);
+  let uploading = $state(false);
+  let uploadError = $state('');
 
   async function loadAssessmentDetails() {
     try {
@@ -68,6 +72,67 @@
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
     return Math.round(bytes / (1024 * 1024)) + ' MB';
+  }
+
+  async function handleFileUpload() {
+    uploading = true;
+    uploadError = '';
+
+    try {
+      // Open file dialog to select files
+      const selected = await open({
+        multiple: true,
+        filters: [{
+          name: 'All Files',
+          extensions: ['*']
+        }]
+      });
+
+      if (!selected) {
+        uploading = false;
+        return;
+      }
+
+      const files = Array.isArray(selected) ? selected : [selected];
+
+      for (const filePath of files) {
+        // Extract filename from path
+        const fileName = filePath.split(/[/\\]/).pop() || 'unknown';
+        
+        // First, upload the file
+        const uploadResponse = await uploadSeqtaFile(fileName, filePath);
+        const uploadResult = JSON.parse(uploadResponse);
+        
+        if (uploadResult.status === '200' && uploadResult.payload) {
+          // Then link the file to the assessment
+          const linkResponse = await seqtaFetch('/seqta/student/assessment/submissions/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
+            body: {
+              action: 'link',
+              assID: parseInt($page.params.id),
+              metaclass: parseInt($page.params.metaclass),
+              files: [uploadResult.payload.id]
+            },
+          });
+          
+          const linkResult = JSON.parse(linkResponse);
+          if (linkResult.status === '200') {
+            // Reload submissions to show the new file
+            await loadAssessmentDetails();
+          } else {
+            throw new Error('Failed to link file to assessment');
+          }
+        } else {
+          throw new Error('Failed to upload file');
+        }
+      }
+    } catch (e) {
+      console.error('File upload error:', e);
+      uploadError = e instanceof Error ? e.message : 'Upload failed';
+    } finally {
+      uploading = false;
+    }
   }
 
   onMount(loadAssessmentDetails);
@@ -245,7 +310,29 @@
         <div class="grid gap-8 animate-fade-in">
           <div
             class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
-            <h1 class="mb-4 text-2xl font-bold">Submissions</h1>
+            <div class="flex justify-between items-center mb-4">
+              <h1 class="text-2xl font-bold">Submissions</h1>
+              <button
+                type="button"
+                class="flex gap-2 items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 text-white bg-accent-bg hover:bg-accent-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                onclick={handleFileUpload}
+                disabled={uploading}>
+                {#if uploading}
+                  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Uploading...
+                {:else}
+                  <Icon src={Plus} class="w-4 h-4" />
+                  Upload Files
+                {/if}
+              </button>
+            </div>
+            
+            {#if uploadError}
+              <div class="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+                <p class="text-sm text-red-700 dark:text-red-400">{uploadError}</p>
+              </div>
+            {/if}
+            
             {#if allSubmissions.filter((f) => !f.staff).length === 0}
               <div class="text-slate-400">No submissions found.</div>
             {:else}

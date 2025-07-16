@@ -23,6 +23,7 @@ use tauri_plugin_notification;
 use tauri_plugin_single_instance;
 use tauri_plugin_autostart;
 use tauri_plugin_autostart::ManagerExt;
+use tauri_plugin_dialog;
 use urlencoding::decode;
 
 /// Boilerplate example command
@@ -95,6 +96,7 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--minimize"]),
@@ -189,6 +191,7 @@ pub fn run() {
             netgrab::post_api_data,
             netgrab::fetch_api_data,
             netgrab::get_seqta_file,
+            netgrab::upload_seqta_file,
             login::check_session_exists,
             login::save_session,
             login::create_login_window,

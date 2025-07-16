@@ -327,3 +327,16 @@ export async function openURL(url: string): Promise<any> {
     throw new Error(error instanceof Error ? error.message : 'Unknown fetch error');
   }
 }
+
+export async function uploadSeqtaFile(fileName: string, filePath: string): Promise<string> {
+  try {
+    const response = await invoke<string>('upload_seqta_file', {
+      fileName: fileName,
+      filePath: filePath,
+    });
+    return response;
+  } catch (error) {
+    console.error('uploadSeqtaFile error:', error);
+    throw new Error(error instanceof Error ? error.message : 'Unknown upload error');
+  }
+}
