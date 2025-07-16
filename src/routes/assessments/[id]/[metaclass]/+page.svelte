@@ -193,22 +193,31 @@
           <div
             class="p-6 rounded-2xl transition-all duration-300 dark:bg-slate-900 bg-slate-100 hover:shadow-lg hover:shadow-accent-500/10">
             <!-- Grade Bar -->
-            {#if assessmentData.marked && firstCriterion}
+            {#if assessmentData.marked && firstCriterion && firstCriterion.results}
               <div class="mb-4">
                 <div class="mb-2 text-2xl font-bold">Grade</div>
                 <div
                   class="overflow-hidden relative w-full h-16 rounded-xl border transition-all duration-300 dark:bg-slate-800 bg-slate-200 dark:border-slate-700 border-slate-200 hover:shadow-lg hover:shadow-accent-500/10">
                   <div
                     class="absolute top-0 left-0 h-full bg-accent-600 transition-all duration-500"
-                    style="width: {firstCriterion.results.percentage}%">
+                    style="width: {firstCriterion.results.percentage || 0}%">
                   </div>
                   <div class="flex relative z-10 justify-center items-center h-full">
                     <span
                       class="text-3xl font-extrabold tracking-wide text-white drop-shadow animate-fade-in"
                       style="text-shadow: 0 2px 8px #000a">
                       {firstCriterion.results.grade ||
-                        firstCriterion.results.percentage.toFixed(2) + '%'}
+                        (firstCriterion.results.percentage ? firstCriterion.results.percentage.toFixed(2) + '%' : 'No Grade')}
                     </span>
+                  </div>
+                </div>
+              </div>
+            {:else if assessmentData.marked && firstCriterion}
+              <div class="mb-4">
+                <div class="mb-2 text-2xl font-bold">Grade</div>
+                <div class="p-4 rounded-xl border dark:bg-slate-800 bg-slate-200 dark:border-slate-700 border-slate-200">
+                  <div class="text-center text-slate-600 dark:text-slate-400">
+                    Grade not yet available
                   </div>
                 </div>
               </div>
