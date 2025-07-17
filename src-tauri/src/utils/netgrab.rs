@@ -1,15 +1,14 @@
 use reqwest::{self, RequestBuilder};
 use reqwest::Client;
-use reqwest::multipart::{Form, Part};
 use rss::Channel;
 use serde::{Deserialize, Serialize};
 use xmltree::{Element, XMLNode};
 use serde_json::{json, Value};
-use std::{io::Cursor, sync::OnceLock};
+use std::{io::Cursor, sync::OnceLock, fs};
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use url::Url;
-use urlencoding;
+use url::form_urlencoded;
 
 use base64::{engine::general_purpose, Engine as _};
 // opens a file using the default program:
@@ -184,8 +183,6 @@ pub async fn get_seqta_file(file_type: &str, uuid: &str) -> Result<String, Strin
 
 #[tauri::command]
 pub async fn upload_seqta_file(file_name: String, file_path: String) -> Result<String, String> {
-    use std::fs;
-    use std::path::Path;
     
     let client = create_client();
     let session = session::Session::load();
@@ -198,8 +195,10 @@ pub async fn upload_seqta_file(file_name: String, file_path: String) -> Result<S
     let mut request = client.post(&url);
     request = append_default_headers(request).await;
 
+    let url_filename: String = form_urlencoded::byte_serialize(&file_name.as_bytes()).collect();
+
     // Set headers exactly like the web UI
-    request = request.header("X-File-Name", urlencoding::encode(&file_name).to_string());
+    request = request.header("X-File-Name", url_filename);
     request = request.header("X-Accept-Mimes", "null");
     request = request.header("X-Requested-With", "XMLHttpRequest");
 

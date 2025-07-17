@@ -24,7 +24,8 @@ use tauri_plugin_single_instance;
 use tauri_plugin_autostart;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_dialog;
-use urlencoding::decode;
+
+use url::form_urlencoded::{byte_serialize, parse};
 
 /// Boilerplate example command
 #[tauri::command]
@@ -131,7 +132,8 @@ pub fn run() {
                                 println!("[Desqta] Found parameter - key: {}, value: {}", key, value);
                                 match key {
                                     "cookie" => {
-                                        if let Ok(decoded) = decode(value) {
+                                        let decoded: String = parse(value.as_bytes()).map(|(key, val)| [key, val].concat()).collect();
+                                        if !decoded.is_empty() {
                                             cookie = Some(decoded.to_string());
                                             println!("[Desqta] Decoded cookie: {}", decoded);
                                         } else {
@@ -139,7 +141,8 @@ pub fn run() {
                                         }
                                     },
                                     "url" => {
-                                        if let Ok(decoded) = decode(value) {
+                                        let decoded: String = parse(value.as_bytes()).map(|(key, val)| [key, val].concat()).collect();
+                                        if !decoded.is_empty() {
                                             base_url = Some(decoded.to_string());
                                             println!("[Desqta] Decoded URL: {}", decoded);
                                         } else {

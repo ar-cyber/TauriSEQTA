@@ -34,7 +34,6 @@ tokio = { version = "1", features = ["full"] }
 time = "0.3"
 url = "2.5"
 tauri-plugin-notification = "2"
-urlencoding = "2.1"
 tauri-plugin-single-instance = "2"
 anyhow = "1.0.98"
 xmltree = "0.11.0"
