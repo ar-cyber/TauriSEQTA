@@ -347,6 +347,7 @@
     { label: 'Timetable', icon: CalendarDays, path: '/timetable' },
     { label: 'Messages', icon: ChatBubbleLeftRight, path: '/direqt-messages' },
     { label: 'Notices', icon: DocumentText, path: '/notices' },
+    { label: 'MyEdOnline', icon: BookOpen, path: '/myed' },
     { label: 'News', icon: Newspaper, path: '/news' },
     { label: 'Directory', icon: User, path: '/directory' },
     { label: 'Reports', icon: ChartBar, path: '/reports' },
