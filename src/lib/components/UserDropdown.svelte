@@ -70,6 +70,13 @@
       devSensitiveInfoHider = false;
     }
   });
+
+  // Close dropdown when userInfo becomes undefined (logout)
+  $effect(() => {
+    if (!userInfo) {
+      showUserDropdown = false;
+    }
+  });
 </script>
 
 <div class="relative user-dropdown-container">

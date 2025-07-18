@@ -58,6 +58,8 @@ export const authService = {
   },
 
   async logout(): Promise<boolean> {
+    // Clear user info cache on logout
+    cache.delete('userInfo');
     return await invoke('logout');
   },
 
