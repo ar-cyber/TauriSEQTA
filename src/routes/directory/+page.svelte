@@ -28,6 +28,8 @@
   let selectedCampus = $state('all');
   let showFilters = $state(false);
   let devSensitiveInfoHider = $state(false);
+  let currentPage = $state(1);
+  let itemsPerPage = $state(24); // 6 rows of 4 cards on large screens
 
   let years: string[] = $state([]);
   let subSchools: string[] = $state([]);
@@ -135,11 +137,46 @@
     selectedSubSchool = 'all';
     selectedHouse = 'all';
     selectedCampus = 'all';
+    currentPage = 1; // Reset to first page when clearing filters
   }
 
   function getFilteredStudents() {
     return students.filter(studentMatches);
   }
+
+  function getPaginatedStudents() {
+    const filtered = getFilteredStudents();
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  }
+
+  function getTotalPages() {
+    return Math.ceil(getFilteredStudents().length / itemsPerPage);
+  }
+
+  function goToPage(page: number) {
+    currentPage = Math.max(1, Math.min(page, getTotalPages()));
+  }
+
+  function nextPage() {
+    if (currentPage < getTotalPages()) {
+      currentPage++;
+    }
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+    }
+  }
+
+  // Reset to first page when filters change
+  $effect(() => {
+    if (search || selectedYear !== 'all' || selectedSubSchool !== 'all' || selectedHouse !== 'all' || selectedCampus !== 'all') {
+      currentPage = 1;
+    }
+  });
 
   onMount(async () => {
     await checkSensitiveInfoHider();
@@ -274,7 +311,7 @@
     <!-- Results Summary -->
     <div class="flex items-center justify-between">
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Showing {getFilteredStudents().length} of {students.length} students
+        Showing {getPaginatedStudents().length} of {getFilteredStudents().length} students (Page {currentPage} of {getTotalPages()})
       </p>
     </div>
 
@@ -311,7 +348,7 @@
     {:else}
       <!-- Students Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {#each getFilteredStudents() as student (student.id)}
+        {#each getPaginatedStudents() as student (student.id)}
           <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-all duration-200 transform hover:scale-[1.02]">
             <!-- Student Avatar -->
             <div class="flex items-center gap-3 mb-3">
@@ -368,6 +405,42 @@
           </div>
         {/each}
       </div>
+
+      <!-- Pagination -->
+      {#if getTotalPages() > 1}
+        <div class="flex items-center justify-center gap-2 mt-6">
+          <button
+            class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === 1}
+            onclick={prevPage}
+          >
+            Previous
+          </button>
+          
+          <div class="flex items-center gap-1">
+            {#each Array.from({ length: Math.min(5, getTotalPages()) }, (_, i) => {
+              const pageNum = i + 1;
+              const isActive = pageNum === currentPage;
+              return { pageNum, isActive };
+            }) as pageInfo}
+              <button
+                class="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 {pageInfo.isActive ? 'text-white accent-bg' : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600'}"
+                onclick={() => goToPage(pageInfo.pageNum)}
+              >
+                {pageInfo.pageNum}
+              </button>
+            {/each}
+          </div>
+          
+          <button
+            class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === getTotalPages()}
+            onclick={nextPage}
+          >
+            Next
+          </button>
+        </div>
+      {/if}
     {/if}
   </div>
 </div> 
