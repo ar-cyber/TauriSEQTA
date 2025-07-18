@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { seqtaFetch } from '../../utils/netUtil';
+  import { seqtaFetch, getRandomDicebearAvatar } from '../../utils/netUtil';
   import { Icon } from 'svelte-hero-icons';
   import { MagnifyingGlass, Funnel, User, AcademicCap, MapPin } from 'svelte-hero-icons';
+  import { invoke } from '@tauri-apps/api/core';
 
   interface Student {
     id: number;
@@ -26,11 +27,30 @@
   let selectedHouse = $state('all');
   let selectedCampus = $state('all');
   let showFilters = $state(false);
+  let devSensitiveInfoHider = $state(false);
 
   let years: string[] = $state([]);
   let subSchools: string[] = $state([]);
   let houses: string[] = $state([]);
   let campuses: string[] = $state([]);
+
+  // Generate random avatars for each student when in sensitive content hider mode
+  function getStudentAvatar(student: Student): string {
+    if (devSensitiveInfoHider) {
+      // Use student ID as seed for consistent avatar per student
+      return `https://api.dicebear.com/7.x/avataaars/svg?seed=${student.id}`;
+    }
+    return '';
+  }
+
+  async function checkSensitiveInfoHider() {
+    try {
+      const settings = await invoke<{ dev_sensitive_info_hider?: boolean }>('get_settings');
+      devSensitiveInfoHider = settings.dev_sensitive_info_hider ?? false;
+    } catch (e) {
+      devSensitiveInfoHider = false;
+    }
+  }
 
   async function loadStudents() {
     loading = true;
@@ -121,7 +141,10 @@
     return students.filter(studentMatches);
   }
 
-  onMount(loadStudents);
+  onMount(async () => {
+    await checkSensitiveInfoHider();
+    await loadStudents();
+  });
 </script>
 
 <div class="p-6 space-y-6">
@@ -292,12 +315,20 @@
           <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-all duration-200 transform hover:scale-[1.02]">
             <!-- Student Avatar -->
             <div class="flex items-center gap-3 mb-3">
-              <div 
-                class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                style="background-color: {student.house_colour}"
-              >
-                {student.firstname.charAt(0)}{student.surname.charAt(0)}
-              </div>
+              {#if devSensitiveInfoHider}
+                <img
+                  src={getStudentAvatar(student)}
+                  alt="Student avatar"
+                  class="w-10 h-10 rounded-full object-cover border-2 border-white/60 dark:border-slate-600/60"
+                />
+              {:else}
+                <div 
+                  class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                  style="background-color: {student.house_colour}"
+                >
+                  {student.firstname.charAt(0)}{student.surname.charAt(0)}
+                </div>
+              {/if}
               <div class="flex-1 min-w-0">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {student.xx_display}
