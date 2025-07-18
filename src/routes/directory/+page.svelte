@@ -417,18 +417,21 @@
             Previous
           </button>
           
-          <div class="flex items-center gap-1">
-            {#each Array.from({ length: Math.min(5, getTotalPages()) }, (_, i) => {
+          <div class="flex items-center gap-1 overflow-hidden">
+            {#each Array.from({ length: getTotalPages() }, (_, i) => {
               const pageNum = i + 1;
               const isActive = pageNum === currentPage;
-              return { pageNum, isActive };
+              const isVisible = pageNum >= Math.max(1, currentPage - 2) && pageNum <= Math.min(getTotalPages(), currentPage + 2);
+              return { pageNum, isActive, isVisible };
             }) as pageInfo}
-              <button
-                class="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 {pageInfo.isActive ? 'text-white accent-bg' : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600'}"
-                onclick={() => goToPage(pageInfo.pageNum)}
-              >
-                {pageInfo.pageNum}
-              </button>
+              {#if pageInfo.isVisible}
+                <button
+                  class="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 {pageInfo.isActive ? 'text-white accent-bg' : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600'}"
+                  onclick={() => goToPage(pageInfo.pageNum)}
+                >
+                  {pageInfo.pageNum}
+                </button>
+              {/if}
             {/each}
           </div>
           
