@@ -18,9 +18,11 @@
     selectedYear: number;
     aiIntegrationsEnabled: boolean;
     gradeAnalyserEnabled: boolean;
+    showInView: 'list' | 'board' | 'calendar';
+    currentView: 'list' | 'board' | 'calendar';
   }
 
-  let { assessments, selectedYear, aiIntegrationsEnabled, gradeAnalyserEnabled }: Props = $props();
+  let { assessments, selectedYear, aiIntegrationsEnabled, gradeAnalyserEnabled, showInView, currentView }: Props = $props();
 
   let gradePredictions = $state<Map<string, any>>(new Map());
   let generatingPredictions = $state<boolean>(false);
@@ -100,7 +102,7 @@
   }
 </script>
 
-{#if aiIntegrationsEnabled && gradeAnalyserEnabled}
+{#if aiIntegrationsEnabled && gradeAnalyserEnabled && currentView === showInView}
   <div class="flex flex-col gap-4 p-4 rounded-xl border backdrop-blur-sm bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200/50 dark:border-purple-700/50">
     <div class="flex justify-between items-center">
       <div>

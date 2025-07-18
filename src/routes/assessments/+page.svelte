@@ -310,6 +310,8 @@
     {selectedYear}
     {aiIntegrationsEnabled}
     {gradeAnalyserEnabled}
+    showInView="list"
+    currentView={selectedTab}
   />
 
   {#if loadingAssessments}
