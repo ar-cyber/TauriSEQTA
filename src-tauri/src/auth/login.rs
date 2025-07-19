@@ -45,6 +45,13 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
 
     let http_url;
 
+    match url.starts_with("seqtalearn://") {
+        true => {
+            // @AdenMGB Please take a look at implementing the QR Code login from the Deeplink here - I've hit a wall unfortunately
+        },
+        false => {},
+    }
+
     match url.starts_with("https://") {
         true => http_url = url.clone(),
         false => {

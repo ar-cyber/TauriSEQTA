@@ -118,10 +118,43 @@
             </p>
           </div>
 
+        <div class="space-y-6">
+          <div>
+            <label
+              for="seqta-url"
+              class="block mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+              SEQTA QR Code
+            </label>
+            <div class="relative">
+              <div
+                class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                <svg
+                  class="w-5 h-5 text-slate-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
+                    clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input
+                id="seqta-qrcode"
+                type="file"
+                oninput={(e) => (document.getElementById('signin-button')! as HTMLButtonElement).disabled = false}
+                class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+            </div>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Enter your SEQTA Login QR Code to get going!
+            </p>
+          </div>
+
           <button
+            id="signin-button"
             class="py-3 w-full text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-lg transition-all duration-200 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed"
             onclick={onStartLogin}
-            disabled={!seqtaUrl}>
+            disabled={!(seqtaUrl)}>
             Sign In
           </button>
 
@@ -138,4 +171,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

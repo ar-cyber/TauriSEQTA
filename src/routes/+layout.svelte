@@ -9,6 +9,8 @@
   import { weatherService, type WeatherData } from '../lib/services/weatherService';
   import { errorService } from '../lib/services/errorService';
 
+  import jsQR from 'jsqr';
+
   import { onMount, onDestroy } from 'svelte';
   import '../app.css';
   import { accentColor, loadAccentColor, theme, loadTheme, loadCurrentTheme } from '../lib/stores/theme';
@@ -147,7 +149,21 @@
   }
 
   async function startLogin() {
+    const input = document.getElementById('seqta-qrcode') as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target?.result as ArrayBuffer;
+        const code = jsQR(new Uint8ClampedArray(imageData), 300, 300);
+        if (code) {
+            seqtaUrl = code.data;;
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
     if (!seqtaUrl) return;
+
     await authService.startLogin(seqtaUrl);
 
     const timer = setInterval(async () => {
@@ -280,7 +296,7 @@
     // Check SEQTA cookie/session on app launch
     if (!($needsSetup)) {
       try {
-        const appUrl = seqtaUrl || 'https://learn.cardijn.catholic.edu.au/#?page=/home';
+        const appUrl = seqtaUrl;
         const response = await seqtaFetch('/seqta/student/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
