@@ -54,7 +54,7 @@
           <FileCard 
             {file}
             variant="submission"
-            showDownload={false}
+            showDownload={true}
           />
         {/each}
       </div>

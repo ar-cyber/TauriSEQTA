@@ -319,7 +319,7 @@
   {:else if filteredAssessments.length === 0}
     <EmptyState 
       title="No assessments for {selectedYear}!"
-      message="Try selecting a different year."
+      message="Try selecting a different year. If the year selector doesn't show up try refreshing by right-clicking."
       icon="🎉"
     />
   {:else if selectedTab === 'board'}
