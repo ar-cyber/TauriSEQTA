@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest a new Feature to be added or replaced in DesQTA
 labels: enhancement
-type: feature
+type: "Feature"
 title: "[FR]"
 
 body:
