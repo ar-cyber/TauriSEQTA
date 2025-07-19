@@ -95,7 +95,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
 
             // Try to get cookies from the login window
             if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
-                if counter > 0 {
+                if counter > 5 {
                     // Check if the auth has finished through url
                     match webview.url() {
                         Ok(current_url) => {
@@ -114,8 +114,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
                             println!("Cookies: {:?}", cookies);
                             for cookie in cookies.clone() {
                                 if cookie.name() == "JSESSIONID"
-                                    && cookie.domain().unwrap_or("None")
-                                        == parsed_url.host_str().unwrap_or("None")
+                                    && cookie.domain().unwrap_or("None") == parsed_url.host_str().unwrap_or("None")
                                 {
                                     if let Some(expire_time) = cookie.expires_datetime() {
                                         let now = OffsetDateTime::now_utc();
