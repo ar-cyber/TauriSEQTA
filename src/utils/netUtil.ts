@@ -285,15 +285,6 @@ function mockApiResponse(url: string): any {
 }
 
 export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promise<any> {
-  console.log('[SEQTA_FETCH] ===== FRONTEND REQUEST ====');
-  console.log('[SEQTA_FETCH] URL:', input);
-  console.log('[SEQTA_FETCH] Method:', init?.method || 'GET');
-  console.log('[SEQTA_FETCH] Headers:', init?.headers || {});
-  console.log('[SEQTA_FETCH] Body:', init?.body || {});
-  console.log('[SEQTA_FETCH] Parameters:', init?.params || {});
-  console.log('[SEQTA_FETCH] Is Image:', init?.is_image || false);
-  console.log('[SEQTA_FETCH] Return URL:', init?.return_url || false);
-  
   // Fetch the dev_sensitive_info_hider value from settings
   let useMock = false;
   try {
@@ -304,11 +295,9 @@ export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promis
   }
   
   if (useMock) {
-    console.log('[SEQTA_FETCH] 🔧 Using mock response (sensitive info hider enabled)');
     return mockApiResponse(input);
   }
   
-  console.log('[SEQTA_FETCH] 🚀 Sending request to backend...');
   try {
     const response = await invoke('fetch_api_data', {
       url: input,
@@ -320,16 +309,8 @@ export async function seqtaFetch(input: string, init?: SeqtaRequestInit): Promis
       returnUrl: init?.return_url || false,
     });
     
-    console.log('[SEQTA_FETCH] ✅ Backend response received');
-    console.log('[SEQTA_FETCH] Response type:', typeof response);
-    console.log('[SEQTA_FETCH] Response length:', typeof response === 'string' ? response.length : 'N/A');
-    console.log('[SEQTA_FETCH] Response preview:', typeof response === 'string' ? response.substring(0, 200) : response);
-    console.log('[SEQTA_FETCH] ===== END FRONTEND REQUEST ====');
-    
     return response;
   } catch (error) {
-    console.error('[SEQTA_FETCH] ❌ Backend request failed:', error);
-    console.log('[SEQTA_FETCH] ===== END FRONTEND REQUEST ====');
     throw new Error(error instanceof Error ? error.message : 'Unknown fetch error');
   }
 }

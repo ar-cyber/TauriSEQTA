@@ -25,9 +25,7 @@
 
   // Global error handler to catch JWT expiration errors
   function handleGlobalError(event: ErrorEvent) {
-    console.log('[LOGIN_SCREEN] Global error caught:', event.error);
     if (event.error && typeof event.error === 'string' && event.error.includes('JWT token has expired')) {
-      console.log('[LOGIN_SCREEN] JWT expiration detected, showing error message');
       jwtExpiredError = true;
       qrError = '';
       qrSuccess = '';
@@ -39,9 +37,7 @@
   if (typeof window !== 'undefined') {
     window.addEventListener('error', handleGlobalError);
     window.addEventListener('unhandledrejection', (event) => {
-      console.log('[LOGIN_SCREEN] Unhandled promise rejection:', event.reason);
       if (event.reason && typeof event.reason === 'string' && event.reason.includes('JWT token has expired')) {
-        console.log('[LOGIN_SCREEN] JWT expiration detected in promise rejection');
         jwtExpiredError = true;
         qrError = '';
         qrSuccess = '';
@@ -195,11 +191,8 @@
                   const fileInput = e.target as HTMLInputElement;
                   const signinButton = document.getElementById('signin-button') as HTMLButtonElement;
                   
-                  console.log('[QR_FRONTEND] File input changed');
-                  
                   if (fileInput.files && fileInput.files.length > 0) {
                     const file = fileInput.files[0];
-                    console.log('[QR_FRONTEND] File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
                     
                     qrProcessing = true;
                     qrError = '';
@@ -208,10 +201,8 @@
                     const reader = new FileReader();
                     
                     reader.onload = (e) => {
-                      console.log('[QR_FRONTEND] File read completed');
                       try {
                         const imageData = e.target?.result as ArrayBuffer;
-                        console.log('[QR_FRONTEND] Image data size:', imageData.byteLength);
                         
                         // Create a blob URL from the array buffer
                         const blob = new Blob([imageData], { type: file.type });
@@ -220,14 +211,11 @@
                         // Create an image element to load the image
                         const img = new Image();
                         img.onload = () => {
-                          console.log('[QR_FRONTEND] Image loaded, dimensions:', img.width, 'x', img.height);
-                          
                           // Create a canvas to get pixel data
                           const canvas = document.createElement('canvas');
                           const ctx = canvas.getContext('2d');
                           
                                                   if (!ctx) {
-                          console.error('[QR_FRONTEND] Could not get canvas context');
                           qrError = 'Could not process image';
                           qrProcessing = false;
                           // Only disable if no manual URL is entered or JWT expired
@@ -246,27 +234,19 @@
                           
                           // Get pixel data
                           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                          console.log('[QR_FRONTEND] Canvas pixel data size:', imageData.data.length);
                           
                           // Decode QR code
                           const code = jsQR(imageData.data, imageData.width, imageData.height);
-                          console.log('[QR_FRONTEND] jsQR result:', code ? 'Success' : 'Failed to decode');
                           
                           if (code) {
-                            console.log('[QR_FRONTEND] QR code data:', code.data);
-                            console.log('[QR_FRONTEND] QR code data length:', code.data.length);
-                            
                             if (code.data.startsWith('seqtalearn://')) {
-                              console.log('[QR_FRONTEND] Valid SEQTA deeplink detected');
                               seqtaUrl = code.data;
                               qrSuccess = 'QR code processed successfully!';
                               // Only enable if no JWT expiration error
                               if (!jwtExpiredError) {
                                 signinButton.disabled = false;
                               }
-                              console.log('[QR_FRONTEND] Setting seqtaUrl to:', seqtaUrl);
                             } else {
-                              console.log('[QR_FRONTEND] Invalid QR code - not a SEQTA deeplink');
                               qrError = 'QR code does not contain a valid SEQTA deeplink';
                               // Only disable if no manual URL is entered or JWT expired
                               if (!seqtaUrl.trim() || jwtExpiredError) {
@@ -274,7 +254,6 @@
                               }
                             }
                           } else {
-                            console.log('[QR_FRONTEND] Failed to decode QR code from image');
                             qrError = 'Could not read QR code from image';
                             // Only disable if no manual URL is entered or JWT expired
                             if (!seqtaUrl.trim() || jwtExpiredError) {
@@ -285,11 +264,9 @@
                           // Clean up
                           URL.revokeObjectURL(imageUrl);
                           qrProcessing = false;
-                          console.log('[QR_FRONTEND] QR processing completed');
                         };
                         
                         img.onerror = () => {
-                          console.error('[QR_FRONTEND] Failed to load image');
                           qrError = 'Failed to load image file';
                           qrProcessing = false;
                           // Only disable if no manual URL is entered or JWT expired
@@ -303,7 +280,6 @@
                         img.src = imageUrl;
                         
                       } catch (error) {
-                        console.error('[QR_FRONTEND] Error processing QR code:', error);
                         qrError = 'Error processing QR code: ' + (error instanceof Error ? error.message : 'Unknown error');
                         qrProcessing = false;
                         // Only disable if no manual URL is entered or JWT expired
@@ -314,7 +290,6 @@
                     };
                     
                     reader.onerror = () => {
-                      console.error('[QR_FRONTEND] File read error');
                       qrError = 'Error reading file';
                       qrProcessing = false;
                       // Only disable if no manual URL is entered or JWT expired
@@ -323,10 +298,8 @@
                       }
                     };
                     
-                    console.log('[QR_FRONTEND] Starting file read as ArrayBuffer');
                     reader.readAsArrayBuffer(file);
                   } else {
-                    console.log('[QR_FRONTEND] No file selected');
                     // Only disable if no manual URL is entered or JWT expired
                     if (!seqtaUrl.trim() || jwtExpiredError) {
                       signinButton.disabled = true;

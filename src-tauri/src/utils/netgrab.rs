@@ -72,42 +72,26 @@ async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
     let mut session = session::Session::load();
     let mut headers = reqwest::header::HeaderMap::new();
 
-    println!("[HTTP_CLIENT] ===== AUTHENTICATION METHOD DETECTION =====");
-    println!("[HTTP_CLIENT] Session Base URL: {}", session.base_url);
-    println!("[HTTP_CLIENT] Session ID/JWT: {}...", &session.jsessionid[..20.min(session.jsessionid.len())]);
-    println!("[HTTP_CLIENT] Session ID starts with 'eyJ': {}", session.jsessionid.starts_with("eyJ"));
-    println!("[HTTP_CLIENT] Session ID length: {}", session.jsessionid.len());
-
     // Check if we're using JWT-based authentication (QR code login)
     if session.jsessionid.starts_with("eyJ") {
-        println!("[HTTP_CLIENT] 🔐 USING JWT-BASED AUTHENTICATION (QR CODE LOGIN)");
-        println!("[HTTP_CLIENT] JWT Token: {}", session.jsessionid);
+        // Check if we have JSESSIONID cookies from previous responses
+        let mut has_jsessionid_cookie = false;
+        let mut jsessionid_cookies: Vec<String> = Vec::new();
+        for cookie in &session.additional_cookies {
+            if cookie.name == "JSESSIONID" {
+                has_jsessionid_cookie = true;
+                jsessionid_cookies.push(cookie.value.clone());
+            }
+        }
         
-            // Check if we have JSESSIONID cookies from previous responses
-    let mut has_jsessionid_cookie = false;
-    let mut jsessionid_cookies: Vec<String> = Vec::new();
-    for cookie in &session.additional_cookies {
-        if cookie.name == "JSESSIONID" {
-            has_jsessionid_cookie = true;
-            jsessionid_cookies.push(cookie.value.clone());
-            println!("[HTTP_CLIENT] 🔐 Found JSESSIONID cookie from previous response: {}", cookie.value);
+        if jsessionid_cookies.len() > 1 {
+            // Clear duplicate JSESSIONID cookies to prevent errors
+            session.additional_cookies.retain(|cookie| cookie.name != "JSESSIONID");
+            let _ = session.save();
+            has_jsessionid_cookie = false;
         }
-    }
-    
-    if jsessionid_cookies.len() > 1 {
-        println!("[HTTP_CLIENT] ⚠️ WARNING: Found {} JSESSIONID cookies, this will cause duplicate cookie errors!", jsessionid_cookies.len());
-        println!("[HTTP_CLIENT] ⚠️ Clearing all JSESSIONID cookies to prevent duplicate cookie errors");
-        session.additional_cookies.retain(|cookie| cookie.name != "JSESSIONID");
-        if let Err(e) = session.save() {
-            println!("[HTTP_CLIENT] ⚠️ Failed to save cleared session: {}", e);
-        } else {
-            println!("[HTTP_CLIENT] ✅ Cleared all JSESSIONID cookies from session");
-        }
-        has_jsessionid_cookie = false;
-    }
         
         if has_jsessionid_cookie {
-            println!("[HTTP_CLIENT] 🔐 Using both JWT Bearer token AND JSESSIONID cookie");
             // Use both JWT Bearer token and JSESSIONID cookie
             headers.insert(
                 reqwest::header::AUTHORIZATION,
@@ -119,7 +103,6 @@ async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
             for cookie in &session.additional_cookies {
                 if cookie.name == "JSESSIONID" {
                     cookie_parts.push(format!("JSESSIONID={}", cookie.value));
-                    println!("[HTTP_CLIENT] Adding JSESSIONID cookie: {}", cookie.value);
                 }
             }
             
@@ -128,10 +111,8 @@ async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
                     reqwest::header::COOKIE,
                     cookie_parts.join("; ").parse().unwrap(),
                 );
-                println!("[HTTP_CLIENT] ✅ Added JSESSIONID cookie header");
             }
         } else {
-            println!("[HTTP_CLIENT] 🔐 Using JWT Bearer token only (no JSESSIONID cookie yet)");
             // This is a JWT token, use Bearer authentication only
             headers.insert(
                 reqwest::header::AUTHORIZATION,
@@ -143,53 +124,35 @@ async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
             headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
             headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
         }
-        if has_jsessionid_cookie {
-            println!("[HTTP_CLIENT] ✅ Added JWT Bearer token, JSESSIONID cookie, and origin/referer headers");
-            println!("[HTTP_CLIENT] Headers added: Authorization, Cookie, Origin, Referer");
-        } else {
-            println!("[HTTP_CLIENT] ✅ Added JWT Bearer token and origin/referer headers");
-            println!("[HTTP_CLIENT] Headers added: Authorization, Origin, Referer");
-        }
     } else {
-        println!("[HTTP_CLIENT] 🍪 USING COOKIE-BASED AUTHENTICATION (TRADITIONAL LOGIN)");
-        println!("[HTTP_CLIENT] Session ID: {}", session.jsessionid);
-        
         // Traditional cookie-based authentication
-    let mut cookie_parts = Vec::new();
+        let mut cookie_parts = Vec::new();
 
         // Add JSESSIONID first if it exists
-    if !session.jsessionid.is_empty() {
-        cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
-            println!("[HTTP_CLIENT] Adding JSESSIONID cookie: {}", session.jsessionid);
-    }
+        if !session.jsessionid.is_empty() {
+            cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
+        }
 
-    // Add all additional cookies
-    for cookie in session.additional_cookies {
-        cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
-            println!("[HTTP_CLIENT] Adding additional cookie: {}={}", cookie.name, cookie.value);
-    }
+        // Add all additional cookies
+        for cookie in session.additional_cookies {
+            cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
+        }
 
         // Set the combined cookie header if we have any cookies
-    if !cookie_parts.is_empty() {
+        if !cookie_parts.is_empty() {
             let cookie_header = cookie_parts.join("; ");
-        headers.insert(
-            reqwest::header::COOKIE,
+            headers.insert(
+                reqwest::header::COOKIE,
                 cookie_header.parse().unwrap(),
-        );
-            println!("[HTTP_CLIENT] ✅ Added cookie header with {} cookies", cookie_parts.len());
-            println!("[HTTP_CLIENT] Cookie header: {}", cookie_header);
-        } else {
-            println!("[HTTP_CLIENT] ⚠️ No cookies to add");
-    }
+            );
+        }
 
-    if !session.base_url.is_empty() {
+        if !session.base_url.is_empty() {
             headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
             headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
-            println!("[HTTP_CLIENT] ✅ Added Origin and Referer headers");
         }
     }
     
-    println!("[HTTP_CLIENT] ===== END AUTHENTICATION METHOD DETECTION =====");
     req.headers(headers)
 }
 
@@ -205,16 +168,6 @@ pub async fn fetch_api_data(
 ) -> Result<String, String> {
     let client = create_client();
     let mut session = session::Session::load();
-    
-    // Debug: Show what cookies are in the session
-    println!("[HTTP_CLIENT] ===== SESSION DEBUG =====");
-    println!("[HTTP_CLIENT] Session Base URL: {}", session.base_url);
-    println!("[HTTP_CLIENT] Session JWT: {}...", &session.jsessionid[..20.min(session.jsessionid.len())]);
-    println!("[HTTP_CLIENT] Session has {} additional cookies", session.additional_cookies.len());
-    for (i, cookie) in session.additional_cookies.iter().enumerate() {
-        println!("[HTTP_CLIENT] Cookie {}: {}={}", i, cookie.name, cookie.value);
-    }
-    println!("[HTTP_CLIENT] ===== END SESSION DEBUG =====");
     
     let full_url = if url.starts_with("http") {
         url.to_string()
@@ -243,55 +196,32 @@ pub async fn fetch_api_data(
 
     // Add body for POST requests if provided
     if let RequestMethod::POST = method {
-        println!("[HTTP_CLIENT] ===== REQUEST BODY CONSTRUCTION =====");
-        println!("[HTTP_CLIENT] Original body from frontend: {:?}", body);
-        
         let mut final_body = body.unwrap_or_else(|| json!({}));
-        println!("[HTTP_CLIENT] Initial final_body: {}", serde_json::to_string(&final_body).unwrap());
         
         // For JWT-based sessions, automatically include the JWT token in the body
         if session.jsessionid.starts_with("eyJ") {
-            println!("[HTTP_CLIENT] 🔐 JWT session detected - adding JWT to request body");
             if let Some(body_obj) = final_body.as_object_mut() {
                 body_obj.insert("jwt".to_string(), json!(session.jsessionid));
-                println!("[HTTP_CLIENT] ✅ Added JWT token to request body");
-                println!("[HTTP_CLIENT] Final request body: {}", serde_json::to_string(&final_body).unwrap());
-            } else {
-                println!("[HTTP_CLIENT] ❌ Failed to add JWT to body - body is not an object");
-        }
-        } else {
-            println!("[HTTP_CLIENT] 🍪 Cookie session - no JWT added to body");
-            println!("[HTTP_CLIENT] Final request body: {}", serde_json::to_string(&final_body).unwrap());
+            }
         }
         
-        println!("[HTTP_CLIENT] ===== END REQUEST BODY CONSTRUCTION =====");
         request = request.json(&final_body);
     }
 
-    println!("[HTTP_CLIENT] ===== SENDING REQUEST =====");
-    println!("[HTTP_CLIENT] Method: {:?}", method);
-    println!("[HTTP_CLIENT] URL: {}", full_url);
-
     match request.send().await {
     Ok(resp) => {
-        println!("[HTTP_CLIENT] ✅ Request sent successfully");
-        println!("[HTTP_CLIENT] Response status: {}", resp.status());
-        println!("[HTTP_CLIENT] Response headers: {:?}", resp.headers());
         
         // Check for JSESSIONID cookie in response headers for JWT-based sessions
         if session.jsessionid.starts_with("eyJ") {
             if let Some(set_cookie_header) = resp.headers().get("set-cookie") {
                 let set_cookie_str = set_cookie_header.to_str().unwrap_or("");
-                println!("[HTTP_CLIENT] 🔍 Found Set-Cookie header: {}", set_cookie_str);
                 
                 if set_cookie_str.contains("JSESSIONID=") {
-                    println!("[HTTP_CLIENT] 🔐 JWT session: Found JSESSIONID cookie in response");
                     // Extract JSESSIONID value
                     if let Some(jsessionid_start) = set_cookie_str.find("JSESSIONID=") {
                         let jsessionid_part = &set_cookie_str[jsessionid_start..];
                         if let Some(jsessionid_end) = jsessionid_part.find(';') {
                             let jsessionid_value = &jsessionid_part[11..jsessionid_end]; // Skip "JSESSIONID="
-                            println!("[HTTP_CLIENT] 🔐 Extracted JSESSIONID: {}", jsessionid_value);
                             
                             // Update session in memory and save to disk
                             if session.jsessionid.starts_with("eyJ") {
@@ -306,23 +236,7 @@ pub async fn fetch_api_data(
                                     path: None,
                                 });
                                 
-                                println!("[HTTP_CLIENT] 🔄 About to save session with {} cookies", session.additional_cookies.len());
-                                for (i, cookie) in session.additional_cookies.iter().enumerate() {
-                                    println!("[HTTP_CLIENT] Saving cookie {}: {}={}", i, cookie.name, cookie.value);
-                                }
-                                
-                                if let Err(e) = session.save() {
-                                    println!("[HTTP_CLIENT] ⚠️ Failed to save updated session: {}", e);
-                                } else {
-                                    println!("[HTTP_CLIENT] ✅ Successfully saved session to disk");
-                                    
-                                    // Verify the save worked by reloading
-                                    let verify_session = session::Session::load();
-                                    println!("[HTTP_CLIENT] 🔍 Verification - reloaded session has {} cookies", verify_session.additional_cookies.len());
-                                    for (i, cookie) in verify_session.additional_cookies.iter().enumerate() {
-                                        println!("[HTTP_CLIENT] Verification cookie {}: {}={}", i, cookie.name, cookie.value);
-                                    }
-                                }
+                                let _ = session.save();
                             }
                         }
                     }
@@ -335,26 +249,18 @@ pub async fn fetch_api_data(
             let bytes = resp.bytes().await.map_err(|e| e.to_string())?;
             // Encode to base64
             let base64_str = general_purpose::STANDARD.encode(&bytes);
-            println!("[HTTP_CLIENT] Returning base64 encoded image data ({} bytes)", bytes.len());
             Ok(base64_str)
         }
         else if return_url == true {
             let url = String::from(resp.url().as_str());
-            println!("[HTTP_CLIENT] Returning URL: {}", url);
             Ok(url)
         }
         else {
             let text = resp.text().await.map_err(|e| e.to_string())?;
-            println!("[HTTP_CLIENT] Response body length: {} characters", text.len());
-            println!("[HTTP_CLIENT] Response body preview: {}", &text[..text.len().min(200)]);
-            if text.len() > 200 {
-                println!("[HTTP_CLIENT] ... (truncated)");
-            }
             Ok(text)
         }
     }
     Err(e) => {
-        println!("[HTTP_CLIENT] ❌ Request failed: {}", e);
         Err(format!("HTTP request failed: {e}"))
     },
 }
