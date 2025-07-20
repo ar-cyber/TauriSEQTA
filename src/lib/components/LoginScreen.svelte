@@ -311,7 +311,7 @@
                 class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
             </div>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Upload your SEQTA Login QR Code to get started from your mobile login eMail
+              Upload your SEQTA Login QR Code to get started from your mobile login email
             </p>
             
             {#if qrProcessing}
