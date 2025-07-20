@@ -194,7 +194,7 @@
           const code = jsQR(imageData.data, imageData.width, imageData.height);
           console.log('[LOGIN_FRONTEND] QR code decoded:', code ? 'Success' : 'Failed');
           
-          if (code) {
+        if (code) {
             console.log('[LOGIN_FRONTEND] QR code data:', code.data);
             // Check if this is a SEQTA deeplink
             if (code.data.startsWith('seqtalearn://')) {
@@ -391,7 +391,7 @@
           // Check if this is actually an error response that indicates logout
           if (responseStr.includes('error') || responseStr.includes('unauthorized') || responseStr.includes('401')) {
             console.debug('Detected logout/error response, triggering logout');
-            await handleLogout();
+          await handleLogout();
           }
         }
       } catch (e) {

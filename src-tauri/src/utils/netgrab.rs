@@ -155,34 +155,34 @@ async fn append_default_headers(req: RequestBuilder) -> RequestBuilder {
         println!("[HTTP_CLIENT] Session ID: {}", session.jsessionid);
         
         // Traditional cookie-based authentication
-        let mut cookie_parts = Vec::new();
+    let mut cookie_parts = Vec::new();
 
         // Add JSESSIONID first if it exists
-        if !session.jsessionid.is_empty() {
-            cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
+    if !session.jsessionid.is_empty() {
+        cookie_parts.push(format!("JSESSIONID={}", session.jsessionid));
             println!("[HTTP_CLIENT] Adding JSESSIONID cookie: {}", session.jsessionid);
-        }
+    }
 
-        // Add all additional cookies
-        for cookie in session.additional_cookies {
-            cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
+    // Add all additional cookies
+    for cookie in session.additional_cookies {
+        cookie_parts.push(format!("{}={}", cookie.name, cookie.value));
             println!("[HTTP_CLIENT] Adding additional cookie: {}={}", cookie.name, cookie.value);
-        }
+    }
 
         // Set the combined cookie header if we have any cookies
-        if !cookie_parts.is_empty() {
+    if !cookie_parts.is_empty() {
             let cookie_header = cookie_parts.join("; ");
-            headers.insert(
-                reqwest::header::COOKIE,
+        headers.insert(
+            reqwest::header::COOKIE,
                 cookie_header.parse().unwrap(),
-            );
+        );
             println!("[HTTP_CLIENT] ✅ Added cookie header with {} cookies", cookie_parts.len());
             println!("[HTTP_CLIENT] Cookie header: {}", cookie_header);
         } else {
             println!("[HTTP_CLIENT] ⚠️ No cookies to add");
-        }
+    }
 
-        if !session.base_url.is_empty() {
+    if !session.base_url.is_empty() {
             headers.insert(reqwest::header::ORIGIN, session.base_url.parse().unwrap());
             headers.insert(reqwest::header::REFERER, session.base_url.parse().unwrap());
             println!("[HTTP_CLIENT] ✅ Added Origin and Referer headers");
@@ -258,7 +258,7 @@ pub async fn fetch_api_data(
                 println!("[HTTP_CLIENT] Final request body: {}", serde_json::to_string(&final_body).unwrap());
             } else {
                 println!("[HTTP_CLIENT] ❌ Failed to add JWT to body - body is not an object");
-            }
+        }
         } else {
             println!("[HTTP_CLIENT] 🍪 Cookie session - no JWT added to body");
             println!("[HTTP_CLIENT] Final request body: {}", serde_json::to_string(&final_body).unwrap());
@@ -271,7 +271,7 @@ pub async fn fetch_api_data(
     println!("[HTTP_CLIENT] ===== SENDING REQUEST =====");
     println!("[HTTP_CLIENT] Method: {:?}", method);
     println!("[HTTP_CLIENT] URL: {}", full_url);
-    
+
     match request.send().await {
     Ok(resp) => {
         println!("[HTTP_CLIENT] ✅ Request sent successfully");

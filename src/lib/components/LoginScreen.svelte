@@ -21,6 +21,34 @@
   let qrProcessing = $state(false);
   let qrError = $state('');
   let qrSuccess = $state('');
+  let jwtExpiredError = $state(false);
+
+  // Global error handler to catch JWT expiration errors
+  function handleGlobalError(event: ErrorEvent) {
+    console.log('[LOGIN_SCREEN] Global error caught:', event.error);
+    if (event.error && typeof event.error === 'string' && event.error.includes('JWT token has expired')) {
+      console.log('[LOGIN_SCREEN] JWT expiration detected, showing error message');
+      jwtExpiredError = true;
+      qrError = '';
+      qrSuccess = '';
+      qrProcessing = false;
+    }
+  }
+
+  // Add global error listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', (event) => {
+      console.log('[LOGIN_SCREEN] Unhandled promise rejection:', event.reason);
+      if (event.reason && typeof event.reason === 'string' && event.reason.includes('JWT token has expired')) {
+        console.log('[LOGIN_SCREEN] JWT expiration detected in promise rejection');
+        jwtExpiredError = true;
+        qrError = '';
+        qrSuccess = '';
+        qrProcessing = false;
+      }
+    });
+  }
 </script>
 
 <div class="flex flex-col h-full">
@@ -122,12 +150,12 @@
                   const url = (e.target as HTMLInputElement).value;
                   onUrlChange(url);
                   
-                  // Enable button if URL is entered
+                  // Enable button if URL is entered and no JWT expiration error
                   const signinButton = document.getElementById('signin-button') as HTMLButtonElement;
-                  if (url.trim()) {
+                  if (url.trim() && !jwtExpiredError) {
                     signinButton.disabled = false;
-                  } else if (!qrSuccess) {
-                    // Only disable if no QR code was processed
+                  } else if (!qrSuccess || jwtExpiredError) {
+                    // Disable if no QR code was processed or JWT expired
                     signinButton.disabled = true;
                   }
                 }}
@@ -202,8 +230,8 @@
                           console.error('[QR_FRONTEND] Could not get canvas context');
                           qrError = 'Could not process image';
                           qrProcessing = false;
-                          // Only disable if no manual URL is entered
-                          if (!seqtaUrl.trim()) {
+                          // Only disable if no manual URL is entered or JWT expired
+                          if (!seqtaUrl.trim() || jwtExpiredError) {
                             signinButton.disabled = true;
                           }
                           return;
@@ -232,21 +260,24 @@
                               console.log('[QR_FRONTEND] Valid SEQTA deeplink detected');
                               seqtaUrl = code.data;
                               qrSuccess = 'QR code processed successfully!';
-                              signinButton.disabled = false;
+                              // Only enable if no JWT expiration error
+                              if (!jwtExpiredError) {
+                                signinButton.disabled = false;
+                              }
                               console.log('[QR_FRONTEND] Setting seqtaUrl to:', seqtaUrl);
                             } else {
                               console.log('[QR_FRONTEND] Invalid QR code - not a SEQTA deeplink');
                               qrError = 'QR code does not contain a valid SEQTA deeplink';
-                              // Only disable if no manual URL is entered
-                              if (!seqtaUrl.trim()) {
+                              // Only disable if no manual URL is entered or JWT expired
+                              if (!seqtaUrl.trim() || jwtExpiredError) {
                                 signinButton.disabled = true;
                               }
                             }
                           } else {
                             console.log('[QR_FRONTEND] Failed to decode QR code from image');
                             qrError = 'Could not read QR code from image';
-                            // Only disable if no manual URL is entered
-                            if (!seqtaUrl.trim()) {
+                            // Only disable if no manual URL is entered or JWT expired
+                            if (!seqtaUrl.trim() || jwtExpiredError) {
                               signinButton.disabled = true;
                             }
                           }
@@ -261,8 +292,8 @@
                           console.error('[QR_FRONTEND] Failed to load image');
                           qrError = 'Failed to load image file';
                           qrProcessing = false;
-                          // Only disable if no manual URL is entered
-                          if (!seqtaUrl.trim()) {
+                          // Only disable if no manual URL is entered or JWT expired
+                          if (!seqtaUrl.trim() || jwtExpiredError) {
                             signinButton.disabled = true;
                           }
                           URL.revokeObjectURL(imageUrl);
@@ -275,8 +306,8 @@
                         console.error('[QR_FRONTEND] Error processing QR code:', error);
                         qrError = 'Error processing QR code: ' + (error instanceof Error ? error.message : 'Unknown error');
                         qrProcessing = false;
-                        // Only disable if no manual URL is entered
-                        if (!seqtaUrl.trim()) {
+                        // Only disable if no manual URL is entered or JWT expired
+                        if (!seqtaUrl.trim() || jwtExpiredError) {
                           signinButton.disabled = true;
                         }
                       }
@@ -286,8 +317,8 @@
                       console.error('[QR_FRONTEND] File read error');
                       qrError = 'Error reading file';
                       qrProcessing = false;
-                      // Only disable if no manual URL is entered
-                      if (!seqtaUrl.trim()) {
+                      // Only disable if no manual URL is entered or JWT expired
+                      if (!seqtaUrl.trim() || jwtExpiredError) {
                         signinButton.disabled = true;
                       }
                     };
@@ -296,8 +327,8 @@
                     reader.readAsArrayBuffer(file);
                   } else {
                     console.log('[QR_FRONTEND] No file selected');
-                    // Only disable if no manual URL is entered
-                    if (!seqtaUrl.trim()) {
+                    // Only disable if no manual URL is entered or JWT expired
+                    if (!seqtaUrl.trim() || jwtExpiredError) {
                       signinButton.disabled = true;
                     }
                     qrError = '';
@@ -327,13 +358,31 @@
                 {qrError}
               </div>
             {/if}
+            
+            {#if jwtExpiredError}
+              <div class="mt-2 p-3 text-sm text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <div class="flex items-start space-x-2">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <div>
+                    <p class="font-medium text-amber-800 dark:text-amber-200">QR Code Expired</p>
+                    <p class="text-amber-700 dark:text-amber-300">The QR code from your mobile login email has expired. Please request a new QR code from your mobile device and try again.</p>
+                  </div>
+                </div>
+              </div>
+            {/if}
           </div>
 
           <button
             id="signin-button"
             class="py-3 w-full text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-lg transition-all duration-200 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed"
-            onclick={onStartLogin}
-            disabled={true}>
+            onclick={() => {
+              // Clear JWT expiration error when starting new login
+              jwtExpiredError = false;
+              onStartLogin();
+            }}
+            disabled={jwtExpiredError}>
             Sign In
           </button>
 
