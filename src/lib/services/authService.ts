@@ -49,18 +49,30 @@ function binaryStringToBase64(binaryStr: string): string {
 
 export const authService = {
   async checkSession(): Promise<boolean> {
-    return await invoke<boolean>('check_session_exists');
+    console.log('[AUTH_SERVICE] Checking session existence');
+    const result = await invoke<boolean>('check_session_exists');
+    console.log('[AUTH_SERVICE] Session exists:', result);
+    return result;
   },
 
   async startLogin(seqtaUrl: string): Promise<void> {
-    if (!seqtaUrl) return;
+    console.log('[AUTH_SERVICE] Starting login with URL:', seqtaUrl);
+    if (!seqtaUrl) {
+      console.log('[AUTH_SERVICE] No URL provided, skipping login');
+      return;
+    }
+    console.log('[AUTH_SERVICE] Calling create_login_window backend command');
     await invoke('create_login_window', { url: seqtaUrl });
+    console.log('[AUTH_SERVICE] create_login_window command completed');
   },
 
   async logout(): Promise<boolean> {
+    console.log('[AUTH_SERVICE] Logging out');
     // Clear user info cache on logout
     cache.delete('userInfo');
-    return await invoke('logout');
+    const result = await invoke<boolean>('logout');
+    console.log('[AUTH_SERVICE] Logout result:', result);
+    return result;
   },
 
   async loadUserInfo(options?: { disableSchoolPicture?: boolean }): Promise<UserInfo | undefined> {
@@ -74,7 +86,7 @@ export const authService = {
         return cachedUserInfo;
       }
 
-      const res = await seqtaFetch('/seqta/student/login?', {
+      const res = await seqtaFetch('/seqta/student/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: {},

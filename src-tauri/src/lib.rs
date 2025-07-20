@@ -25,7 +25,7 @@ use tauri_plugin_autostart;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_dialog;
 
-use url::form_urlencoded::{byte_serialize, parse};
+use url::form_urlencoded::parse;
 
 /// Boilerplate example command
 #[tauri::command]

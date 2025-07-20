@@ -2,6 +2,11 @@
   import { Window } from '@tauri-apps/api/window';
   import { Icon } from 'svelte-hero-icons';
   import { Minus, Square2Stack, XMark } from 'svelte-hero-icons';
+  import jsQR from 'jsqr';
+  import { authService } from '$lib/services/authService';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { theme } from '$lib/stores/theme';
 
   interface Props {
     seqtaUrl: string;
@@ -12,6 +17,10 @@
   let { seqtaUrl, onStartLogin, onUrlChange }: Props = $props();
 
   const appWindow = Window.getCurrent();
+  
+  let qrProcessing = $state(false);
+  let qrError = $state('');
+  let qrSuccess = $state('');
 </script>
 
 <div class="flex flex-col h-full">
@@ -118,10 +127,9 @@
             </p>
           </div>
 
-        <div class="space-y-6">
           <div>
             <label
-              for="seqta-url"
+              for="seqta-qrcode"
               class="block mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
               SEQTA QR Code
             </label>
@@ -142,19 +150,157 @@
               <input
                 id="seqta-qrcode"
                 type="file"
-                oninput={(e) => (document.getElementById('signin-button')! as HTMLButtonElement).disabled = false}
+                accept="image/*"
+                oninput={async (e) => {
+                  const fileInput = e.target as HTMLInputElement;
+                  const signinButton = document.getElementById('signin-button') as HTMLButtonElement;
+                  
+                  console.log('[QR_FRONTEND] File input changed');
+                  
+                  if (fileInput.files && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    console.log('[QR_FRONTEND] File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                    
+                    qrProcessing = true;
+                    qrError = '';
+                    qrSuccess = '';
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                      console.log('[QR_FRONTEND] File read completed');
+                      try {
+                        const imageData = e.target?.result as ArrayBuffer;
+                        console.log('[QR_FRONTEND] Image data size:', imageData.byteLength);
+                        
+                        // Create a blob URL from the array buffer
+                        const blob = new Blob([imageData], { type: file.type });
+                        const imageUrl = URL.createObjectURL(blob);
+                        
+                        // Create an image element to load the image
+                        const img = new Image();
+                        img.onload = () => {
+                          console.log('[QR_FRONTEND] Image loaded, dimensions:', img.width, 'x', img.height);
+                          
+                          // Create a canvas to get pixel data
+                          const canvas = document.createElement('canvas');
+                          const ctx = canvas.getContext('2d');
+                          
+                          if (!ctx) {
+                            console.error('[QR_FRONTEND] Could not get canvas context');
+                            qrError = 'Could not process image';
+                            qrProcessing = false;
+                            signinButton.disabled = true;
+                            return;
+                          }
+                          
+                          // Set canvas size to image size
+                          canvas.width = img.width;
+                          canvas.height = img.height;
+                          
+                          // Draw image to canvas
+                          ctx.drawImage(img, 0, 0);
+                          
+                          // Get pixel data
+                          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                          console.log('[QR_FRONTEND] Canvas pixel data size:', imageData.data.length);
+                          
+                          // Decode QR code
+                          const code = jsQR(imageData.data, imageData.width, imageData.height);
+                          console.log('[QR_FRONTEND] jsQR result:', code ? 'Success' : 'Failed to decode');
+                          
+                          if (code) {
+                            console.log('[QR_FRONTEND] QR code data:', code.data);
+                            console.log('[QR_FRONTEND] QR code data length:', code.data.length);
+                            
+                            if (code.data.startsWith('seqtalearn://')) {
+                              console.log('[QR_FRONTEND] Valid SEQTA deeplink detected');
+                              seqtaUrl = code.data;
+                              qrSuccess = 'QR code processed successfully!';
+                              signinButton.disabled = false;
+                              console.log('[QR_FRONTEND] Setting seqtaUrl to:', seqtaUrl);
+                            } else {
+                              console.log('[QR_FRONTEND] Invalid QR code - not a SEQTA deeplink');
+                              qrError = 'QR code does not contain a valid SEQTA deeplink';
+                              signinButton.disabled = true;
+                            }
+                          } else {
+                            console.log('[QR_FRONTEND] Failed to decode QR code from image');
+                            qrError = 'Could not read QR code from image';
+                            signinButton.disabled = true;
+                          }
+                          
+                          // Clean up
+                          URL.revokeObjectURL(imageUrl);
+                          qrProcessing = false;
+                          console.log('[QR_FRONTEND] QR processing completed');
+                        };
+                        
+                        img.onerror = () => {
+                          console.error('[QR_FRONTEND] Failed to load image');
+                          qrError = 'Failed to load image file';
+                          qrProcessing = false;
+                          signinButton.disabled = true;
+                          URL.revokeObjectURL(imageUrl);
+                        };
+                        
+                        // Load the image
+                        img.src = imageUrl;
+                        
+                      } catch (error) {
+                        console.error('[QR_FRONTEND] Error processing QR code:', error);
+                        qrError = 'Error processing QR code: ' + (error instanceof Error ? error.message : 'Unknown error');
+                        qrProcessing = false;
+                        signinButton.disabled = true;
+                      }
+                    };
+                    
+                    reader.onerror = () => {
+                      console.error('[QR_FRONTEND] File read error');
+                      qrError = 'Error reading file';
+                      qrProcessing = false;
+                      signinButton.disabled = true;
+                    };
+                    
+                    console.log('[QR_FRONTEND] Starting file read as ArrayBuffer');
+                    reader.readAsArrayBuffer(file);
+                  } else {
+                    console.log('[QR_FRONTEND] No file selected');
+                    signinButton.disabled = true;
+                    qrError = '';
+                    qrSuccess = '';
+                  }
+                }}
                 class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
             </div>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Enter your SEQTA Login QR Code to get going!
+              Upload your SEQTA Login QR Code to get started
             </p>
+            
+            {#if qrProcessing}
+              <div class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                Processing QR code...
+              </div>
+            {/if}
+            
+            {#if qrSuccess}
+              <div class="mt-2 text-sm text-green-600 dark:text-green-400">
+                {qrSuccess}
+              </div>
+            {/if}
+            
+            {#if qrError}
+              <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                {qrError}
+              </div>
+            {/if}
           </div>
 
           <button
             id="signin-button"
             class="py-3 w-full text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-lg transition-all duration-200 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed"
             onclick={onStartLogin}
-            disabled={!(seqtaUrl)}>
+            disabled={true}>
             Sign In
           </button>
 
@@ -171,5 +317,4 @@
       </div>
     </div>
   </div>
-</div>
 </div>
