@@ -118,7 +118,19 @@
                 id="seqta-url"
                 type="text"
                 bind:value={seqtaUrl}
-                oninput={(e) => onUrlChange((e.target as HTMLInputElement).value)}
+                oninput={(e) => {
+                  const url = (e.target as HTMLInputElement).value;
+                  onUrlChange(url);
+                  
+                  // Enable button if URL is entered
+                  const signinButton = document.getElementById('signin-button') as HTMLButtonElement;
+                  if (url.trim()) {
+                    signinButton.disabled = false;
+                  } else if (!qrSuccess) {
+                    // Only disable if no QR code was processed
+                    signinButton.disabled = true;
+                  }
+                }}
                 placeholder="your-school.seqta.com.au"
                 class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
             </div>
@@ -186,13 +198,16 @@
                           const canvas = document.createElement('canvas');
                           const ctx = canvas.getContext('2d');
                           
-                          if (!ctx) {
-                            console.error('[QR_FRONTEND] Could not get canvas context');
-                            qrError = 'Could not process image';
-                            qrProcessing = false;
+                                                  if (!ctx) {
+                          console.error('[QR_FRONTEND] Could not get canvas context');
+                          qrError = 'Could not process image';
+                          qrProcessing = false;
+                          // Only disable if no manual URL is entered
+                          if (!seqtaUrl.trim()) {
                             signinButton.disabled = true;
-                            return;
                           }
+                          return;
+                        }
                           
                           // Set canvas size to image size
                           canvas.width = img.width;
@@ -222,12 +237,18 @@
                             } else {
                               console.log('[QR_FRONTEND] Invalid QR code - not a SEQTA deeplink');
                               qrError = 'QR code does not contain a valid SEQTA deeplink';
-                              signinButton.disabled = true;
+                              // Only disable if no manual URL is entered
+                              if (!seqtaUrl.trim()) {
+                                signinButton.disabled = true;
+                              }
                             }
                           } else {
                             console.log('[QR_FRONTEND] Failed to decode QR code from image');
                             qrError = 'Could not read QR code from image';
-                            signinButton.disabled = true;
+                            // Only disable if no manual URL is entered
+                            if (!seqtaUrl.trim()) {
+                              signinButton.disabled = true;
+                            }
                           }
                           
                           // Clean up
@@ -240,7 +261,10 @@
                           console.error('[QR_FRONTEND] Failed to load image');
                           qrError = 'Failed to load image file';
                           qrProcessing = false;
-                          signinButton.disabled = true;
+                          // Only disable if no manual URL is entered
+                          if (!seqtaUrl.trim()) {
+                            signinButton.disabled = true;
+                          }
                           URL.revokeObjectURL(imageUrl);
                         };
                         
@@ -251,7 +275,10 @@
                         console.error('[QR_FRONTEND] Error processing QR code:', error);
                         qrError = 'Error processing QR code: ' + (error instanceof Error ? error.message : 'Unknown error');
                         qrProcessing = false;
-                        signinButton.disabled = true;
+                        // Only disable if no manual URL is entered
+                        if (!seqtaUrl.trim()) {
+                          signinButton.disabled = true;
+                        }
                       }
                     };
                     
@@ -259,14 +286,20 @@
                       console.error('[QR_FRONTEND] File read error');
                       qrError = 'Error reading file';
                       qrProcessing = false;
-                      signinButton.disabled = true;
+                      // Only disable if no manual URL is entered
+                      if (!seqtaUrl.trim()) {
+                        signinButton.disabled = true;
+                      }
                     };
                     
                     console.log('[QR_FRONTEND] Starting file read as ArrayBuffer');
                     reader.readAsArrayBuffer(file);
                   } else {
                     console.log('[QR_FRONTEND] No file selected');
-                    signinButton.disabled = true;
+                    // Only disable if no manual URL is entered
+                    if (!seqtaUrl.trim()) {
+                      signinButton.disabled = true;
+                    }
                     qrError = '';
                     qrSuccess = '';
                   }
