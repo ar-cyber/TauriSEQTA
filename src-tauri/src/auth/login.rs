@@ -209,7 +209,7 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
     }
 
     // Step 4 - get cookie (which should be stored here)
-    jsessionid = second_response.headers().get("Set-Cookie");
+    let jsessionid = second_response.headers().get("Set-Cookie");
 
     // Step 5: Recovery request
     let recovery_response = client.post(&recovery_url)
