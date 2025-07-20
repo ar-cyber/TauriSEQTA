@@ -38,7 +38,7 @@ pub enum RequestMethod {
 }
 
 /// Build an HTTP client with headers based on the saved session.
-fn create_client() -> &'static reqwest::Client {
+pub fn create_client() -> &'static reqwest::Client {
 
     GLOBAL_CLIENT.get_or_init(|| {
         let mut headers = reqwest::header::HeaderMap::new();

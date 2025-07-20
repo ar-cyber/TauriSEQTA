@@ -152,6 +152,7 @@
     console.log('[LOGIN_FRONTEND] startLogin called');
     
     const input = document.getElementById('seqta-qrcode') as HTMLInputElement;
+    console.log('america ya')
     if (input.files && input.files[0]) {
       const file = input.files[0];
       console.log('[LOGIN_FRONTEND] Processing QR code file:', file.name);

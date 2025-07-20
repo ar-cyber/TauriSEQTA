@@ -91,6 +91,15 @@ export const authService = {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: {},
       });
+
+      const trwen = await seqtaFetch('/seqta/student/load/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: {},
+      });
+
+      console.log(trwen);
+
       const userInfo: UserInfo = JSON.parse(res).payload;
 
       // Check if sensitive content hider mode is enabled
