@@ -268,7 +268,7 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
     // Create session with the JWT token as the session ID
     let session = session::Session {
         base_url,
-        jsessionid: jsessionid,
+        jsessionid: jsessionid.expect("Could not get JSESSIONID"),
         additional_cookies: vec![], // QR auth doesn't use traditional cookies
     };
 
