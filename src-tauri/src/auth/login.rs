@@ -338,7 +338,7 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
 
                 // Try to get cookies from the login window
                 if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
-                    if counter > 5 {
+                    if counter > 60 {
                         // Check if the auth has finished through url
                         match webview.url() {
                             Ok(current_url) => {
