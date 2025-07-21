@@ -92,6 +92,25 @@ jobs:
           echo "JAVA_HOME: $JAVA_HOME"
           echo "GRADLE_OPTS: $GRADLE_OPTS"
 
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Accept Android licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Verify NDK installation
+        run: |
+          echo "Checking NDK installation..."
+          ls -la $ANDROID_NDK_HOME
+          echo "NDK version:"
+          $ANDROID_NDK_HOME/ndk-build --version || echo "ndk-build not found"
+          echo "Available NDK tools:"
+          ls -la $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/ | head -10
+
       - name: Fix Gradle Java home
         run: |
           echo "Fixing Gradle Java home for Linux..."
@@ -126,12 +145,12 @@ jobs:
           echo "Building with GRADLE_OPTS: $GRADLE_OPTS"
           JAVA_HOME=$JAVA_HOME GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME -Xmx4g -XX:+HeapDumpOnOutOfMemoryError" npm run tauri android build
 
-      - name: Upload Android build artifacts
+      - name: Zip Android build outputs
         run: |
           cd src-tauri/gen/android/app/build
-          zip -r outputs.zip outputs
-        
-      - name: Upload zipped Android build outputs
+          zip -r outputs.zip outputs || true
+
+      - name: Upload Android build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-build-outputs
