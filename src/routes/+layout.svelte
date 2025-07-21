@@ -47,7 +47,6 @@
   let loadingWeather = $state(false);
   let weatherError = $state('');
 
-  let isMobileMenuOpen = $state(false);
   let isMobile = $state(false);
 
   let sidebarOpen = $state(true);
@@ -129,6 +128,10 @@
   // Function to handle page navigation with auto-collapse
   function handlePageNavigation() {
     if (autoCollapseSidebar) {
+      sidebarOpen = false;
+    }
+    // Auto-close sidebar on mobile when menu item is clicked
+    if (isMobile) {
       sidebarOpen = false;
     }
   }
@@ -481,9 +484,21 @@
       />
     {/if}
 
-    <div class="flex flex-1 min-h-0">
+    <div class="flex flex-1 min-h-0 relative">
       {#if !$needsSetup}
         <AppSidebar {sidebarOpen} {menu} onMenuItemClick={handlePageNavigation} />
+      {/if}
+
+      <!-- Mobile Sidebar Overlay -->
+      {#if sidebarOpen && isMobile && !$needsSetup}
+        <div
+          class="fixed inset-0 z-20 bg-black/50 sm:hidden"
+          onclick={() => (sidebarOpen = false)}
+          onkeydown={(e) => e.key === 'Escape' && (sidebarOpen = false)}
+          role="button"
+          tabindex="0"
+          aria-label="Close sidebar overlay">
+        </div>
       {/if}
 
       <main
@@ -503,17 +518,7 @@
   </div>
 {/if}
 
-<!-- Mobile Menu Overlay -->
-{#if isMobileMenuOpen}
-  <div
-    class="fixed inset-0 z-40 bg-black/50"
-    onclick={() => (isMobileMenuOpen = false)}
-    onkeydown={(e) => e.key === 'Escape' && (isMobileMenuOpen = false)}
-    role="button"
-    tabindex="0"
-    aria-label="Close mobile menu">
-  </div>
-{/if}
+
 
 <!-- About Modal -->
 <AboutModal bind:open={showAboutModal} onclose={() => (showAboutModal = false)} />
