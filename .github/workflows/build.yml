@@ -82,7 +82,7 @@ jobs:
           echo "NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_HOME" >> $GITHUB_ENV
           echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-          echo "GRADLE_OPTS=-Dorg.gradle.java.home=$JAVA_HOME -Xmx4g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> $GITHUB_ENV
+          echo "GRADLE_OPTS=-Dorg.gradle.java.home=$JAVA_HOME -Xmx4g -XX:+HeapDumpOnOutOfMemoryError" >> $GITHUB_ENV
           echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_NDK_HOME" >> $GITHUB_ENV
           
           # Debug: Print environment variables
@@ -91,25 +91,6 @@ jobs:
           echo "NDK_HOME: $NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
           echo "GRADLE_OPTS: $GRADLE_OPTS"
-
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Accept Android licenses
-        run: |
-          yes | sdkmanager --licenses || true
-
-      - name: Verify NDK installation
-        run: |
-          echo "Checking NDK installation..."
-          ls -la $ANDROID_NDK_HOME
-          echo "NDK version:"
-          $ANDROID_NDK_HOME/ndk-build --version || echo "ndk-build not found"
-          echo "Available NDK tools:"
-          ls -la $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/ | head -10
 
       - name: Fix Gradle Java home
         run: |
@@ -124,7 +105,7 @@ jobs:
           org.gradle.java.home=$JAVA_HOME
           android.useAndroidX=true
           android.enableJetifier=true
-          org.gradle.jvmargs=-Xmx4g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+          org.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
           org.gradle.daemon=false
           org.gradle.parallel=true
           org.gradle.configureondemand=true
@@ -143,7 +124,7 @@ jobs:
         run: |
           echo "Building with JAVA_HOME: $JAVA_HOME"
           echo "Building with GRADLE_OPTS: $GRADLE_OPTS"
-          JAVA_HOME=$JAVA_HOME GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME -Xmx4g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" npm run tauri android build
+          JAVA_HOME=$JAVA_HOME GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME -Xmx4g -XX:+HeapDumpOnOutOfMemoryError" npm run tauri android build
 
       - name: Upload Android build artifacts
         uses: actions/upload-artifact@v4
