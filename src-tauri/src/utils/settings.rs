@@ -136,7 +136,7 @@ impl Default for Settings {
             lesson_summary_analyser_enabled: Some(true),
             auto_collapse_sidebar: false,
             auto_expand_sidebar_hover: false,
-            global_search_enabled: true,
+            global_search_enabled: false,
             current_theme: None,
             widget_layout: vec![
                 WidgetLayout { id: "shortcuts".to_string(), x: 0, y: 0, width: 2, height: 1, enabled: true },
