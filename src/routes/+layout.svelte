@@ -154,79 +154,6 @@
   async function startLogin() {
     console.log('[LOGIN_FRONTEND] startLogin called');
     
-    const input = document.getElementById('seqta-qrcode') as HTMLInputElement;
-    console.log('america ya')
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      console.log('[LOGIN_FRONTEND] Processing QR code file:', file.name);
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageData = e.target?.result as ArrayBuffer;
-        console.log('[LOGIN_FRONTEND] Image data loaded, size:', imageData.byteLength);
-        
-        // Create a blob URL from the array buffer
-        const blob = new Blob([imageData], { type: file.type });
-        const imageUrl = URL.createObjectURL(blob);
-        
-        // Create an image element to load the image
-        const img = new Image();
-        img.onload = () => {
-          console.log('[LOGIN_FRONTEND] Image loaded, dimensions:', img.width, 'x', img.height);
-          
-          // Create a canvas to get pixel data
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          if (!ctx) {
-            console.error('[LOGIN_FRONTEND] Could not get canvas context');
-            return;
-          }
-          
-          // Set canvas size to image size
-          canvas.width = img.width;
-          canvas.height = img.height;
-          
-          // Draw image to canvas
-          ctx.drawImage(img, 0, 0);
-          
-          // Get pixel data
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          console.log('[LOGIN_FRONTEND] Canvas pixel data size:', imageData.data.length);
-          
-          // Decode QR code
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          console.log('[LOGIN_FRONTEND] QR code decoded:', code ? 'Success' : 'Failed');
-          
-        if (code) {
-            console.log('[LOGIN_FRONTEND] QR code data:', code.data);
-            // Check if this is a SEQTA deeplink
-            if (code.data.startsWith('seqtalearn://')) {
-              seqtaUrl = code.data;
-              console.log('[LOGIN_FRONTEND] Found SEQTA deeplink:', seqtaUrl);
-            } else {
-              console.error('[LOGIN_FRONTEND] QR code does not contain a valid SEQTA deeplink');
-            }
-          }
-          
-          // Clean up
-          URL.revokeObjectURL(imageUrl);
-        };
-        
-        img.onerror = () => {
-          console.error('[LOGIN_FRONTEND] Failed to load image');
-          URL.revokeObjectURL(imageUrl);
-        };
-        
-        // Load the image
-        img.src = imageUrl;
-      };
-      reader.readAsArrayBuffer(file);
-    }
-    
-    // Wait a bit for the file reader to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
     if (!seqtaUrl) {
       console.error('[LOGIN_FRONTEND] No valid SEQTA URL found');
       return;
@@ -429,7 +356,12 @@
 
   onMount(() => {
     const checkMobile = () => {
-      isMobile = window.innerWidth < 768;
+      const tauri_platform = import.meta.env.TAURI_ENV_PLATFORM
+      if (tauri_platform == "ios" || tauri_platform == "android") {
+        isMobile = true
+      } else {
+        isMobile = false
+      }
       if (isMobile) {
         sidebarOpen = false;
       }
