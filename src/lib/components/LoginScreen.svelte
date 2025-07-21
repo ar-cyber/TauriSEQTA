@@ -2,11 +2,13 @@
   import { Window } from '@tauri-apps/api/window';
   import { Icon } from 'svelte-hero-icons';
   import { Minus, Square2Stack, XMark } from 'svelte-hero-icons';
-  import jsQR from 'jsqr';
   import { authService } from '$lib/services/authService';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { theme } from '$lib/stores/theme';
+
+  // Remove jsQR import and add html5-qrcode import
+  import { Html5Qrcode } from 'html5-qrcode';
 
   interface Props {
     seqtaUrl: string;
@@ -44,6 +46,45 @@
         qrProcessing = false;
       }
     });
+  }
+
+  // Remove old QR file input logic and add new handler using html5-qrcode
+  async function handleQrFileInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    console.debug('[QR] File selected:', file.name, 'type:', file.type, 'size:', file.size);
+    qrProcessing = true;
+    qrError = '';
+    qrSuccess = '';
+    jwtExpiredError = false;
+    try {
+      console.debug('[QR] Starting scan...');
+      // Create an instance of Html5Qrcode and scan the file
+      const html5Qr = new Html5Qrcode('qr-reader-temp');
+      const qrCodeData = await html5Qr.scanFile(file, true);
+      await html5Qr.clear();
+      if (qrCodeData) {
+        console.debug('[QR] Scan success:', qrCodeData);
+        qrSuccess = 'QR code scanned successfully!';
+        onUrlChange(qrCodeData);
+      } else {
+        console.warn('[QR] No QR code found in the image.');
+        qrError = 'No QR code found in the image.';
+      }
+    } catch (err) {
+      console.error('[QR] Failed to scan QR code:', err);
+      let errorMsg = 'Failed to scan QR code. Please try a clearer image.';
+      if (err && typeof err === 'object' && 'message' in err) {
+        errorMsg += ' ' + (err as any).message;
+      } else if (typeof err === 'string') {
+        errorMsg += ' ' + err;
+      }
+      qrError = errorMsg;
+    } finally {
+      console.debug('[QR] Scan finished.');
+      qrProcessing = false;
+    }
   }
 </script>
 
@@ -187,7 +228,9 @@
                 id="seqta-qrcode"
                 type="file"
                 accept="image/*"
-                class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                onchange={handleQrFileInput}
+              />
             </div>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Upload your SEQTA Login QR Code to get started from your mobile login email
@@ -252,3 +295,4 @@
     </div>
   </div>
 </div>
+<div id="qr-reader-temp" style="display:none;"></div>
