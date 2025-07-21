@@ -74,15 +74,15 @@
   async function handleQrFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-    console.debug('[QR] File selected:', file.name, 'type:', file.type, 'size:', file.size);
-    qrProcessing = true;
+    // Always clear error/success/expired state on new file selection
     qrError = '';
     qrSuccess = '';
     jwtExpiredError = false;
+    const file = input.files[0];
+    console.debug('[QR] File selected:', file.name, 'type:', file.type, 'size:', file.size);
+    qrProcessing = true;
     try {
       console.debug('[QR] Starting scan...');
-      // Create an instance of Html5Qrcode and scan the file
       const html5Qr = new Html5Qrcode('qr-reader-temp');
       const qrCodeData = await html5Qr.scanFile(file, true);
       await html5Qr.clear();
@@ -104,6 +104,8 @@
       }
       qrError = errorMsg;
     } finally {
+      // Reset file input value so user can re-select the same file
+      if (input) input.value = '';
       console.debug('[QR] Scan finished.');
       qrProcessing = false;
     }
@@ -111,6 +113,7 @@
 
   async function startLiveScan() {
     liveScanError = '';
+    jwtExpiredError = false;
     // Check for available cameras before opening modal
     try {
       const cameras = await Html5Qrcode.getCameras();
