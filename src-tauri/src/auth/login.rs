@@ -150,7 +150,7 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
     let token = sso_payload.t;
 
     let jar = Arc::new(Jar::default());
-    jar.add_cookie_str(&format!("JSESSIONID={}", &token), &base_url.parse::<Url>().unwrap());
+    jar.add_cookie_str(&token, &base_url.parse::<Url>().unwrap());
     
     let mut headers = header::HeaderMap::new();
     headers.insert("Content-Type", header::HeaderValue::from_static("application/json"));
