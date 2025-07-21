@@ -6,6 +6,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { theme } from '$lib/stores/theme';
+  import { tick } from 'svelte';
 
   // Remove jsQR import and add html5-qrcode import
   import { Html5Qrcode } from 'html5-qrcode';
@@ -24,6 +25,9 @@
   let qrError = $state('');
   let qrSuccess = $state('');
   let jwtExpiredError = $state(false);
+  let showLiveScan = $state(false);
+  let liveScanError = $state('');
+  let html5QrLive: Html5Qrcode | null = null;
 
   // Global error handler to catch JWT expiration errors
   function handleGlobalError(event: ErrorEvent) {
@@ -85,6 +89,52 @@
       console.debug('[QR] Scan finished.');
       qrProcessing = false;
     }
+  }
+
+  async function startLiveScan() {
+    liveScanError = '';
+    // Check for available cameras before opening modal
+    try {
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) {
+        liveScanError = 'No camera found on this device.';
+        showLiveScan = true;
+        return;
+      }
+    } catch (err) {
+      liveScanError = 'Unable to access camera. Please check browser permissions.';
+      showLiveScan = true;
+      return;
+    }
+    showLiveScan = true;
+    await tick(); // Wait for modal DOM
+    try {
+      html5QrLive = new Html5Qrcode('qr-reader-live');
+      await html5QrLive.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 300, height: 300 } },
+        (decodedText) => {
+          qrSuccess = 'QR code scanned successfully!';
+          onUrlChange(decodedText);
+          stopLiveScan();
+        },
+        (err) => {
+          // Optionally log scan errors
+        }
+      );
+    } catch (err) {
+      liveScanError = 'Failed to start live scan. ' + (err && typeof err === 'object' && 'message' in err ? (err as any).message : err);
+      console.error('[QR] Live scan error:', err);
+    }
+  }
+
+  async function stopLiveScan() {
+    if (html5QrLive) {
+      await html5QrLive.stop();
+      await html5QrLive.clear();
+      html5QrLive = null;
+    }
+    showLiveScan = false;
   }
 </script>
 
@@ -231,10 +281,41 @@
                 class="py-3 pr-4 pl-10 w-full rounded-lg border transition-colors text-slate-900 bg-slate-50 border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 onchange={handleQrFileInput}
               />
+              <div class="flex items-center my-2">
+                <div class="flex-grow h-px bg-slate-200 dark:bg-slate-700"></div>
+                <span class="mx-2 text-xs text-slate-400 dark:text-slate-500">or</span>
+                <div class="flex-grow h-px bg-slate-200 dark:bg-slate-700"></div>
+              </div>
+              <button
+                type="button"
+                class="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 accent-bg accent-ring text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                onclick={startLiveScan}
+              >
+                Scan QR Code Live
+              </button>
             </div>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Upload your SEQTA Login QR Code to get started from your mobile login email
             </p>
+            
+            {#if showLiveScan}
+              <div class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/50">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full max-w-md relative">
+                  <button
+                    class="absolute top-2 right-2 p-2 rounded-lg accent-bg accent-ring text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    onclick={stopLiveScan}
+                    aria-label="Close live scan modal"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                  <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Scan QR Code Live</h2>
+                  <div id="qr-reader-live" class="w-72 h-72 mx-auto rounded-lg overflow-hidden bg-black"></div>
+                  {#if liveScanError}
+                    <div class="mt-2 text-red-600 dark:text-red-400">{liveScanError}</div>
+                  {/if}
+                </div>
+              </div>
+            {/if}
             
             {#if qrProcessing}
               <div class="mt-2 text-sm text-blue-600 dark:text-blue-400">
