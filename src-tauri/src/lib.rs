@@ -1,9 +1,4 @@
-#[cfg(not(any(target_os = "ios", target_os = "android")))]
 #[path = "auth/login.rs"]
-mod login;
-
-#[cfg(any(target_os = "ios", target_os = "android"))]
-#[path = "mobilechanges/login.rs"]
 mod login;
 
 #[path = "utils/netgrab.rs"]

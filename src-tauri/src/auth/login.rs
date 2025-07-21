@@ -273,9 +273,6 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
 /// Open a login window and harvest the cookie once the user signs in.
 #[tauri::command]
 pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(), String> {
-    use tauri::{WebviewUrl, WebviewWindowBuilder};
-    use tokio::time::{sleep, Duration};
-
     // Check if this is a QR code deeplink
     if url.starts_with("seqtalearn://") {
         // Parse the deeplink
@@ -295,131 +292,167 @@ pub async fn create_login_window(app: tauri::AppHandle, url: String) -> Result<(
         return Ok(());
     }
 
-    let http_url;
+    // For regular URL-based login, handle differently for desktop vs mobile
+    #[cfg(desktop)]
+    {
+        use tauri::{WebviewUrl, WebviewWindowBuilder};
+        use tokio::time::{sleep, Duration};
 
-    match url.starts_with("https://") {
-        true => http_url = url.clone(),
-        false => {
-            http_url = format!("https://{}", url.clone());
-        }
-    }
+        let http_url = if url.starts_with("https://") {
+            url.clone()
+        } else {
+            format!("https://{}", url.clone())
+        };
 
-    let parsed_url = match Url::parse(&http_url) {
-        Ok(u) => u,
-        Err(e) => {
-            return Err(format!("Invalid URL: {}", e));
-        }
-    };
+        let parsed_url = match Url::parse(&http_url) {
+            Ok(u) => u,
+            Err(e) => {
+                return Err(format!("Invalid URL: {}", e));
+            }
+        };
 
-    let full_url: Url = match Url::parse(&format!("{}/#?page=/welcome", parsed_url)) {
-        Ok(u) => u,
-        Err(e) => {
-            return Err(format!("Parsing error: {}", e));
-        }
-    };
+        let full_url: Url = match Url::parse(&format!("{}/#?page=/welcome", parsed_url)) {
+            Ok(u) => u,
+            Err(e) => {
+                return Err(format!("Parsing error: {}", e));
+            }
+        };
 
-    // Spawn the login window
-    WebviewWindowBuilder::new(&app, "seqta_login", WebviewUrl::External(full_url.clone()))
-        .title("SEQTA Login")
-        .inner_size(900.0, 700.0)
-        .build()
-        .map_err(|e| format!("Failed to build window: {}", e))?;
+        // Spawn the login window
+        WebviewWindowBuilder::new(&app, "seqta_login", WebviewUrl::External(full_url.clone()))
+            .title("SEQTA Login")
+            .inner_size(900.0, 700.0)
+            .build()
+            .map_err(|e| format!("Failed to build window: {}", e))?;
 
-    // Clone handles for async block
-    let app_handle_clone = app.clone();
+        // Clone handles for async block
+        let app_handle_clone = app.clone();
 
-    let mut counter = 0; // Creates a counter so that we don't quit authentication upon the first request (which redirects)
-                         // Start polling in a background task
-    tauri::async_runtime::spawn(async move {
-        for _ in 0..1920 {
-            // Poll for 1920 seconds max
-            // Wait 1 second between polls
-            sleep(Duration::from_secs(1)).await;
+        let mut counter = 0; // Creates a counter so that we don't quit authentication upon the first request (which redirects)
+                             // Start polling in a background task
+        tauri::async_runtime::spawn(async move {
+            for _ in 0..1920 {
+                // Poll for 1920 seconds max
+                // Wait 1 second between polls
+                sleep(Duration::from_secs(1)).await;
 
-            // Construct the full URL with the page parameter
-
-            // Try to get cookies from the login window
-            if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
-                if counter > 5 {
-                    // Check if the auth has finished through url
-                    match webview.url() {
-                        Ok(current_url) => {
-                            if !(current_url.to_string().contains("#?page=/welcome")) {
-                                continue;
+                // Try to get cookies from the login window
+                if let Some(webview) = app_handle_clone.get_webview_window("seqta_login") {
+                    if counter > 5 {
+                        // Check if the auth has finished through url
+                        match webview.url() {
+                            Ok(current_url) => {
+                                if !(current_url.to_string().contains("#?page=/welcome")) {
+                                    continue;
+                                }
+                            }
+                            Err(_) => {
+                                // URL retrieval failed, continue polling
                             }
                         }
-                        Err(_) => {
-                            // URL retrieval failed, continue polling
-                        }
-                    }
 
-                    match webview.cookies() {
-                        Ok(cookies) => {
-                            for cookie in cookies.clone() {
-                                if cookie.name() == "JSESSIONID"
-                                    && cookie.domain().unwrap_or("None") == parsed_url.host_str().unwrap_or("None")
-                                {
-                                    if let Some(expire_time) = cookie.expires_datetime() {
-                                        let now = OffsetDateTime::now_utc();
-                                        if expire_time > now {
+                        match webview.cookies() {
+                            Ok(cookies) => {
+                                for cookie in cookies.clone() {
+                                    if cookie.name() == "JSESSIONID"
+                                        && cookie.domain().unwrap_or("None") == parsed_url.host_str().unwrap_or("None")
+                                    {
+                                        if let Some(expire_time) = cookie.expires_datetime() {
+                                            let now = OffsetDateTime::now_utc();
+                                            if expire_time > now {
 
-                                            let value = cookie.value().to_string();
-                                            let base_url = http_url.clone();
+                                                let value = cookie.value().to_string();
+                                                let base_url = http_url.clone();
 
-                                            // Convert all cookies to our storage format
-                                            let additional_cookies = cookies
-                                                .iter()
-                                                .filter(|c| c.name() != "JSESSIONID") // Skip JSESSIONID as it's stored separately
-                                                .filter(|c| {
-                                                    if let Some(cookie_domain) = c.domain() {
-                                                        if let Some(host) = parsed_url.host_str() {
-                                                            host.ends_with(
-                                                                cookie_domain
-                                                                    .trim_start_matches('.'),
-                                                            )
+                                                // Convert all cookies to our storage format
+                                                let additional_cookies = cookies
+                                                    .iter()
+                                                    .filter(|c| c.name() != "JSESSIONID") // Skip JSESSIONID as it's stored separately
+                                                    .filter(|c| {
+                                                        if let Some(cookie_domain) = c.domain() {
+                                                            if let Some(host) = parsed_url.host_str() {
+                                                                host.ends_with(
+                                                                    cookie_domain
+                                                                        .trim_start_matches('.'),
+                                                                )
+                                                            } else {
+                                                                false
+                                                            }
                                                         } else {
                                                             false
                                                         }
-                                                    } else {
-                                                        false
-                                                    }
-                                                }) // only include cookies for the same domain
-                                                .map(|c| session::Cookie {
-                                                    name: c.name().to_string(),
-                                                    value: c.value().to_string(),
-                                                    domain: c.domain().map(|s| s.to_string()),
-                                                    path: c.path().map(|s| s.to_string()),
-                                                })
-                                                .collect();
+                                                    }) // only include cookies for the same domain
+                                                    .map(|c| session::Cookie {
+                                                        name: c.name().to_string(),
+                                                        value: c.value().to_string(),
+                                                        domain: c.domain().map(|s| s.to_string()),
+                                                        path: c.path().map(|s| s.to_string()),
+                                                    })
+                                                    .collect();
 
-                                            // Save session with all cookies
-                                            let session = session::Session {
-                                                base_url,
-                                                jsessionid: value,
-                                                additional_cookies,
-                                            };
+                                                // Save session with all cookies
+                                                let session = session::Session {
+                                                    base_url,
+                                                    jsessionid: value,
+                                                    additional_cookies,
+                                                };
 
-                                            let _ = session.save();
+                                                let _ = session.save();
 
-                                            let _ = webview.close();
-                                            force_reload(app);
-                                            return; // Stop polling once found
+                                                let _ = webview.close();
+                                                force_reload(app);
+                                                return; // Stop polling once found
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        Err(_) => {
-                            // Cookie retrieval failed, continue polling
+                            Err(_) => {
+                                // Cookie retrieval failed, continue polling
+                            }
                         }
                     }
                 }
+                counter += 1; // increment the counter at the end of the loop
             }
-            counter += 1; // increment the counter at the end of the loop
-        }
 
-        // JSESSIONID not found within timeout
-    });
+            // JSESSIONID not found within timeout
+        });
+    }
+
+    #[cfg(not(desktop))]
+    {
+        // For mobile, we'll use the system browser for authentication
+        // since webview windows aren't supported on mobile
+        let http_url = if url.starts_with("https://") {
+            url.clone()
+        } else {
+            format!("https://{}", url.clone())
+        };
+
+        let parsed_url = match Url::parse(&http_url) {
+            Ok(u) => u,
+            Err(e) => {
+                return Err(format!("Invalid URL: {}", e));
+            }
+        };
+
+        let full_url = match Url::parse(&format!("{}/#?page=/welcome", parsed_url)) {
+            Ok(u) => u,
+            Err(e) => {
+                return Err(format!("Parsing error: {}", e));
+            }
+        };
+
+        // On mobile, we'll use the system browser for authentication
+        // This is a simplified approach - in a real app, you might want to
+        // implement a more sophisticated mobile authentication flow
+        println!("Opening URL in system browser: {}", full_url);
+        
+        // For now, we'll return an error indicating that manual authentication is needed
+        // In a production app, you might want to implement deep linking back to the app
+        return Err("Mobile authentication requires manual login through the system browser. Please implement a proper mobile authentication flow.".to_string());
+    }
 
     Ok(())
 }
