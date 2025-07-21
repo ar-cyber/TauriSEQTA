@@ -109,6 +109,13 @@ jobs:
           echo "Available NDK tools:"
           ls -la $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/ | head -10
 
+      - name: Fix Gradle Java home
+        run: |
+          echo "Fixing Gradle Java home for Linux..."
+          echo "org.gradle.java.home=$JAVA_HOME" >> src-tauri/gen/android/gradle.properties
+          echo "Fixed gradle.properties:"
+          cat src-tauri/gen/android/gradle.properties
+
       - name: Build Android APK
         run: npm run tauri android build
 
