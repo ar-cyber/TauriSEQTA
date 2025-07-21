@@ -119,8 +119,12 @@ jobs:
           echo "Current gradle.properties content:"
           cat src-tauri/gen/android/gradle.properties || echo "gradle.properties not found"
           
-          # Override the Java home in gradle.properties
-          echo "org.gradle.java.home=$JAVA_HOME" > src-tauri/gen/android/gradle.properties
+          # Create gradle.properties with all necessary properties
+          cat > src-tauri/gen/android/gradle.properties << EOF
+          org.gradle.java.home=$JAVA_HOME
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
           
           # Also check and fix gradle-wrapper.properties if needed
           echo "Current gradle-wrapper.properties content:"
