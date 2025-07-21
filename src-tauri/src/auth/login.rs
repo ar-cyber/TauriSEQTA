@@ -150,7 +150,7 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
     let token = sso_payload.t;
 
     let jar = Arc::new(Jar::default());
-    jar.add_cookie_str(&token, &base_url.parse::<Url>().unwrap());
+    jar.add_cookie_str(&format!("JSESSIONID={}", &token), &base_url.parse::<Url>().unwrap());
     
     let mut headers = header::HeaderMap::new();
     headers.insert("Content-Type", header::HeaderValue::from_static("application/json"));
@@ -268,7 +268,7 @@ async fn perform_qr_auth(sso_payload: SeqtaSSOPayload) -> Result<session::Sessio
     // Create session with the JWT token as the session ID
     let session = session::Session {
         base_url,
-        jsessionid: jsessionid.expect("Could not get JSESSIONID"),
+        jsessionid: jsessionid.expect("Could not get JSESSIONID").replace("JSESSIONID=", ""),
         additional_cookies: vec![], // QR auth doesn't use traditional cookies
     };
 
