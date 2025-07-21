@@ -10,6 +10,7 @@ mod analytics;
 #[path = "utils/session.rs"]
 mod session;
 
+
 use tauri::Manager;
 #[cfg(desktop)]
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
@@ -218,7 +219,7 @@ pub fn run() {
             settings::check_cloud_settings,
             analytics::save_analytics,
             analytics::load_analytics,
-            analytics::delete_analytics,
+            analytics::delete_analytics
         ])
         .setup(|app| {
             #[cfg(desktop)]
