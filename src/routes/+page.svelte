@@ -395,7 +395,7 @@
   });
 </script>
 
-<div class="p-4 sm:p-6 lg:p-8 mx-auto min-h-screen max-w-7xl">
+<div class="p-4 sm:p-6 lg:p-8 xl:p-12 mx-auto min-h-screen max-w-7xl">
   <!-- Edit Mode Toggle -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
     {#if isEditMode}
@@ -419,13 +419,13 @@
   </div>
 
   <!-- Widget Grid -->
-  <div class="widget-grid relative grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 min-h-screen">
+  <div class="widget-grid relative grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 min-h-screen">
     {#if isEditMode}
       <!-- Grid Overlay for Visual Feedback -->
-      <div class="absolute inset-0 pointer-events-none hidden sm:grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+      <div class="absolute inset-0 pointer-events-none hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {#each Array.from({ length: 20 }, (_, i) => i) as row}
           <div class="border border-dashed border-slate-300 dark:border-slate-600 opacity-30" style="grid-row: {row + 1}; grid-column: 1;"></div>
-          <div class="border border-dashed border-slate-300 dark:border-slate-600 opacity-30 hidden sm:block" style="grid-row: {row + 1}; grid-column: 2;"></div>
+          <div class="border border-dashed border-slate-300 dark:border-slate-600 opacity-30 hidden lg:block" style="grid-row: {row + 1}; grid-column: 2;"></div>
         {/each}
       </div>
     {/if}
@@ -435,8 +435,8 @@
       
       {#if renderedWidget}
         <div
-          class="widget-container relative {isEditMode ? 'cursor-move' : ''} bg-white/80 dark:bg-slate-900/60 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-3 sm:p-4 transition-all duration-200 {draggedWidget === layout.id ? 'opacity-75 shadow-lg scale-105 z-50' : 'hover:shadow-md'} {isEditMode ? 'hover:border-accent-300 dark:hover:border-accent-600' : ''}"
-          style="grid-column: 1 / span 1; grid-row: {layout.y + 1} / span {layout.height};"
+          class="widget-container relative {isEditMode ? 'cursor-move' : ''} bg-white/80 dark:bg-slate-900/60 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-6 transition-all duration-200 {draggedWidget === layout.id ? 'opacity-75 shadow-lg scale-105 z-50' : 'hover:shadow-md'} {isEditMode ? 'hover:border-accent-300 dark:hover:border-accent-600' : ''}"
+          style="grid-column: {layout.width === 2 ? '1 / span 2' : layout.x === 0 ? '1 / span 1' : '2 / span 1'}; grid-row: {layout.y + 1} / span {layout.height};"
           onmousedown={(e) => handleDragStart(e, layout.id)}
         >
           <!-- Widget Header (Edit Mode) -->
@@ -518,6 +518,12 @@
   @media (min-width: 640px) {
     .widget-container {
       min-height: 200px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .widget-container {
+      min-height: 250px;
     }
   }
 </style>
