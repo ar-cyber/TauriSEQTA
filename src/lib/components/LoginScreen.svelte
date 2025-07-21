@@ -10,6 +10,7 @@
 
   // Remove jsQR import and add html5-qrcode import
   import { Html5Qrcode } from 'html5-qrcode';
+  import { onMount } from 'svelte';
 
   interface Props {
     seqtaUrl: string;
@@ -28,6 +29,23 @@
   let showLiveScan = $state(false);
   let liveScanError = $state('');
   let html5QrLive: Html5Qrcode | null = null;
+  let isMobile = $state(false);
+
+  onMount(() => {
+    const checkMobile = () => {
+      const tauri_platform = import.meta.env.TAURI_ENV_PLATFORM;
+      if (tauri_platform == "ios" || tauri_platform == "android") {
+        isMobile = true;
+      } else {
+        isMobile = false;
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  });
 
   // Global error handler to catch JWT expiration errors
   function handleGlobalError(event: ErrorEvent) {
@@ -152,26 +170,28 @@
     </div>
 
     <!-- Window Controls -->
-    <div class="flex items-center space-x-2" data-tauri-drag-region>
-      <button
-        class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-        onclick={() => appWindow.minimize()}
-        aria-label="Minimize">
-        <Icon src={Minus} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
-      </button>
-      <button
-        class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-        onclick={() => appWindow.toggleMaximize()}
-        aria-label="Maximize">
-        <Icon src={Square2Stack} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
-      </button>
-      <button
-        class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 group hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-        onclick={() => appWindow.close()}
-        aria-label="Close">
-        <Icon src={XMark} class="w-4 h-4 transition duration-200 text-slate-600 dark:text-slate-400 group-hover:text-white" />
-      </button>
-    </div>
+    {#if !isMobile}
+      <div class="flex items-center space-x-2" data-tauri-drag-region>
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+          onclick={() => appWindow.minimize()}
+          aria-label="Minimize">
+          <Icon src={Minus} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        </button>
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+          onclick={() => appWindow.toggleMaximize()}
+          aria-label="Maximize">
+          <Icon src={Square2Stack} class="w-4 h-4 text-slate-600 dark:text-slate-400" />
+        </button>
+        <button
+          class="flex justify-center items-center w-8 h-8 rounded-lg transition-all duration-200 group hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          onclick={() => appWindow.close()}
+          aria-label="Close">
+          <Icon src={XMark} class="w-4 h-4 transition duration-200 text-slate-600 dark:text-slate-400 group-hover:text-white" />
+        </button>
+      </div>
+    {/if}
   </div>
 
   <!-- Login Content -->
