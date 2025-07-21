@@ -82,6 +82,7 @@ jobs:
           echo "NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_HOME" >> $GITHUB_ENV
           echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "GRADLE_OPTS=-Dorg.gradle.java.home=$JAVA_HOME" >> $GITHUB_ENV
           echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_NDK_HOME" >> $GITHUB_ENV
           
           # Debug: Print environment variables
@@ -89,6 +90,7 @@ jobs:
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
           echo "NDK_HOME: $NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
+          echo "GRADLE_OPTS: $GRADLE_OPTS"
 
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
@@ -112,12 +114,28 @@ jobs:
       - name: Fix Gradle Java home
         run: |
           echo "Fixing Gradle Java home for Linux..."
-          echo "org.gradle.java.home=$JAVA_HOME" >> src-tauri/gen/android/gradle.properties
+          
+          # Check if gradle.properties exists and show current content
+          echo "Current gradle.properties content:"
+          cat src-tauri/gen/android/gradle.properties || echo "gradle.properties not found"
+          
+          # Override the Java home in gradle.properties
+          echo "org.gradle.java.home=$JAVA_HOME" > src-tauri/gen/android/gradle.properties
+          
+          # Also check and fix gradle-wrapper.properties if needed
+          echo "Current gradle-wrapper.properties content:"
+          cat src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties || echo "gradle-wrapper.properties not found"
+          
           echo "Fixed gradle.properties:"
           cat src-tauri/gen/android/gradle.properties
+          
+          echo "JAVA_HOME value: $JAVA_HOME"
 
       - name: Build Android APK
-        run: npm run tauri android build
+        run: |
+          echo "Building with JAVA_HOME: $JAVA_HOME"
+          echo "Building with GRADLE_OPTS: $GRADLE_OPTS"
+          JAVA_HOME=$JAVA_HOME GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME" npm run tauri android build
 
       - name: Upload Android build artifacts
         uses: actions/upload-artifact@v4
